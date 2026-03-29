@@ -1,0 +1,225 @@
+/**
+ * ForThePeople.in — Your District. Your Data. Your Right.
+ * © 2026 Jayanth M B. MIT License with Attribution.
+ * https://github.com/jayanthmb14/forthepeople
+ */
+
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import type { ContributorsResponse, ContributorItem } from "@/app/api/payment/contributors/route";
+
+const TIER_EMOJI: Record<string, string> = {
+  chai: "☕",
+  supporter: "🙏",
+  district: "🏛️",
+  state: "🇮🇳",
+  patron: "🌏",
+  custom: "💝",
+  "Buy me a Chai": "☕",
+  "Monthly Supporter": "🙏",
+  "District Sponsor": "🏛️",
+  "State Champion": "🇮🇳",
+  "All-India Patron": "🌏",
+};
+
+function amountColor(rupees: number): string {
+  if (rupees >= 10000) return "#D97706";
+  if (rupees >= 1000) return "#2563EB";
+  if (rupees >= 100) return "#16A34A";
+  return "#6B6B6B";
+}
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+function ContributorCard({ item }: { item: ContributorItem }) {
+  const emoji = (item.tier && TIER_EMOJI[item.tier]) || "💝";
+  const color = amountColor(item.amountRupees);
+  return (
+    <div
+      style={{
+        width: 120,
+        minWidth: 120,
+        background: "#FFFFFF",
+        border: "1px solid #E8E8E4",
+        borderRadius: 12,
+        padding: "14px 12px",
+        flexShrink: 0,
+      }}
+    >
+      <div style={{ fontSize: 22, marginBottom: 6 }}>{emoji}</div>
+      <div
+        style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: "#1A1A1A",
+          marginBottom: 4,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {item.name}
+      </div>
+      <div
+        style={{
+          fontSize: 14,
+          fontWeight: 800,
+          color,
+          fontFamily: "var(--font-mono, monospace)",
+          marginBottom: 4,
+          letterSpacing: "-0.3px",
+        }}
+      >
+        ₹{item.amountRupees.toLocaleString("en-IN")}
+      </div>
+      {item.message && (
+        <div
+          style={{
+            fontSize: 10,
+            color: "#6B6B6B",
+            lineHeight: 1.4,
+            marginBottom: 4,
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+          }}
+        >
+          &ldquo;{item.message.slice(0, 30)}{item.message.length > 30 ? "…" : ""}&rdquo;
+        </div>
+      )}
+      <div style={{ fontSize: 10, color: "#9B9B9B" }}>{timeAgo(item.paidAt)}</div>
+    </div>
+  );
+}
+
+function SkeletonCard() {
+  return (
+    <div
+      style={{
+        width: 120,
+        minWidth: 120,
+        background: "#F5F5F0",
+        borderRadius: 12,
+        padding: "14px 12px",
+        flexShrink: 0,
+      }}
+    >
+      {[22, 40, 14, 10].map((h, i) => (
+        <div
+          key={i}
+          style={{
+            height: h,
+            background: "#E8E8E4",
+            borderRadius: 4,
+            marginBottom: 6,
+            animation: "pulse 1.5s ease-in-out infinite",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default function ContributorWall() {
+  const { data, isLoading } = useQuery<ContributorsResponse>({
+    queryKey: ["contributors"],
+    queryFn: () => fetch("/api/payment/contributors").then((r) => r.json()),
+    refetchInterval: 60_000,
+    staleTime: 50_000,
+  });
+
+  const contributors = data?.contributors ?? [];
+  const shouldScroll = contributors.length >= 4;
+
+  return (
+    <>
+      <style>{`
+        @keyframes wall-scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .wall-track {
+          animation: wall-scroll 30s linear infinite;
+        }
+        .wall-track:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      <div style={{ marginTop: 48 }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1A1A1A", letterSpacing: "-0.3px", margin: 0 }}>
+            🎉 Live Contributions
+          </h2>
+          {!isLoading && data && data.count > 0 && (
+            <div style={{ fontSize: 12, color: "#6B6B6B" }}>
+              <span style={{ fontWeight: 700, color: "#2563EB", fontFamily: "var(--font-mono, monospace)" }}>
+                ₹{data.totalRupees.toLocaleString("en-IN")}
+              </span>
+              {" "}from{" "}
+              <span style={{ fontWeight: 700, color: "#1A1A1A" }}>{data.count}</span>
+              {" "}supporter{data.count !== 1 ? "s" : ""}
+            </div>
+          )}
+        </div>
+
+        {/* Scrolling track */}
+        <div
+          style={{
+            background: "#FAFAF8",
+            border: "1px solid #E8E8E4",
+            borderRadius: 14,
+            padding: "16px",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          {isLoading ? (
+            <div style={{ display: "flex", gap: 12 }}>
+              {Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)}
+            </div>
+          ) : contributors.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "32px 16px" }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>💝</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "#1A1A1A", marginBottom: 6 }}>
+                Be the first to support ForThePeople.in!
+              </div>
+              <div style={{ fontSize: 13, color: "#6B6B6B" }}>
+                Your name will appear here.
+              </div>
+            </div>
+          ) : (
+            <div style={{ overflow: "hidden" }}>
+              <div
+                className={shouldScroll ? "wall-track" : undefined}
+                style={{ display: "flex", gap: 12, width: shouldScroll ? "max-content" : undefined }}
+              >
+                {(shouldScroll ? [...contributors, ...contributors] : contributors).map((item, i) => (
+                  <ContributorCard key={`${item.name}-${i}`} item={item} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Summary bar */}
+        {!isLoading && data && data.count > 0 && (
+          <div style={{ textAlign: "center", marginTop: 12, fontSize: 13, color: "#6B6B6B" }}>
+            ₹{data.totalRupees.toLocaleString("en-IN")} contributed by{" "}
+            <strong style={{ color: "#1A1A1A" }}>{data.count}</strong> supporters — Thank you! 🙏
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
