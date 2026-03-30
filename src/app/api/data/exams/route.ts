@@ -13,9 +13,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import redis from "@/lib/redis";
 
-type RouteContext = { params: Promise<{ module: string }> };
-
-export async function GET(req: NextRequest, _ctx: RouteContext) {
+export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   const districtSlug = sp.get("district") ?? "";
   const stateSlug = sp.get("state") ?? "";
