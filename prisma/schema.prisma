@@ -22,6 +22,7 @@ model State {
   active      Boolean    @default(false)
   capital     String?
   districts   District[]
+  governmentExams GovernmentExam[]
 }
 
 model District {
@@ -87,6 +88,8 @@ model District {
   moduleInsights      AIModuleInsight[]
   healthScore         DistrictHealthScore?
   newsActionQueue     NewsActionQueue[]
+  governmentExams     GovernmentExam[]
+  departmentStaffing  DepartmentStaffing[]
 
   @@unique([stateId, slug])
 }
@@ -1334,4 +1337,59 @@ model FeatureVote {
 
   @@unique([featureId, fingerprint])
   @@index([featureId])
+}
+
+// ═══ EXAMS & STAFFING ══════════════════════════════════════════
+
+model GovernmentExam {
+  id               String    @id @default(cuid())
+  level            String    // "state" | "district"
+  stateId          String?
+  state            State?    @relation(fields: [stateId], references: [id])
+  districtId       String?
+  district         District? @relation(fields: [districtId], references: [id])
+
+  title            String
+  department       String
+  vacancies        Int?
+  qualification    String?
+  ageLimit         String?   // e.g. "18-25 yrs (+3 OBC)"
+  applicationFee   String?   // e.g. "Gen: ₹500, SC/ST: Free"
+  selectionProcess String?   // e.g. "Prelims -> Mains -> Interview"
+  payScale         String?   // e.g. "Level 6: ₹35,400"
+
+  applyUrl         String?   // Genuine official link
+  notificationUrl  String?   // Official PDF
+  syllabusUrl      String?
+
+  status           String    @default("upcoming") // "upcoming", "open", "closed", "results"
+  announcedDate    DateTime?
+  startDate        DateTime?
+  endDate          DateTime?
+  admitCardDate    DateTime?
+  examDate         DateTime?
+  resultDate       DateTime?
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([stateId, status])
+  @@index([districtId, status])
+}
+
+model DepartmentStaffing {
+  id               String    @id @default(cuid())
+  districtId       String
+  district         District  @relation(fields: [districtId], references: [id])
+  module           String    // "health", "police", "schools"
+  department       String
+  roleName         String    // "Doctors", "Police Inspectors", "Teachers"
+  sanctionedPosts  Int
+  workingStrength  Int
+  vacantPosts      Int
+  asOfDate         DateTime
+  sourceUrl        String?
+  updatedAt        DateTime  @updatedAt
+
+  @@index([districtId, module])
 }

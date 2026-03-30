@@ -57,7 +57,7 @@ CRITICAL DATE RULE: This article is ${ageDays} day(s) old.
 Classify into one of these modules:
 leaders, infrastructure, budget, water, crops, weather, police, elections,
 education, health, transport, schemes, housing, power, courts, industries,
-jjm, gram-panchayat, alerts, sugar-factory, soil, population, news
+jjm, gram-panchayat, alerts, sugar-factory, soil, population, news, exams, staffing
 
 Return ONLY valid JSON (no markdown):
 {
@@ -77,6 +77,8 @@ Module-specific extractedData fields:
 - water: {"damName":"KRS","storagePct":72,"waterLevel":110.5,"inflow":1200,"outflow":800}
 - power: {"area":"Mandya city","type":"Scheduled","reason":"...","startTime":"2026-03-29T06:00","endTime":"2026-03-29T09:00"}
 - elections: {"alertTitle":"...","description":"..."}
+- exams: {"examTitle":"...","department":"...","vacancies":500,"status":"open","applyUrl":"https://..."}
+- staffing: {"module":"health|police|schools","department":"Primary Health Centre","roleName":"Doctors","sanctionedPosts":10,"workingStrength":8,"vacantPosts":2}
 
 Use "news" module if it doesn't clearly fit another. confidence = how certain you are (0-1).`;
 
@@ -284,6 +286,79 @@ export async function executeNewsAction(
             },
           });
           console.log(`[NewsAction] ✅ Created PowerOutage: ${data.area}`);
+        }
+        break;
+      }
+
+      case "exams": {
+        const data = extractedData as Record<string, unknown>;
+        if (data.examTitle && data.department) {
+          const state = await prisma.state.findFirst({ where: { districts: { some: { id: districtId } } } });
+          await prisma.governmentExam.create({
+            data: {
+              level: "state",
+              stateId: state?.id ?? null,
+              districtId,
+              title: data.examTitle as string,
+              department: data.department as string,
+              vacancies: typeof data.vacancies === "number" ? data.vacancies : null,
+              status: (data.status as string) ?? "upcoming",
+              applyUrl: (data.applyUrl as string) ?? articleUrl,
+              notificationUrl: articleUrl,
+              announcedDate: new Date(),
+            },
+          });
+          console.log(`[NewsAction] ✅ Created GovernmentExam: ${data.examTitle}`);
+        }
+        break;
+      }
+
+      case "staffing": {
+        const data = extractedData as Record<string, unknown>;
+        if (
+          data.module &&
+          data.department &&
+          data.roleName &&
+          typeof data.sanctionedPosts === "number" &&
+          typeof data.workingStrength === "number"
+        ) {
+          const vacantPosts = Math.max(0, (data.sanctionedPosts as number) - (data.workingStrength as number));
+          const existing = await prisma.departmentStaffing.findFirst({
+            where: {
+              districtId,
+              module: data.module as string,
+              department: data.department as string,
+              roleName: data.roleName as string,
+            },
+          });
+          if (existing) {
+            await prisma.departmentStaffing.update({
+              where: { id: existing.id },
+              data: {
+                sanctionedPosts: data.sanctionedPosts as number,
+                workingStrength: data.workingStrength as number,
+                vacantPosts,
+                asOfDate: new Date(),
+                sourceUrl: articleUrl,
+              },
+            });
+            console.log(`[NewsAction] ✅ Updated DepartmentStaffing: ${data.module}/${data.roleName}`);
+          } else {
+            await prisma.departmentStaffing.create({
+              data: {
+                districtId,
+                module: data.module as string,
+                department: data.department as string,
+                roleName: data.roleName as string,
+                sanctionedPosts: data.sanctionedPosts as number,
+                workingStrength: data.workingStrength as number,
+                vacantPosts,
+                asOfDate: new Date(),
+                sourceUrl: articleUrl,
+              },
+            });
+            console.log(`[NewsAction] ✅ Created DepartmentStaffing: ${data.module}/${data.roleName}`);
+          }
         }
         break;
       }

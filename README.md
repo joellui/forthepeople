@@ -10,7 +10,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Districts](https://img.shields.io/badge/districts_live-3-green.svg)
-![Modules](https://img.shields.io/badge/dashboards-29_per_district-orange.svg)
+![Modules](https://img.shields.io/badge/dashboards-30_per_district-orange.svg)
 
 </div>
 

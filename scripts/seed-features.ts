@@ -7,8 +7,7 @@ import { prisma } from "../src/lib/db";
 
 const FEATURES = [
   // ── Language & Accessibility ─────────────────────────────
-  { title: "Kannada Language Support", description: "Full Kannada translation for all modules, navigation, and AI insights. Karnataka citizens can browse entirely in ಕನ್ನಡ.", category: "Language", icon: "🗣️", priority: 10 },
-  { title: "Hindi Language Support", description: "Full Hindi translation for north Indian states. Essential for scaling to UP, Bihar, MP, Rajasthan.", category: "Language", icon: "🇮🇳", priority: 9 },
+  { title: "Multilingual Support — Vote for Your Language", description: "ForThePeople.in should speak your language. Citizens vote for which languages they want — Kannada, Hindi, Tamil, Telugu, Malayalam, Marathi, and more. The most-voted languages get built first. This is a community decision, not a top-down roadmap.", category: "Accessibility", icon: "🗣️", priority: 10 },
   { title: "Voice Search in Regional Languages", description: "Search by speaking in Kannada, Hindi, Tamil, Telugu. Uses Web Speech API — no typing needed. Critical for rural users.", category: "Accessibility", icon: "🎤", priority: 8 },
   { title: "Offline Mode (PWA)", description: "Add to Home Screen and browse even without internet. Essential for rural areas with poor connectivity.", category: "Accessibility", icon: "📱", priority: 7 },
 
@@ -35,11 +34,26 @@ const FEATURES = [
 
   // ── Expansion ────────────────────────────────────────────
   { title: "Unlock Your District", description: "Vote for your district to go live next! We expand based on citizen demand. The most-voted district gets priority.", category: "Expansion", icon: "🗺️", priority: 10 },
+  { title: "Android App", description: "Native Android app on the Google Play Store. Push notifications, offline reading, faster load times, and a better experience on Android devices — the most-used smartphone OS in India.", category: "Expansion", icon: "🤖", priority: 10 },
+  { title: "iPhone App", description: "Native iOS app on the App Store. Built for iPhone users in Karnataka and beyond — smooth, fast, and always up-to-date with district data, alerts, and news.", category: "Expansion", icon: "🍎", priority: 10 },
   { title: "AI Chatbot in Local Language", description: "Ask questions about your district in Kannada, Hindi, Tamil. Get instant answers from government data.", category: "Accessibility", icon: "🤖", priority: 8 },
 ];
 
 async function main() {
   console.log(`\n🌱 Seeding ${FEATURES.length} feature requests...\n`);
+
+  // Remove old hardcoded language proposals (replaced by community multilingual vote)
+  await prisma.featureRequest.deleteMany({
+    where: {
+      title: {
+        in: [
+          "Kannada Language Support",
+          "Hindi Language Support",
+        ],
+      },
+    },
+  });
+  console.log("  🧹 Removed old language proposals\n");
 
   let created = 0;
   let skipped = 0;

@@ -41,8 +41,8 @@ export async function cacheSet(
 /** TTL by module — live data shorter, stable data longer */
 export function getModuleTTL(module: string): number {
   const live = new Set(["crops", "weather", "water", "dam", "alerts", "news", "power"]);
-  const veryStable = new Set(["leaders", "offices", "elections", "schools", "services", "taluks"]);
+  const stable = new Set(["leaders", "offices", "elections", "schools", "services", "taluks", "exams"]);
   if (live.has(module)) return 60;
-  if (veryStable.has(module)) return 600;
+  if (stable.has(module)) return 600;
   return 300;
 }

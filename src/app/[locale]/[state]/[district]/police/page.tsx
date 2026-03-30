@@ -12,6 +12,7 @@ import { Shield, Phone, MapPin } from "lucide-react";
 import { usePolice } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, SectionLabel, LoadingShell, ErrorBlock, DataTable } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import StaffingWidget from "@/components/district/StaffingWidget";
 
 function PolicePageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -51,6 +52,15 @@ function PolicePageInner({ params }: { params: Promise<{ locale: string; state: 
             <StatCard label={`Crimes (${latestYear})`} value={totalCrimes.toLocaleString("en-IN")} />
             <StatCard label="Traffic Revenue" value={`₹${(totalTraffic / 100000).toFixed(1)}L`} />
           </div>
+
+          {/* Sanctioned vs. Filled staffing widget */}
+          <StaffingWidget
+            module="police"
+            roleLabel="Police Force"
+            district={district}
+            state={state}
+            accentColor="#2563EB"
+          />
 
           {/* Station Directory */}
           <SectionLabel>Police Stations</SectionLabel>

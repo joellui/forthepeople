@@ -668,6 +668,56 @@ export function useFamousPersonalities(district: string, state: string) {
   return useDistrictData<FamousPersonality[]>("famous-personalities", district, state);
 }
 
+// ── Exams & Staffing ───────────────────────────────────────
+
+export interface ExamsData {
+  stateExams: Array<{
+    id: string;
+    level: string;
+    title: string;
+    department: string;
+    vacancies: number | null;
+    qualification: string | null;
+    ageLimit: string | null;
+    applicationFee: string | null;
+    selectionProcess: string | null;
+    payScale: string | null;
+    applyUrl: string | null;
+    notificationUrl: string | null;
+    syllabusUrl: string | null;
+    status: string;
+    announcedDate: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    admitCardDate: string | null;
+    examDate: string | null;
+    resultDate: string | null;
+  }>;
+  districtExams: Array<ExamsData["stateExams"][number]>;
+  staffing: Array<{
+    id: string;
+    module: string;
+    department: string;
+    roleName: string;
+    sanctionedPosts: number;
+    workingStrength: number;
+    vacantPosts: number;
+    asOfDate: string;
+    sourceUrl: string | null;
+  }>;
+  summary: {
+    totalStateExams: number;
+    totalDistrictExams: number;
+    openExams: number;
+    upcomingExams: number;
+    totalStaffingRecords: number;
+  };
+}
+
+export function useExams(district: string, state: string) {
+  return useDistrictData<ExamsData>("exams", district, state);
+}
+
 // ── AI Insight ────────────────────────────────────────────
 export interface AIInsight {
   id: string;

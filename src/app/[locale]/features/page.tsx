@@ -26,7 +26,6 @@ interface Feature {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Language:       "#7C3AED",
   Accessibility:  "#0891B2",
   Community:      "#16A34A",
   Data:           "#2563EB",

@@ -1,0 +1,425 @@
+/**
+ * ForThePeople.in — Your District. Your Data. Your Right.
+ * © 2026 Jayanth M B. MIT License with Attribution.
+ * https://github.com/jayanthmb14/forthepeople
+ */
+
+"use client";
+import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
+import AIInsightCard from "@/components/common/AIInsightCard";
+import ExamStepper from "@/components/district/ExamStepper";
+import { ModuleHeader, SectionLabel, LoadingShell, ErrorBlock, EmptyBlock } from "@/components/district/ui";
+import { useDistrictData } from "@/hooks/useDistrictData";
+import { use } from "react";
+import { BookOpen, GraduationCap, ExternalLink, Users } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+// ── Types ─────────────────────────────────────────────────
+interface GovernmentExam {
+  id: string;
+  level: string;
+  title: string;
+  department: string;
+  vacancies: number | null;
+  qualification: string | null;
+  ageLimit: string | null;
+  applicationFee: string | null;
+  selectionProcess: string | null;
+  payScale: string | null;
+  applyUrl: string | null;
+  notificationUrl: string | null;
+  syllabusUrl: string | null;
+  status: string;
+  announcedDate: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  admitCardDate: string | null;
+  examDate: string | null;
+  resultDate: string | null;
+}
+
+interface DepartmentStaffing {
+  id: string;
+  module: string;
+  department: string;
+  roleName: string;
+  sanctionedPosts: number;
+  workingStrength: number;
+  vacantPosts: number;
+  asOfDate: string;
+  sourceUrl: string | null;
+}
+
+interface ExamsResponse {
+  stateExams: GovernmentExam[];
+  districtExams: GovernmentExam[];
+  staffing: DepartmentStaffing[];
+  summary: {
+    totalStateExams: number;
+    totalDistrictExams: number;
+    openExams: number;
+    upcomingExams: number;
+    totalStaffingRecords: number;
+  };
+}
+
+// ── Status config ────────────────────────────────────────
+const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
+  upcoming: { color: "#2563EB", bg: "#EFF6FF", label: "Upcoming" },
+  open:     { color: "#16A34A", bg: "#DCFCE7", label: "Applications Open" },
+  closed:   { color: "#6B7280", bg: "#F3F4F6", label: "Closed" },
+  results:   { color: "#D97706", bg: "#FEF3C7", label: "Results Out" },
+};
+
+// ── Staffing widget ────────────────────────────────────────
+function StaffingWidget({ staffing }: { staffing: DepartmentStaffing[] }) {
+  if (!staffing.length) return null;
+
+  return (
+    <div style={{
+      background: "#FFF",
+      border: "1px solid #E8E8E4",
+      borderRadius: 14,
+      padding: "16px 20px",
+      marginBottom: 24,
+    }}>
+      <SectionLabel>🏛️ Sanctioned vs. Filled (Department Staffing)</SectionLabel>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
+        {staffing.map((s) => {
+          const filledPct = s.sanctionedPosts > 0
+            ? Math.round((s.workingStrength / s.sanctionedPosts) * 100)
+            : 0;
+          const vacantPct = 100 - filledPct;
+          const dangerLevel = vacantPct > 30;
+
+          const barColor = dangerLevel ? "#DC2626" : filledPct >= 70 ? "#16A34A" : "#D97706";
+
+          const moduleColors: Record<string, string> = {
+            health: "#DC2626", police: "#2563EB", schools: "#7C3AED",
+          };
+          const accent = moduleColors[s.module] ?? "#6B7280";
+
+          return (
+            <div key={s.id} style={{
+              border: `1px solid ${accent}25`,
+              borderRadius: 10,
+              padding: "12px 14px",
+              background: `${accent}05`,
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#1A1A1A" }}>{s.roleName}</div>
+                  <div style={{ fontSize: 10, color: "#9B9B9B" }}>{s.department}</div>
+                </div>
+                <span style={{
+                  fontSize: 10, fontWeight: 700,
+                  color: dangerLevel ? "#DC2626" : accent,
+                  background: dangerLevel ? "#FEE2E2" : `${accent}15`,
+                  padding: "2px 6px", borderRadius: 20,
+                }}>
+                  {s.module}
+                </span>
+              </div>
+
+              {/* Progress bar */}
+              <div style={{ background: "#F0F0EC", borderRadius: 4, height: 6, overflow: "hidden", marginBottom: 6 }}>
+                <div style={{
+                  background: barColor,
+                  width: `${filledPct}%`,
+                  height: "100%",
+                  borderRadius: 4,
+                  transition: "width 600ms ease",
+                }} />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#6B7280" }}>
+                <span className="font-data" style={{ fontFamily: "var(--font-mono)" }}>
+                  Filled: <strong style={{ color: "#1A1A1A" }}>{s.workingStrength}</strong>/{s.sanctionedPosts}
+                </span>
+                <span style={{
+                  color: dangerLevel ? "#DC2626" : "#9B9B9B",
+                  fontWeight: dangerLevel ? 700 : 400,
+                }}>
+                  Vacant: {s.vacantPosts} ({vacantPct}%)
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Exam detail card ───────────────────────────────────────
+function ExamCard({ exam, isStateLevel }: { exam: GovernmentExam; isStateLevel: boolean }) {
+  const cfg = STATUS_CONFIG[exam.status] ?? STATUS_CONFIG.upcoming;
+
+  return (
+    <div style={{
+      background: "#FFF",
+      border: "1px solid #E8E8E4",
+      borderRadius: 14,
+      padding: "18px 20px",
+      boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+      display: "flex",
+      flexDirection: "column",
+      gap: 0,
+    }}>
+      {/* Header row */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 12 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A", lineHeight: 1.3, marginBottom: 3 }}>
+            {exam.title}
+          </div>
+          <div style={{ fontSize: 12, color: "#6B7280" }}>{exam.department}</div>
+        </div>
+        <span style={{
+          fontSize: 11,
+          fontWeight: 700,
+          color: cfg.color,
+          background: cfg.bg,
+          padding: "3px 10px",
+          borderRadius: 20,
+          flexShrink: 0,
+          border: `1px solid ${cfg.color}30`,
+          whiteSpace: "nowrap",
+        }}>
+          {cfg.label}
+        </span>
+      </div>
+
+      {/* Stepper */}
+      <div style={{ marginBottom: 14, padding: "12px 8px", background: "#FAFAF8", borderRadius: 10 }}>
+        <ExamStepper
+          status={exam.status}
+          announcedDate={exam.announcedDate}
+          startDate={exam.startDate}
+          endDate={exam.endDate}
+          admitCardDate={exam.admitCardDate}
+          examDate={exam.examDate}
+          resultDate={exam.resultDate}
+          applyUrl={exam.applyUrl}
+        />
+      </div>
+
+      {/* Student perspective grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px 16px", marginBottom: 12 }}>
+        {[
+          { label: "Vacancies", value: exam.vacancies?.toLocaleString("en-IN") ?? "TBA", mono: true },
+          { label: "Age Limit", value: exam.ageLimit ?? "—", mono: false },
+          { label: "Qualification", value: exam.qualification ?? "—", mono: false },
+          { label: "Application Fee", value: exam.applicationFee ?? "—", mono: false },
+          { label: "Pay Scale", value: exam.payScale ?? "—", mono: false },
+          { label: "Selection", value: exam.selectionProcess ?? "—", mono: false },
+        ].map((item) => (
+          <div key={item.label}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "#9B9B9B", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: 2 }}>
+              {item.label}
+            </div>
+            <div style={{
+              fontSize: 12,
+              color: "#374151",
+              fontFamily: item.mono ? "var(--font-mono)" : "inherit",
+              fontWeight: item.mono ? 600 : 400,
+            }}>
+              {item.value}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Action buttons */}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: "auto" }}>
+        {exam.applyUrl && exam.status === "open" && (
+          <a
+            href={exam.applyUrl.startsWith("http") ? exam.applyUrl : `https://${exam.applyUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "7px 14px",
+              background: "#16A34A",
+              color: "#FFF",
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            Apply Now <ExternalLink size={11} />
+          </a>
+        )}
+        {exam.notificationUrl && (
+          <a
+            href={exam.notificationUrl.startsWith("http") ? exam.notificationUrl : `https://${exam.notificationUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "7px 14px",
+              background: "#EFF6FF",
+              color: "#2563EB",
+              border: "1px solid #BFDBFE",
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            Notification <ExternalLink size={11} />
+          </a>
+        )}
+        {exam.syllabusUrl && (
+          <a
+            href={exam.syllabusUrl.startsWith("http") ? exam.syllabusUrl : `https://${exam.syllabusUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "7px 14px",
+              background: "#F5F3FF",
+              color: "#7C3AED",
+              border: "1px solid #DDD6FE",
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            Syllabus <ExternalLink size={11} />
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Stats row ─────────────────────────────────────────────
+function StatsRow({ summary }: { summary: ExamsResponse["summary"] }) {
+  const stats = [
+    { icon: BookOpen, label: "Total Exams", value: summary.totalStateExams + summary.totalDistrictExams, color: "#2563EB" },
+    { icon: GraduationCap, label: "Open Now", value: summary.openExams, color: "#16A34A" },
+    { icon: Users, label: "Upcoming", value: summary.upcomingExams, color: "#D97706" },
+    { icon: Users, label: "Staffing Records", value: summary.totalStaffingRecords, color: "#7C3AED" },
+  ];
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 10, marginBottom: 24 }}>
+      {stats.map((s) => (
+        <div key={s.label} style={{
+          background: "#FFF",
+          border: "1px solid #E8E8E4",
+          borderRadius: 12,
+          padding: "14px 16px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+            <s.icon size={14} style={{ color: s.color }} />
+            <span style={{ fontSize: 10, fontWeight: 600, color: "#9B9B9B", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              {s.label}
+            </span>
+          </div>
+          <div className="font-data" style={{ fontSize: 22, fontWeight: 700, color: "#1A1A1A", fontFamily: "var(--font-mono)" }}>
+            {s.value}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Inner page ────────────────────────────────────────────
+function ExamsPageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
+  const { locale, state, district } = use(params);
+  const base = `/${locale}/${state}/${district}`;
+
+  const { data: apiResponse, isLoading, error } = useDistrictData<ExamsResponse>("exams", district, state);
+  const examsData = apiResponse?.data;
+  const meta = apiResponse?.meta;
+
+  const allExams = examsData ? [...(examsData.stateExams ?? []), ...(examsData.districtExams ?? [])] : [];
+  const openExams = allExams.filter((e) => e.status === "open");
+  const upcomingExams = allExams.filter((e) => e.status === "upcoming");
+  const closedExams = allExams.filter((e) => e.status === "closed" || e.status === "results");
+
+  return (
+    <div style={{ padding: 24 }}>
+      <ModuleHeader
+        icon={GraduationCap as LucideIcon}
+        title="Exams & Jobs"
+        description="Government exam notifications, eligibility, fees, and department staffing data"
+        backHref={base}
+      />
+      <AIInsightCard module="exams" district={district} />
+
+      {isLoading && <LoadingShell rows={4} />}
+      {error && <ErrorBlock />}
+      {!isLoading && !error && !examsData && <EmptyBlock icon="📝" message="No exam data available yet" />}
+
+      {!isLoading && examsData && (
+        <>
+          {/* Summary stats */}
+          <StatsRow summary={examsData.summary} />
+
+          {/* Staffing widget */}
+          <StaffingWidget staffing={examsData.staffing ?? []} />
+
+          {/* Open exams */}
+          {openExams.length > 0 && (
+            <>
+              <SectionLabel>🟢 Applications Open ({openExams.length})</SectionLabel>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 14, marginBottom: 28 }}>
+                {openExams.map((e) => (
+                  <ExamCard key={e.id} exam={e} isStateLevel={e.level === "state"} />
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Upcoming exams */}
+          {upcomingExams.length > 0 && (
+            <>
+              <SectionLabel>📋 Upcoming Exams ({upcomingExams.length})</SectionLabel>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 14, marginBottom: 28 }}>
+                {upcomingExams.map((e) => (
+                  <ExamCard key={e.id} exam={e} isStateLevel={e.level === "state"} />
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Closed / Results */}
+          {closedExams.length > 0 && (
+            <>
+              <SectionLabel>🔒 Closed / Results ({closedExams.length})</SectionLabel>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 14, marginBottom: 28 }}>
+                {closedExams.map((e) => (
+                  <ExamCard key={e.id} exam={e} isStateLevel={e.level === "state"} />
+                ))}
+              </div>
+            </>
+          )}
+
+          {!allExams.length && (
+            <EmptyBlock icon="📝" message="No exam notifications yet. Check back after the next scraping cycle." />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function ExamsPage({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
+  return (
+    <ModuleErrorBoundary moduleName="Exams & Jobs">
+      <ExamsPageInner params={params} />
+    </ModuleErrorBoundary>
+  );
+}

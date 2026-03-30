@@ -1,4 +1,4 @@
-// ── ForThePeople.in — 29 Dashboard Modules ───────────────
+// ── ForThePeople.in — 30 Dashboard Modules ───────────────
 import {
   LayoutDashboard, Map, Users, Waves, Factory,
   PiggyBank, Wheat, BarChart3, Cloud, Shield,
@@ -6,7 +6,7 @@ import {
   Home, Zap, GraduationCap, Tractor,
   ClipboardList, FilePen, Building, Scale, Heart,
   AlertTriangle, Building2, Handshake, Newspaper,
-  Database, Flame, Star,
+  Database, Flame, Star, BookOpen,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -34,6 +34,7 @@ export const SIDEBAR_MODULES: SidebarModule[] = [
 
   // ── Civic ────────────────────────────────────────────────
   { slug: "schemes",          label: "Gov. Schemes",        emoji: "📋", icon: ScrollText,       description: "Active schemes, eligibility, apply links", group: "civic" },
+  { slug: "exams",            label: "Exams & Jobs",         emoji: "📝", icon: BookOpen,         description: "Govt. exam notifications, eligibility, staffing data", group: "civic" },
   { slug: "services",         label: "Services Guide",      emoji: "📋", icon: FileText,         description: "How to get certificates, land records", group: "civic" },
   { slug: "elections",        label: "Elections",           emoji: "📊", icon: Vote,             description: "Results, turnout, booth finder", group: "civic" },
   { slug: "transport",        label: "Transport",           emoji: "🚌", icon: Bus,              description: "Bus routes, trains, auto fares", group: "civic" },

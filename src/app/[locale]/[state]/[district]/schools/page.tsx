@@ -7,6 +7,7 @@
 "use client";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import StaffingWidget from "@/components/district/StaffingWidget";
 import { use, useState } from "react";
 import { GraduationCap } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
@@ -67,6 +68,15 @@ function SchoolsPageInner({ params }: { params: Promise<{ locale: string; state:
             <StatCard label="Teachers" value={totalTeachers.toLocaleString("en-IN")} />
             <StatCard label="Student:Teacher" value={`${avgRatio.toFixed(0)}:1`} />
           </div>
+
+          {/* Sanctioned vs. Filled staffing widget */}
+          <StaffingWidget
+            module="schools"
+            roleLabel="Teaching Staff"
+            district={district}
+            state={state}
+            accentColor="#7C3AED"
+          />
 
           {/* Pass rate chart */}
           {passChart.length > 0 && (

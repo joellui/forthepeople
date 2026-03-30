@@ -40,6 +40,8 @@ import { scrapeTransport } from "./jobs/transport";
 import { scrapeSchemes } from "./jobs/schemes";
 import { scrapeSoil } from "./jobs/soil";
 import { scrapeElections } from "./jobs/elections";
+// ── 12-hour scrapers ─────────────────────────────────────
+import { scrapeExams } from "./jobs/exams";
 
 // ── Fetch active districts from DB ───────────────────────
 async function getActiveDistricts(): Promise<Array<{ slug: string; name: string; stateSlug: string; stateName: string }>> {
@@ -145,6 +147,9 @@ async function scheduleJobs() {
     // ── Every 12 hours: Infrastructure ───────────────────
     cron.schedule("0 */12 * * *", () => runJob("infrastructure", scrapeInfrastructure, ctx, ["infrastructure"]));
 
+    // ── Every 12 hours: Exams & Jobs ─────────────────────
+    cron.schedule("0 */12 * * *", () => runJob("exams", scrapeExams, ctx, ["exams"]));
+
     // ── Daily 2 AM: RTI stats ─────────────────────────────
     cron.schedule("0 2 * * *", () => runJob("rti", scrapeRTI, ctx, ["rti"]));
 
@@ -195,6 +200,7 @@ async function main() {
     await runJob("crops", scrapeCrops, ctx, ["crops", "overview"]);
     await runJob("news", scrapeNews, ctx, ["news"]);
     await runJob("alerts", scrapeAlerts, ctx, ["alerts", "overview"]);
+    await runJob("exams", scrapeExams, ctx, ["exams"]);
   }
 
   console.log("[Scheduler] All cron jobs scheduled. Running indefinitely...");

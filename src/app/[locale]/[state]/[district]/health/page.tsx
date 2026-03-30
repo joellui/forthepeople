@@ -7,6 +7,7 @@
 "use client";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import StaffingWidget from "@/components/district/StaffingWidget";
 import { use } from "react";
 import { Heart, Phone, ExternalLink } from "lucide-react";
 import { ModuleHeader, SectionLabel } from "@/components/district/ui";
@@ -37,6 +38,15 @@ function HealthPageInner({ params }: { params: Promise<{ locale: string; state: 
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Heart} title="Health" description="Emergency helplines, hospitals, and health schemes" backHref={base} />
       <AIInsightCard module="health" district={district} />
+
+      {/* Sanctioned vs. Filled staffing widget */}
+      <StaffingWidget
+        module="health"
+        roleLabel="Healthcare Staff"
+        district={district}
+        state={state}
+        accentColor="#DC2626"
+      />
 
       {/* Emergency Helplines */}
       <SectionLabel>Emergency Helplines</SectionLabel>
