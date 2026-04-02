@@ -607,24 +607,26 @@ Header.tsx          — Logo (🗣️ ForThePeople.in), navigation, district sel
 MarketTicker.tsx    — 40px ticker bar: SENSEX, NIFTY, Gold, Silver, Crude, USD/INR
                       5-min refresh during market hours (IST 9:15–15:30 Mon–Fri)
                       30-min refresh off-hours. Mobile: CSS scroll animation.
-HomeDrilldown.tsx   — Main state→district drill-down interface
+HomeDrilldown.tsx   — Unified scrollable homepage layout (same on desktop + mobile)
+                      Desktop: 2-col grid (60% map + 40% districts), Mobile: stacked
+                      Sections: Stats → Map + Districts → Live Data → How It Works → Request → Support
 LiveDataPreview.tsx — Horizontally scrollable district preview cards
 HomepageStats.tsx   — Animated counters (useCountUp hook): districts, modules, data points
 HowItWorks.tsx      — 3-column explainer section
 DistrictRequestSection.tsx — State/district dropdowns for requesting new districts
 ContributorWall.tsx — Compact supporter wall (isPublic=true contributions)
-DistrictCards.tsx   — Active district cards showing health grade + live snippet
 FeatureVoteWidget.tsx — Top-voted feature requests widget
 ```
 
 ### District Cards (on homepage)
 - Show DistrictHealthScore grade (A+, A, B+, B, C+, C, D, F)
-- Live weather snippet from last WeatherReading
-- Link to `/en/[state]/[district]`
+- Live weather, dam storage, crop price snippets per district
+- All active districts across all states (not just Karnataka)
+- Link to `/en/[state]/[district]` using dynamic state slug
 
 ### Stats Bar
-- Active districts: 3
-- Data modules: 30
+- Active districts: 8 (Mandya, Bengaluru Urban, Mysuru, Chennai, Mumbai, Kolkata, New Delhi, Lucknow)
+- Data modules: 29
 - Records in DB: ~50,000+
 - Contributor count from Contribution table
 

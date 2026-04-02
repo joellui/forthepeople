@@ -462,18 +462,21 @@ DATABASE_URL=<neon-prod-url> npx tsx scripts/calculate-health-scores.ts
 
 ## HOMEPAGE STRUCTURE
 
+Unified scrollable layout — same sections on desktop and mobile.
+Desktop: 2-col grid (60% map + 40% district cards), Mobile: stacked.
+
 ```
 1. Header (Logo + nav + district selector)
-2. MarketTicker (40px bar: SENSEX, NIFTY, Gold, Silver, Crude, USD/INR — 5min refresh)
-3. HomeDrilldown (state→district drill-down)
-4. DistrictCards (active districts with health grade + live data snippet)
+2. MarketTicker (40px bar: SENSEX, NIFTY, Gold, Silver, Crude, USD/INR — 5min market hours, 30min off-hours)
+3. HomepageStats (animated counters: 8 districts, 29 modules, data points)
+4. DrillDownMap + ActiveDistrictsCard (2-col on desktop, stacked on mobile)
+   - Map: India states, click to drill into state
+   - District cards: all 8 active districts with health grade, weather, dam, crop snippets
 5. LiveDataPreview (horizontally scrollable preview cards, links to active districts)
-6. HomepageStats (animated counters: districts, modules, data points)
-7. HowItWorks (3-column explainer)
-8. FeatureVoteWidget (top-voted feature requests)
-9. DistrictRequestSection (vote to add new districts)
-10. ContributorWall (compact, isPublic=true supporters)
-11. Footer (NDSAP disclaimer + "Built with ❤️ by Jayanth M B")
+6. HowItWorks (3-column explainer)
+7. DistrictRequestSection (vote to add new districts)
+8. Support button
+9. DisclaimerStrip (NDSAP + "Built by Jayanth M B")
 ```
 
 ---

@@ -90,9 +90,9 @@ STEP 3: Build DrillDownMap component at src/components/map/DrillDownMap.tsx
     Selected: #EFF6FF with 2px #2563EB border
 
   RESPONSIVE:
-    Desktop: 60% width on left, stats panel on right
-    Tablet: full width, stats below
-    Mobile: full width, simplified (fewer labels), stats below
+    Unified scrollable layout for all screen sizes
+    Desktop: 2-col grid (60% map + 40% district cards), rest stacked below
+    Tablet/Mobile: fully stacked, single column
     Min touch target: 44×44px for each region
 
   FALLBACK: If GeoJSON fails to load, show a grid-based selector:
