@@ -9,7 +9,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { Search, Globe, ChevronDown, Menu, Lock, Users } from "lucide-react";
+import { Search, Globe, ChevronDown, Menu, Lock, Users, Github } from "lucide-react";
 import { INDIA_STATES, getState, getDistrict, PILOT_STATE, PILOT_DISTRICT } from "@/lib/constants/districts";
 import MobileSidebar from "./MobileSidebar";
 
@@ -372,6 +372,29 @@ export default function Header({ locale }: HeaderProps) {
             </div>
           </>
         )}
+
+        {/* GitHub link */}
+        <a
+          href="https://github.com/jayanthmb14/forthepeople"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="View source on GitHub"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 34,
+            height: 34,
+            borderRadius: 8,
+            border: "1px solid #E8E8E4",
+            background: "#FAFAF8",
+            color: "#4B4B4B",
+            cursor: "pointer",
+            flexShrink: 0,
+          }}
+        >
+          <Github size={16} />
+        </a>
 
         {/* Vote on Features — eye-catching CTA */}
         <Link

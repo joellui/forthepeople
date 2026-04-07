@@ -166,7 +166,7 @@ async function fetchIBJAPrices(): Promise<{
 const FALLBACK: TickerItem[] = [
   { symbol: "SENSEX", label: "Sensex", value: "74,248", change: "+312", changePct: 0.42, direction: "up", unit: "" },
   { symbol: "NIFTY50", label: "Nifty 50", value: "22,519", change: "+87", changePct: 0.39, direction: "up", unit: "" },
-  { symbol: "GOLD", label: "Gold (24K)", value: "₹1,47,786", change: "–", changePct: 0, direction: "flat", unit: "/10g" },
+  { symbol: "GOLD", label: "Gold (24K)", value: "₹14,779", change: "–", changePct: 0, direction: "flat", unit: "/g" },
   { symbol: "SILVER", label: "Silver", value: "₹2,30,881", change: "–", changePct: 0, direction: "flat", unit: "/kg" },
   { symbol: "USD_INR", label: "USD/INR", value: "₹84.52", change: "+0.08", changePct: 0.09, direction: "up", unit: "" },
   { symbol: "CRUDE", label: "Crude", value: "$78.40", change: "-0.90", changePct: -1.14, direction: "down", unit: "/bbl" },
@@ -250,16 +250,19 @@ export async function GET() {
   const ibja = await fetchIBJAPrices();
   if (ibja.gold) {
     fetchedAny = true;
+    // IBJA gives price per 10g — convert to per gram
+    const goldPerGram = ibja.gold.price / 10;
+    const goldChangePerGram = ibja.gold.change / 10;
     items.push({
       symbol: "GOLD",
       label: "Gold (24K)",
-      value: `₹${fmt(Math.round(ibja.gold.price))}`,
-      change: ibja.gold.change !== 0
-        ? `${ibja.gold.change >= 0 ? "+" : ""}₹${fmt(Math.round(Math.abs(ibja.gold.change)))}`
+      value: `₹${fmt(Math.round(goldPerGram))}`,
+      change: goldChangePerGram !== 0
+        ? `${goldChangePerGram >= 0 ? "+" : ""}₹${fmt(Math.round(Math.abs(goldChangePerGram)))}`
         : "–",
       changePct: ibja.gold.changePct,
       direction: ibja.gold.change > 0 ? "up" : ibja.gold.change < 0 ? "down" : "flat",
-      unit: "/10g",
+      unit: "/g",
     });
   }
   if (ibja.silver) {
