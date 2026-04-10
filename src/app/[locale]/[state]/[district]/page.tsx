@@ -62,6 +62,7 @@ export default async function DistrictPage({
         literacy: districtData.literacy,
         sexRatio: districtData.sexRatio,
         active: districtData.active,
+        badges: districtData.badges,
         taluks: districtData.taluks.map((t) => ({
           slug: t.slug,
           name: t.name,

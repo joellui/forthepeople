@@ -13,7 +13,8 @@ import { useBudget, useRevenue, useAIInsight } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, SectionLabel, LoadingShell, DataTable, ProgressBar, AIInsightBanner } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
 import DataSourceBanner from "@/components/common/DataSourceBanner";
-import { getModuleSources } from "@/lib/constants/state-config";
+import { getModuleSources, getStateConfig } from "@/lib/constants/state-config";
+import ModuleNews from "@/components/district/ModuleNews";
 
 function FinancePageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -51,9 +52,15 @@ function FinancePageInner({ params }: { params: Promise<{ locale: string; state:
       <ModuleHeader icon={PiggyBank} title="Finance & Budget" description="District budget allocation, utilisation, lapsed funds and revenue collections" backHref={base} />
 
       {/* AI-crawler readable summary */}
-      <p style={{ fontSize: 13, color: "#6B6B6B", lineHeight: 1.7, marginBottom: 16, padding: "12px 16px", background: "#FAFAF8", borderRadius: 8, borderLeft: "3px solid #7C3AED" }}>
-        This page shows the annual budget allocation and expenditure data for this district&apos;s panchayati raj institutions and government departments, sourced from PFMS (Public Financial Management System) and eGramSwaraj. Figures are in Indian Rupees in Crores (1 Crore = ₹10 million). Unspent budget that lapses at fiscal year end is highlighted as &ldquo;lapsed funds.&rdquo;
-      </p>
+      {(() => {
+        const sc = getStateConfig(state);
+        const stateFinSource = sc ? `${sc.name} Finance Department, PFMS, eGramSwaraj` : "State Finance Department, PFMS, eGramSwaraj";
+        return (
+          <p style={{ fontSize: 13, color: "#6B6B6B", lineHeight: 1.7, marginBottom: 16, padding: "12px 16px", background: "#FAFAF8", borderRadius: 8, borderLeft: "3px solid #7C3AED" }}>
+            This page shows the annual budget allocation and expenditure data for this district&apos;s government departments, sourced from {stateFinSource}. Figures are in Indian Rupees in Crores (1 Crore = ₹10 million). Unspent budget that lapses at fiscal year end is highlighted as &ldquo;lapsed funds.&rdquo;
+          </p>
+        );
+      })()}
       {aiInsight && (
         <AIInsightBanner
           headline={aiInsight.headline}
@@ -145,6 +152,8 @@ function FinancePageInner({ params }: { params: Promise<{ locale: string; state:
           />
         </>
       )}
+
+      <ModuleNews district={district} state={state} locale={locale} module="budget" />
 
       {/* Revenue collections */}
       {!rLoading && revChart.length > 0 && (

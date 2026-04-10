@@ -53,6 +53,18 @@ const MODULE_TAGS: Record<string, { icon: string; label: string; bg: string; tex
   "news":               { icon: "📰", label: "General",        bg: "#F9FAFB", text: "#6B7280", border: "#E5E7EB" },
 };
 
+function cleanHtml(text: string): string {
+  return text
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const h = Math.floor(diff / 3600000);
@@ -155,8 +167,8 @@ function NewsPageInner({ params }: { params: Promise<{ locale: string; state: st
                           <span style={{ fontSize: 11, color: "#9B9B9B", display: "flex", alignItems: "center", gap: 3 }}><Clock size={10} />{timeAgo(n.publishedAt)}</span>
                           <span style={{ fontSize: 11, color: "#9B9B9B" }}>{n.source}</span>
                         </div>
-                        <div style={{ fontSize: 17, fontWeight: 700, color: "#1A1A1A", lineHeight: 1.4, marginBottom: n.summary ? 8 : 0 }}>{n.headline}</div>
-                        {n.summary && <div style={{ fontSize: 13, color: "#6B6B6B", lineHeight: 1.6 }}>{n.summary}</div>}
+                        <div style={{ fontSize: 17, fontWeight: 700, color: "#1A1A1A", lineHeight: 1.4, marginBottom: n.summary ? 8 : 0 }}>{cleanHtml(n.headline)}</div>
+                        {n.summary && <div style={{ fontSize: 13, color: "#6B6B6B", lineHeight: 1.6 }}>{cleanHtml(n.summary)}</div>}
                         {n.targetModule && <ModuleTag targetModule={n.targetModule} moduleAction={n.moduleAction} base={base} />}
                       </div>
                       {n.url && (
@@ -188,8 +200,8 @@ function NewsPageInner({ params }: { params: Promise<{ locale: string; state: st
                         <span style={{ fontSize: 11, color: "#9B9B9B", display: "flex", alignItems: "center", gap: 3 }}><Clock size={10} />{timeAgo(n.publishedAt)}</span>
                         <span style={{ fontSize: 11, color: "#9B9B9B" }}>{n.source}</span>
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A", lineHeight: 1.4, marginBottom: n.summary ? 4 : 0 }}>{n.headline}</div>
-                      {n.summary && <div style={{ fontSize: 12, color: "#9B9B9B", lineHeight: 1.5 }}>{n.summary}</div>}
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A", lineHeight: 1.4, marginBottom: n.summary ? 4 : 0 }}>{cleanHtml(n.headline)}</div>
+                      {n.summary && <div style={{ fontSize: 12, color: "#9B9B9B", lineHeight: 1.5 }}>{cleanHtml(n.summary)}</div>}
                       {n.targetModule && <ModuleTag targetModule={n.targetModule} moduleAction={n.moduleAction} base={base} />}
                     </div>
                     {n.url && (

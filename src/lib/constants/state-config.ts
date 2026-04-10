@@ -51,9 +51,22 @@ export interface StateConfig {
   // Governance terminology
   districtHeadTitle: string;
   subDistrictUnit: string;
+  subDistrictUnitPlural: string;
 
   // State police
   policeSystemType: "commissionerate" | "sp";
+
+  // Urban district handling
+  healthSubLabel: string;
+  villageLabel: string;
+  showVillages: boolean;
+  gramPanchayatApplicable: boolean;
+  jjmApplicable: boolean;
+  municipalBody?: string;
+  waterBoard?: string;
+  stateHealthScheme?: string;
+  lastElectionYear?: number;
+  lastElectionType?: string;
 
   // State-specific data sources
   dataSources: DataSourceEntry[];
@@ -79,7 +92,16 @@ const KARNATAKA: StateConfig = {
   agroClimaticZone: "Southern Plateau and Hills / South Interior Karnataka",
   districtHeadTitle: "Deputy Commissioner",
   subDistrictUnit: "Taluk",
+  subDistrictUnitPlural: "Taluks",
   policeSystemType: "sp",
+  healthSubLabel: "Taluk Hospitals",
+  villageLabel: "Villages",
+  showVillages: true,
+  gramPanchayatApplicable: true,
+  jjmApplicable: true,
+  stateHealthScheme: "Arogya Karnataka",
+  lastElectionYear: 2023,
+  lastElectionType: "Karnataka assembly",
   dataSources: [
     { module: "Power Outages", source: "BESCOM", type: "Collected", frequency: "Every 15 minutes", url: "https://bescom.karnataka.gov.in", status: "live" },
     { module: "Dam Levels", source: "Karnataka Water Resources Department", type: "Collected", frequency: "Daily", url: null, status: "live" },
@@ -111,7 +133,18 @@ const TELANGANA: StateConfig = {
   agroClimaticZone: "Southern Plateau and Hills",
   districtHeadTitle: "Collector & District Magistrate",
   subDistrictUnit: "Mandal",
+  subDistrictUnitPlural: "Mandals",
   policeSystemType: "commissionerate",
+  healthSubLabel: "Area Hospitals",
+  villageLabel: "Localities",
+  showVillages: false,
+  gramPanchayatApplicable: false,
+  jjmApplicable: false,
+  municipalBody: "GHMC",
+  waterBoard: "HMWSSB",
+  stateHealthScheme: "Aarogyasri",
+  lastElectionYear: 2023,
+  lastElectionType: "Telangana assembly",
   dataSources: [
     { module: "Power Outages", source: "TGSPDCL", type: "Collected", frequency: "Every 15 minutes", url: "https://tgsouthernpower.org", status: "static" },
     { module: "Dam Levels", source: "Telangana Irrigation Department", type: "Collected", frequency: "Daily", url: "https://irrigation.telangana.gov.in", status: "static" },
@@ -142,7 +175,18 @@ const DELHI: StateConfig = {
   agroClimaticZone: "Trans-Gangetic Plains",
   districtHeadTitle: "District Magistrate",
   subDistrictUnit: "Tehsil",
+  subDistrictUnitPlural: "Tehsils",
   policeSystemType: "commissionerate",
+  healthSubLabel: "Zonal Hospitals",
+  villageLabel: "Wards",
+  showVillages: false,
+  gramPanchayatApplicable: false,
+  jjmApplicable: false,
+  municipalBody: "MCD",
+  waterBoard: "DJB",
+  stateHealthScheme: "Delhi Arogya Kosh",
+  lastElectionYear: 2025,
+  lastElectionType: "Delhi assembly",
   dataSources: [
     { module: "Power Outages", source: "BSES / TPDDL", type: "Collected", frequency: "Every 15 minutes", url: "https://www.bsesdelhi.com", status: "static" },
     { module: "Dam Levels", source: "Delhi Jal Board", type: "Collected", frequency: "Daily", url: "https://delhijalboard.delhi.gov.in", status: "static" },
@@ -173,7 +217,18 @@ const MAHARASHTRA: StateConfig = {
   agroClimaticZone: "West Coast Plains and Ghats / Western Plateau",
   districtHeadTitle: "Collector & District Magistrate",
   subDistrictUnit: "Taluka",
+  subDistrictUnitPlural: "Talukas",
   policeSystemType: "commissionerate",
+  healthSubLabel: "Sub-District Hospitals",
+  villageLabel: "Villages",
+  showVillages: false,
+  gramPanchayatApplicable: false,
+  jjmApplicable: false,
+  municipalBody: "BMC",
+  waterBoard: "BMC Water Dept",
+  stateHealthScheme: "MJPJAY",
+  lastElectionYear: 2024,
+  lastElectionType: "Maharashtra assembly",
   dataSources: [
     { module: "Power Outages", source: "BEST / Adani Electricity", type: "Collected", frequency: "Every 15 minutes", url: "https://www.bestundertaking.com", status: "static" },
     { module: "Dam Levels", source: "Maharashtra Water Resources Department", type: "Collected", frequency: "Daily", url: "https://wrd.maharashtra.gov.in", status: "static" },
@@ -204,7 +259,18 @@ const WEST_BENGAL: StateConfig = {
   agroClimaticZone: "Lower Gangetic Plain",
   districtHeadTitle: "District Magistrate",
   subDistrictUnit: "Block",
+  subDistrictUnitPlural: "Blocks",
   policeSystemType: "commissionerate",
+  healthSubLabel: "Block Hospitals",
+  villageLabel: "Wards",
+  showVillages: false,
+  gramPanchayatApplicable: false,
+  jjmApplicable: false,
+  municipalBody: "KMC",
+  waterBoard: "KMC Water Supply",
+  stateHealthScheme: "Swasthya Sathi",
+  lastElectionYear: 2021,
+  lastElectionType: "West Bengal assembly",
   dataSources: [
     { module: "Power Outages", source: "CESC / WBSEDCL", type: "Collected", frequency: "Every 15 minutes", url: "https://www.cesc.co.in", status: "static" },
     { module: "Dam Levels", source: "WB Irrigation & Waterways Department", type: "Collected", frequency: "Daily", url: "https://wbiwd.gov.in", status: "static" },
@@ -235,7 +301,18 @@ const TAMIL_NADU: StateConfig = {
   agroClimaticZone: "East Coast Plains and Hills",
   districtHeadTitle: "Collector",
   subDistrictUnit: "Taluk",
+  subDistrictUnitPlural: "Taluks",
   policeSystemType: "commissionerate",
+  healthSubLabel: "Taluk Hospitals",
+  villageLabel: "Villages",
+  showVillages: false,
+  gramPanchayatApplicable: false,
+  jjmApplicable: false,
+  municipalBody: "GCC",
+  waterBoard: "CMWSSB",
+  stateHealthScheme: "CMCHIS",
+  lastElectionYear: 2021,
+  lastElectionType: "Tamil Nadu assembly",
   dataSources: [
     { module: "Power Outages", source: "TANGEDCO", type: "Collected", frequency: "Every 15 minutes", url: "https://www.tangedco.gov.in", status: "static" },
     { module: "Dam Levels", source: "TN Public Works Department (WRD)", type: "Collected", frequency: "Daily", url: null, status: "static" },
@@ -243,6 +320,48 @@ const TAMIL_NADU: StateConfig = {
     { module: "RTI", source: "Tamil Nadu Information Commission", type: "Collected", frequency: "Annual", url: "https://www.tnic.gov.in", status: "static" },
     { module: "Transport", source: "TNSTC / Chennai Metro / IRCTC", type: "API", frequency: "Monthly", url: "https://www.tnstc.in", status: "static" },
     { module: "Rainfall", source: "India Meteorological Department (IMD), Chennai", type: "API", frequency: "Daily", url: null, status: "live" },
+  ],
+};
+
+// ── Uttar Pradesh ─────────────────────────────────────────
+const UTTAR_PRADESH: StateConfig = {
+  slug: "uttar-pradesh",
+  name: "Uttar Pradesh",
+  nameLocal: "उत्तर प्रदेश",
+  discomName: "UPPCL / LESA",
+  discomFullName: "Uttar Pradesh Power Corporation Limited / Lucknow Electricity Supply Administration",
+  discomPortalUrl: "https://www.uppcl.org",
+  waterPortalName: "UP Jal Nigam / Jal Kal Vibhag",
+  waterPortalUrl: "https://upjn.up.gov.in",
+  stateTransportName: "UPSRTC / LMRC",
+  stateTransportFullName: "Uttar Pradesh State Road Transport Corporation (UPSRTC) / Lucknow Metro Rail Corporation",
+  stateTransportUrl: "https://www.upsrtc.com",
+  boardExamName: "UP Board",
+  boardName: "Uttar Pradesh Madhyamik Shiksha Parishad",
+  stateInformationCommission: "UP State Information Commission",
+  rtiPortalUrl: "https://upsic.up.nic.in",
+  agroClimaticZone: "Upper Gangetic Plains",
+  districtHeadTitle: "District Magistrate",
+  subDistrictUnit: "Tehsil",
+  subDistrictUnitPlural: "Tehsils",
+  policeSystemType: "commissionerate",
+  healthSubLabel: "Community Health Centres",
+  villageLabel: "Villages",
+  showVillages: true,
+  gramPanchayatApplicable: true,
+  jjmApplicable: true,
+  municipalBody: "LMC",
+  waterBoard: "Jal Kal Vibhag",
+  stateHealthScheme: "Ayushman Bharat UP",
+  lastElectionYear: 2022,
+  lastElectionType: "Uttar Pradesh assembly",
+  dataSources: [
+    { module: "Power Outages", source: "UPPCL / LESA", type: "Collected", frequency: "Every 15 minutes", url: "https://www.uppcl.org", status: "static" },
+    { module: "Dam Levels", source: "UP Jal Nigam / India-WRIS", type: "Collected", frequency: "Daily", url: "https://upjn.up.gov.in", status: "static" },
+    { module: "Budget & Revenue", source: "UP Finance Department", type: "Collected", frequency: "Quarterly", url: "https://budget.up.nic.in", status: "static" },
+    { module: "RTI", source: "UP State Information Commission", type: "Collected", frequency: "Annual", url: "https://upsic.up.nic.in", status: "static" },
+    { module: "Transport", source: "UPSRTC / LMRC / IRCTC", type: "API", frequency: "Monthly", url: "https://www.upsrtc.com", status: "static" },
+    { module: "Rainfall", source: "India Meteorological Department (IMD), Lucknow", type: "API", frequency: "Daily", url: null, status: "live" },
   ],
 };
 
@@ -254,6 +373,7 @@ const STATE_CONFIGS: Record<string, StateConfig> = {
   maharashtra: MAHARASHTRA,
   "west-bengal": WEST_BENGAL,
   "tamil-nadu": TAMIL_NADU,
+  "uttar-pradesh": UTTAR_PRADESH,
 };
 
 // ── Universal data sources (apply to ALL districts) ────────

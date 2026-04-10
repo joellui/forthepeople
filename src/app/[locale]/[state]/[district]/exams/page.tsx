@@ -13,9 +13,10 @@ import { getModuleSources } from "@/lib/constants/state-config";
 import ExamStepper from "@/components/district/ExamStepper";
 import { ModuleHeader, SectionLabel, LoadingShell, ErrorBlock, EmptyBlock } from "@/components/district/ui";
 import { useDistrictData } from "@/hooks/useDistrictData";
-import { use } from "react";
+import { use, useState } from "react";
 import { BookOpen, GraduationCap, ExternalLink, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import ModuleNews from "@/components/district/ModuleNews";
 
 // ── Types ─────────────────────────────────────────────────
 interface GovernmentExam {
@@ -347,7 +348,21 @@ function ExamsPageInner({ params }: { params: Promise<{ locale: string; state: s
   const examsData = apiResponse?.data;
   const meta = apiResponse?.meta;
 
-  const allExams = examsData ? [...(examsData.stateExams ?? []), ...(examsData.districtExams ?? [])] : [];
+  const [examCategory, setExamCategory] = useState<"all" | "central" | "state" | "banking">("all");
+
+  const allExamsRaw = examsData ? [...(examsData.stateExams ?? []), ...(examsData.districtExams ?? [])] : [];
+
+  function getExamCategory(exam: GovernmentExam): "central" | "state" | "banking" {
+    const dept = exam.department.toLowerCase();
+    if (/bank|reserve bank|ibps|rbi|sbi|nabard/i.test(dept)) return "banking";
+    if (/union public service|staff selection|railway|nta|upsc|ssc|rrb|cbse/i.test(dept)) return "central";
+    return "state";
+  }
+
+  const allExams = examCategory === "all"
+    ? allExamsRaw
+    : allExamsRaw.filter((e) => getExamCategory(e) === examCategory);
+
   const openExams = allExams.filter((e) => e.status === "open");
   const upcomingExams = allExams.filter((e) => e.status === "upcoming");
   const closedExams = allExams.filter((e) => e.status === "closed" || e.status === "results");
@@ -371,6 +386,26 @@ function ExamsPageInner({ params }: { params: Promise<{ locale: string; state: s
         <>
           {/* Summary stats */}
           <StatsRow summary={examsData.summary} />
+
+          {/* Category filter */}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+            {([
+              { id: "all", label: "All" },
+              { id: "central", label: "Central (UPSC, SSC, NTA)" },
+              { id: "state", label: "State PSC" },
+              { id: "banking", label: "Banking (IBPS, SBI)" },
+            ] as const).map((cat) => (
+              <button key={cat.id} onClick={() => setExamCategory(cat.id)} style={{
+                padding: "5px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer",
+                background: examCategory === cat.id ? "#2563EB" : "#F5F5F0",
+                color: examCategory === cat.id ? "#FFF" : "#6B6B6B",
+                border: examCategory === cat.id ? "1px solid #2563EB" : "1px solid #E8E8E4",
+              }}>
+                {cat.label}
+                {cat.id !== "all" && ` (${allExamsRaw.filter((e) => getExamCategory(e) === cat.id).length})`}
+              </button>
+            ))}
+          </div>
 
           {/* Staffing widget */}
           <StaffingWidget staffing={examsData.staffing ?? []} />
@@ -414,6 +449,8 @@ function ExamsPageInner({ params }: { params: Promise<{ locale: string; state: s
           {!allExams.length && (
             <EmptyBlock icon="📝" message="No exam notifications yet. Check back after the next data update." />
           )}
+
+          <ModuleNews district={district} state={state} locale={locale} module="exams" />
         </>
       )}
     </div>

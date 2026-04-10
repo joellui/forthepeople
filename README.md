@@ -9,7 +9,7 @@
 [Live Site](https://forthepeople.in) · [Watch the Platform Walkthrough](https://www.instagram.com/reel/DW0UIkWvmxq/) · [Vote for Features](https://forthepeople.in/en/features) · [Support the Project](https://forthepeople.in/support)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Districts](https://img.shields.io/badge/districts_live-7-green.svg)
+![Districts](https://img.shields.io/badge/districts_live-10-green.svg)
 ![Modules](https://img.shields.io/badge/dashboards-30_per_district-orange.svg)
 
 </div>
@@ -21,7 +21,7 @@
 ForThePeople.in aggregates publicly available Indian government data into clean, citizen-friendly dashboards — one for every district. Instead of navigating 50+ government portals, citizens get a single platform with real-time data on crop prices, dam levels, budget spending, school performance, infrastructure projects, and 25+ more modules.
 
 **Currently live:** Karnataka (Mandya, Mysuru, Bengaluru Urban) |
-Delhi (New Delhi) | Maharashtra (Mumbai) | West Bengal (Kolkata) | Tamil Nadu (Chennai) | Telangana (Hyderabad)
+Delhi (New Delhi) | Maharashtra (Mumbai) | West Bengal (Kolkata) | Tamil Nadu (Chennai) | Telangana (Hyderabad) | Uttar Pradesh (Lucknow)
 **Goal:** All 780+ districts across 28 states and 8 UTs.
 
 ## 29 Dashboard Modules

@@ -16,6 +16,7 @@ import DataSourceBanner from "@/components/common/DataSourceBanner";
 import NoDataCard from "@/components/common/NoDataCard";
 import { getModuleSources } from "@/lib/constants/state-config";
 import StaffingWidget from "@/components/district/StaffingWidget";
+import ModuleNews from "@/components/district/ModuleNews";
 
 function PolicePageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -147,6 +148,7 @@ function PolicePageInner({ params }: { params: Promise<{ locale: string; state: 
           )}
         </>
       )}
+      <ModuleNews district={district} state={state} locale={locale} module="police" />
     </div>
   );
 }

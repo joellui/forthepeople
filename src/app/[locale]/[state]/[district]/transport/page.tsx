@@ -10,6 +10,7 @@ import AIInsightCard from "@/components/common/AIInsightCard";
 import DataSourceBanner from "@/components/common/DataSourceBanner";
 import NoDataCard from "@/components/common/NoDataCard";
 import { getModuleSources } from "@/lib/constants/state-config";
+import ModuleNews from "@/components/district/ModuleNews";
 import { use, useState } from "react";
 import { Bus, Train, Clock, MapPin } from "lucide-react";
 import { useTransport } from "@/hooks/useRealtimeData";
@@ -102,7 +103,7 @@ function TransportPageInner({ params }: { params: Promise<{ locale: string; stat
                         </div>
                       )}
                       {b.frequency && (
-                        <div style={{ fontSize: 12, color: "#4B4B4B" }}>Every {b.frequency}</div>
+                        <div style={{ fontSize: 12, color: "#4B4B4B" }}>{/^every\s/i.test(b.frequency) ? b.frequency : `Every ${b.frequency}`}</div>
                       )}
                       {b.duration && (
                         <div style={{ fontSize: 12, color: "#4B4B4B" }}>⏱ {b.duration}</div>
@@ -155,6 +156,7 @@ function TransportPageInner({ params }: { params: Promise<{ locale: string; stat
               ))}
             </div>
           )}
+          <ModuleNews district={district} state={state} locale={locale} module="transport" />
         </>
       )}
     </div>

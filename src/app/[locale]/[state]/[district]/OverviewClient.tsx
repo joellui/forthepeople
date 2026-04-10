@@ -12,7 +12,7 @@
 import Link from "next/link";
 import {
   MapPin, Users, TreePine, Percent, Activity,
-  Lock, BarChart3, Cloud,
+  BarChart3, Cloud,
   Shield, ScrollText, AlertTriangle, HardHat, TrendingUp, Newspaper,
 } from "lucide-react";
 import {
@@ -26,6 +26,9 @@ import AIInsightCard from "@/components/common/AIInsightCard";
 import { DistrictHealthScoreCard } from "@/components/district/DistrictHealthScoreCard";
 import DistrictSponsorBanner from "@/components/common/DistrictSponsorBanner";
 import { TIER_CONFIG } from "@/lib/constants/razorpay-plans";
+import { getStateConfig } from "@/lib/constants/state-config";
+import DistrictHeroIllustration from "@/components/district/DistrictHeroIllustration";
+import type { DistrictBadge } from "@/lib/constants/districts";
 
 interface Props {
   locale: string;
@@ -43,6 +46,7 @@ interface Props {
     literacy?: number | null;
     sexRatio?: number | null;
     active: boolean;
+    badges?: DistrictBadge[];
     taluks: Array<{ slug: string; name: string; nameLocal?: string; tagline?: string }>;
   };
 }
@@ -117,6 +121,7 @@ function timeAgo(dateStr: string): string {
 
 export default function OverviewClient({ locale, stateSlug, districtSlug, stateName, districtData }: Props) {
   const base = `/${locale}/${stateSlug}/${districtSlug}`;
+  const stateConfig = getStateConfig(stateSlug);
   const { data: overview } = useOverview(districtSlug, stateSlug);
   const { data: crops, isLoading: cropsLoading } = useCropPrices(districtSlug, stateSlug);
   const { data: weather, isLoading: weatherLoading } = useWeather(districtSlug, stateSlug);
@@ -154,96 +159,50 @@ export default function OverviewClient({ locale, stateSlug, districtSlug, stateN
   return (
     <div style={{ padding: "0" }}>
 
-      {/* ── District Header (clean white, no gradient) ─── */}
+      {/* ── District Hero with SVG Illustration ─── */}
+      <DistrictHeroIllustration
+        stateSlug={stateSlug}
+        districtSlug={districtSlug}
+        districtName={districtData.name}
+        stateName={stateName}
+        districtNameLocal={districtData.nameLocal}
+        tagline={districtData.tagline}
+        badges={districtData.badges}
+        active={districtData.active}
+        stats={{
+          population: districtData.population ? `${(districtData.population / 1000000).toFixed(2)}M` : undefined,
+          area: districtData.area ? districtData.area.toLocaleString("en-IN") : undefined,
+          literacy: districtData.literacy ? `${districtData.literacy}%` : undefined,
+          subDistrictCount: districtData.talukCount,
+          subDistrictLabel: stateConfig?.subDistrictUnitPlural ?? "Taluks",
+        }}
+      />
+
+      {/* ── Sponsor CTA (plain subtle bar below hero) ─── */}
       <div style={{
-        background: "#FFFFFF",
+        display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+        padding: "10px 28px",
         borderBottom: "1px solid #E8E8E4",
-        padding: "24px 28px 20px",
+        background: "#FAFAF8",
       }}>
-        <div style={{ fontSize: 12, color: "#9B9B9B", marginBottom: 6, display: "flex", alignItems: "center", gap: 5 }}>
-          <MapPin size={11} />
-          {stateName}
-          {!districtData.active && (
-            <span style={{ marginLeft: 8, display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, fontSize: 11, color: "#EA580C" }}>
-              <Lock size={10} /> Preview · Limited data
-            </span>
-          )}
-        </div>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-          <div>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: "#1A1A1A", letterSpacing: "-0.6px", margin: 0, lineHeight: 1.1 }}>
-              {districtData.name}
-            </h1>
-            {districtData.nameLocal && (
-              <div style={{ fontSize: 16, color: "#6B6B6B", fontFamily: "var(--font-regional)", marginTop: 4 }}>
-                {districtData.nameLocal}
-              </div>
-            )}
-            {districtData.tagline && (
-              <div style={{ fontSize: 13, color: "#9B9B9B", marginTop: 6, fontStyle: "italic" }}>
-                &ldquo;{districtData.tagline}&rdquo;
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Key stats strip */}
-        <div style={{ display: "flex", gap: 20, marginTop: 16, flexWrap: "wrap" }}>
-          {districtData.population && (
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "var(--font-mono)", letterSpacing: "-0.4px", color: "#1A1A1A" }}>
-                {(districtData.population / 1000000).toFixed(2)}M
-              </div>
-              <div style={{ fontSize: 10, color: "#9B9B9B", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Population</div>
-            </div>
-          )}
-          {districtData.area && (
-            <div style={{ paddingLeft: 20, borderLeft: "1px solid #E8E8E4" }}>
-              <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "var(--font-mono)", letterSpacing: "-0.4px", color: "#1A1A1A" }}>
-                {districtData.area.toLocaleString("en-IN")}
-              </div>
-              <div style={{ fontSize: 10, color: "#9B9B9B", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>km²</div>
-            </div>
-          )}
-          {districtData.literacy && (
-            <div style={{ paddingLeft: 20, borderLeft: "1px solid #E8E8E4" }}>
-              <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "var(--font-mono)", letterSpacing: "-0.4px", color: "#1A1A1A" }}>
-                {districtData.literacy}%
-              </div>
-              <div style={{ fontSize: 10, color: "#9B9B9B", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Literacy</div>
-            </div>
-          )}
-          {districtData.talukCount && (
-            <div style={{ paddingLeft: 20, borderLeft: "1px solid #E8E8E4" }}>
-              <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "var(--font-mono)", letterSpacing: "-0.4px", color: "#1A1A1A" }}>
-                {districtData.talukCount}
-              </div>
-              <div style={{ fontSize: 10, color: "#9B9B9B", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Taluks</div>
-            </div>
-          )}
-        </div>
-
-        {/* Sponsor CTA */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 16, flexWrap: "wrap" }}>
-          <Link
-            href={`/${locale}/support?tier=district&state=${stateSlug}&district=${districtSlug}`}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 5,
-              padding: "8px 20px", background: "linear-gradient(135deg, #EC4899, #F43F5E)", color: "#fff",
-              border: "none", borderRadius: 20,
-              fontSize: 13, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap",
-              boxShadow: "0 2px 8px rgba(244, 63, 94, 0.2)",
-            }}
-          >
-            ❤️ Sponsor {districtData.name} — ₹{TIER_CONFIG.district.amount.toLocaleString("en-IN")}/mo →
-          </Link>
-          <Link href={`/${locale}/support?tier=state&state=${stateSlug}`} style={{ fontSize: 12, color: "#6B6B6B", textDecoration: "none" }}>
-            or: Sponsor all of {stateName} — ₹{TIER_CONFIG.state.amount.toLocaleString("en-IN")}/mo →
-          </Link>
-          <Link href={`/${locale}/support?tier=patron`} style={{ fontSize: 12, color: "#6B6B6B", textDecoration: "none" }}>
-            or: Sponsor all of India — ₹{TIER_CONFIG.patron.amount.toLocaleString("en-IN")}/mo →
-          </Link>
-        </div>
+        <Link
+          href={`/${locale}/support?tier=district&state=${stateSlug}&district=${districtSlug}`}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 5,
+            padding: "7px 16px",
+            background: "#FFF", color: "#6B6B6B",
+            border: "1px solid #E8E8E4", borderRadius: 10,
+            fontSize: 12, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap",
+          }}
+        >
+          ❤️ Sponsor {districtData.name} — ₹{TIER_CONFIG.district.amount.toLocaleString("en-IN")}/mo
+        </Link>
+        <Link href={`/${locale}/support?tier=state&state=${stateSlug}`} style={{ fontSize: 11, color: "#999", textDecoration: "none" }}>
+          or: {stateName} ₹{TIER_CONFIG.state.amount.toLocaleString("en-IN")}/mo
+        </Link>
+        <Link href={`/${locale}/support?tier=patron`} style={{ fontSize: 11, color: "#999", textDecoration: "none" }}>
+          · All India ₹{TIER_CONFIG.patron.amount.toLocaleString("en-IN")}/mo
+        </Link>
       </div>
 
       <div style={{ padding: "20px 24px 24px" }}>
@@ -388,8 +347,8 @@ export default function OverviewClient({ locale, stateSlug, districtSlug, stateN
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 10 }}>
             <StatCard label="Population" value={districtData.population?.toLocaleString("en-IN") ?? "—"} icon={Users} />
             <StatCard label="Area (km²)" value={districtData.area?.toLocaleString("en-IN") ?? "—"} icon={TreePine} />
-            <StatCard label="Taluks" value={districtData.talukCount ?? "—"} icon={MapPin} />
-            <StatCard label="Villages" value={districtData.villageCount?.toLocaleString("en-IN") ?? "—"} icon={MapPin} />
+            <StatCard label={stateConfig?.subDistrictUnitPlural ?? "Taluks"} value={districtData.talukCount ?? "—"} icon={MapPin} />
+            {(stateConfig?.showVillages !== false) && <StatCard label="Villages" value={districtData.villageCount?.toLocaleString("en-IN") ?? "—"} icon={MapPin} />}
             <StatCard label="Literacy" value={districtData.literacy ? `${districtData.literacy}%` : "—"} icon={Percent} accent="#16A34A" />
             <StatCard label="Sex Ratio" value={districtData.sexRatio ? `${districtData.sexRatio}/1k` : "—"} icon={Activity} />
             <StatCard label="Schemes" value={overview?.data?._count?.schemes?.toString() ?? "—"} icon={ScrollText} />
@@ -620,7 +579,7 @@ export default function OverviewClient({ locale, stateSlug, districtSlug, stateN
         {/* ── Taluks ────────────────────────────────────── */}
         {districtData.taluks.length > 0 && (
           <div style={{ marginBottom: 28 }}>
-            <SectionLabel>Taluks in {districtData.name}</SectionLabel>
+            <SectionLabel>{stateConfig?.subDistrictUnitPlural ?? "Taluks"} in {districtData.name}</SectionLabel>
             <CardGrid>
               {districtData.taluks.map((t) => (
                 <Link

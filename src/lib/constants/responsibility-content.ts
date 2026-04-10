@@ -990,6 +990,96 @@ const GENERIC_CONTENT: DistrictResponsibilityContent = {
   ],
 };
 
+// ── Hyderabad ──────────────────────────────────────────────────
+
+const HYDERABAD_CONTENT: DistrictResponsibilityContent = {
+  districtName: "Hyderabad",
+  intro:
+    "Hyderabad is one of India's fastest-growing cities. Here's what YOU can do as a citizen to keep the City of Pearls thriving.",
+  sections: [
+    {
+      emoji: "🧹",
+      title: "Cleanliness & Waste",
+      color: "#FFF7ED",
+      border: "#FED7AA",
+      items: [
+        "Hyderabad generates ~5,500 tonnes of solid waste per day — GHMC manages collection across 150 wards",
+        "Segregate waste at source: wet waste (green bin) + dry waste (blue bin)",
+        "Use the GHMC Swachh app to report garbage dumping or missed collection",
+        "Never dump waste into Musi River or Hussain Sagar lake — they are being revived",
+        "Participate in Swachh Hyderabad drives conducted by GHMC every Saturday",
+      ],
+    },
+    {
+      emoji: "💧",
+      title: "Water Conservation",
+      color: "#EFF6FF",
+      border: "#BFDBFE",
+      items: [
+        "Hyderabad's water supply depends on Osmansagar, Himayatsagar, and Krishna/Godavari sources — all are stressed during summer",
+        "Report water leaks and illegal connections to HMWSSB: 040-23420418",
+        "Install rainwater harvesting — GHMC makes it mandatory for plots above 200 sq yards",
+        "Fix leaky taps: a dripping tap wastes 15,000 litres per year",
+        "Hyderabad receives ~800mm rainfall annually — harvest it for non-drinking use",
+      ],
+    },
+    {
+      emoji: "🏙️",
+      title: "Urban Environment",
+      color: "#F0FDF4",
+      border: "#BBF7D0",
+      items: [
+        "Hyderabad's green cover has shrunk due to rapid construction — plant native trees (Neem, Peepal, Gulmohar)",
+        "Use public transport: TSRTC buses, Hyderabad Metro, or MMTS for daily commute to reduce pollution",
+        "Air quality deteriorates in winter — avoid burning waste and report violations at 1800-425-3600",
+        "Protect Hyderabad's 200+ lakes from encroachment — report illegal construction near water bodies to HMDA",
+        "Use the GHMC T-App Folio for property-related civic services",
+      ],
+    },
+    {
+      emoji: "🗳️",
+      title: "Democratic Participation",
+      color: "#F5F3FF",
+      border: "#DDD6FE",
+      items: [
+        "Check your voter enrollment: voterportal.eci.gov.in — ensure your address is updated",
+        "Attend ward committee meetings held quarterly by GHMC — your voice shapes local decisions",
+        "File RTI requests to track municipal spending: fee is ₹10 at the Telangana SIC portal",
+        "Know your GHMC corporator and MLA — they are accountable for your ward's development",
+        "Report corruption via the Anti-Corruption Bureau helpline: 1064",
+      ],
+    },
+    {
+      emoji: "🚦",
+      title: "Traffic & Safety",
+      color: "#FFF1F2",
+      border: "#FECDD3",
+      items: [
+        "Hyderabad has a Commissionerate police system — Dial 100 for emergencies",
+        "Follow traffic rules: Hyderabad Traffic Police actively uses e-challans — check at echallan.tspolice.gov.in",
+        "Use designated pedestrian crossings, especially on major roads like Tank Bund, Necklace Road, and Jubilee Hills",
+        "Report road damage and potholes to GHMC at 040-21111111 or via the Swachh app",
+        "For women's safety, use SHE Teams helpline: 100 or WhatsApp: 9490617444",
+      ],
+    },
+    {
+      emoji: "🔮",
+      title: "What Hyderabad Can Become in 5 Years",
+      color: "linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)",
+      border: "#BFDBFE",
+      isProjection: true,
+      items: [
+        "🏙️ A global top-20 liveable city — if citizens participate in urban governance and hold GHMC accountable",
+        "💧 Zero water tanker dependency — if HMWSSB infrastructure is maintained and rainwater harvesting becomes universal",
+        "🌳 30% green cover — if every household plants and protects at least one tree",
+        "🚇 Full metro connectivity — if citizens use public transit and reduce private vehicle dependency",
+        "🛣️ Safer roads with zero fatalities — if traffic rules are followed by every citizen",
+        "🏆 A model city for governance — if citizens actively participate in ward committees and democratic processes",
+      ],
+    },
+  ],
+};
+
 // ── Lookup ──────────────────────────────────────────────────
 
 const RESPONSIBILITY_CONTENT: Record<string, DistrictResponsibilityContent> = {
@@ -1001,6 +1091,7 @@ const RESPONSIBILITY_CONTENT: Record<string, DistrictResponsibilityContent> = {
   kolkata: KOLKATA_CONTENT,
   chennai: CHENNAI_CONTENT,
   lucknow: LUCKNOW_CONTENT,
+  hyderabad: HYDERABAD_CONTENT,
 };
 
 export function getResponsibilityContent(

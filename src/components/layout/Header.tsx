@@ -11,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { Search, Globe, ChevronDown, Menu, Lock, Users, Github, Heart } from "lucide-react";
 import { INDIA_STATES, getState, getDistrict, PILOT_STATE, PILOT_DISTRICT } from "@/lib/constants/districts";
+import { getStateConfig } from "@/lib/constants/state-config";
 import MobileSidebar from "./MobileSidebar";
 
 // ── Static search index for modules + common queries ───────
@@ -763,7 +764,8 @@ function TalukDropdown({ locale, stateSlug, district, currentTaluk }: {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
-  const label = currentTaluk ? currentTaluk.name : "Select Taluk";
+  const sc = getStateConfig(stateSlug);
+  const label = currentTaluk ? currentTaluk.name : `Select ${sc?.subDistrictUnit ?? "Taluk"}`;
 
   return (
     <div style={{ position: "relative" }}>

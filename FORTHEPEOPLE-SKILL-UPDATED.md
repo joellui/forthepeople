@@ -12,15 +12,15 @@ STATUS:           Sections 1-10 COMPLETE + Contributor system + All states unloc
 LIVE URL:         https://forthepeople.in
 GITHUB:           https://github.com/jayanthmb14/forthepeople (PUBLIC — clean history, MIT with Attribution)
 VERCEL:           zurvoapp Pro (scope: zurvoapps-projects)
-ACTIVE DISTRICTS: 9 across 7 states (Karnataka: Mandya, Mysuru, Bengaluru Urban;
+ACTIVE DISTRICTS: 10 across 7 states (Karnataka: Mandya, Mysuru, Bengaluru Urban;
                   Delhi: New Delhi; Maharashtra: Mumbai;
                   West Bengal: Kolkata; Tamil Nadu: Chennai;
-                  Uttar Pradesh: Lucknow; Telangana: Hyderabad)
+                  Telangana: Hyderabad; Uttar Pradesh: Lucknow)
 ALL STATES:       36 states/UTs browsable (locked ones show preview + sponsor CTA)
 ALL DISTRICTS:    152 districts in DB (locked ones show LockedDistrictPreview)
 STATE MAPS:       33 GeoJSON maps from DataMeet Census 2011 + Karnataka hand-tuned
 PROJECT ID:       FTP-JMB-2026-IN (watermark ID)
-LAST UPDATED:     April 10, 2026
+LAST UPDATED:     April 11, 2026
 ```
 
 ---
@@ -717,3 +717,21 @@ scripts/cleanup-test-contributors.ts   — Removes [TEST] records before deploy
 18. **2FA recovery token** — Must use `crypto.timingSafeEqual()` for constant-time comparison. Never string equality `===` on security tokens.
 
 19. **LIVE_MODULES list** — Keep in sync between `src/lib/cache.ts` (server TTLs) and `src/hooks/useDistrictData.ts` (client stale times). Includes: crops, weather, water, dam, alerts, news, power.
+
+20. **State-aware labels** — Never hardcode "Taluk" in UI. Use `getStateConfig(stateSlug).subDistrictUnit` / `.subDistrictUnitPlural`. Different states use Mandal (Telangana/AP), Tehsil (Delhi), Block (West Bengal), Taluka (Maharashtra), etc.
+
+21. **Urban district handling** — For 100% urban districts: hide villages column (`showVillages: false`), show Municipal Governance instead of Gram Panchayat (`gramPanchayatApplicable: false`), mark JJM as N/A (`jjmApplicable: false`), adapt My Responsibility and Citizen Corner text. Check `getStateConfig(stateSlug)` fields.
+
+22. **Health schemes are state-specific** — Never show one state's health scheme on another state's page. Use `STATE_HEALTH_SCHEMES` mapping in `health/page.tsx`. National schemes (PM-JAY, RBSK) show for all states.
+
+23. **Election data source text** — The "most recent election" text in the data source banner must match the state. Uses `getStateConfig(stateSlug).lastElectionYear` / `.lastElectionType`. Don't copy Karnataka text to other states.
+
+24. **Sub-district population** — Always seed via `scripts/seed-subdistrict-populations.ts` when adding new districts. The `seed-hierarchy.ts` upsert uses `update: {}` so won't fix null populations on existing records.
+
+25. **District hero illustrations** — Each district has an inline SVG in `DistrictHeroIllustration.tsx` with a unique color palette. When adding a new district, add its SVG (landmark on right side, under 50 lines) and palette to the component.
+
+26. **District badges** — Stored in `districts.ts` config as `badges` array, max 5 per district. Badge colors auto-avoid the district's palette family via `AVOID_MAP` in `DistrictBadges.tsx`. Web search to verify each claim before adding.
+
+27. **Sponsor UI** — Uses subtle warm styling (#f5f0eb background) in a separated bar below the hero. NOT hot pink/red gradient. Keep consistent with the site's warm aesthetic.
+
+28. **UP uses "Tehsil"** — `state-config.ts` has `uttar-pradesh` entry with `subDistrictUnit: "Tehsil"`. Never hardcode Taluk/Mandal/Tehsil in UI — always use `getStateConfig(stateSlug).subDistrictUnit`.

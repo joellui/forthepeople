@@ -16,6 +16,7 @@ import NoDataCard from "@/components/common/NoDataCard";
 import { getModuleSources } from "@/lib/constants/state-config";
 import ShareButtons from "@/components/common/ShareButtons";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
+import ModuleNews from "@/components/district/ModuleNews";
 import { downloadCSV, todayISO } from "@/lib/csv";
 
 function CropsPageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
@@ -170,6 +171,7 @@ function CropsPageInner({ params }: { params: Promise<{ locale: string; state: s
           />
         </>
       )}
+      <ModuleNews district={district} state={state} locale={locale} module="crops" />
     </div>
   );
 }

@@ -315,25 +315,25 @@ function ActiveDistrictsCard({
                 {d.tagline && (
                   <div style={{ fontSize: 11, color: "#9B9B9B", marginTop: 1 }}>{d.tagline}</div>
                 )}
-                {preview && (
-                  <div style={{ display: "flex", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
-                    {preview.weather?.temp != null && (
-                      <span style={{ fontSize: 11, color: "#2563EB", fontFamily: "var(--font-mono, monospace)" }}>
-                        🌡️ {preview.weather.temp}°C
-                      </span>
-                    )}
-                    {preview.dam && (
-                      <span style={{ fontSize: 11, color: preview.dam.storagePct > 60 ? "#16A34A" : "#F59E0B", fontFamily: "var(--font-mono, monospace)" }}>
-                        🚰 {preview.dam.name.split(" ")[0]}: {preview.dam.storagePct}%
-                      </span>
-                    )}
-                    {preview.crop && (
-                      <span style={{ fontSize: 11, color: "#6B6B6B", fontFamily: "var(--font-mono, monospace)" }}>
-                        🌾 {preview.crop.commodity}: ₹{preview.crop.price.toLocaleString("en-IN")}
-                      </span>
-                    )}
-                  </div>
-                )}
+                {/* Badges + weather */}
+                <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap", alignItems: "center" }}>
+                  {(d.badges ?? []).slice(0, 3).map((b, i) => (
+                    <span key={i} style={{
+                      display: "inline-flex", alignItems: "center", gap: 3,
+                      padding: "2px 8px", borderRadius: 100,
+                      fontSize: 10, fontWeight: 600,
+                      background: "rgba(0,0,0,0.04)", color: "#6B6B6B",
+                      border: "1px solid rgba(0,0,0,0.06)",
+                    }}>
+                      {b.emoji} {b.label}
+                    </span>
+                  ))}
+                  {preview?.weather?.temp != null && (
+                    <span style={{ fontSize: 11, color: "#2563EB", fontFamily: "var(--font-mono, monospace)" }}>
+                      🌡️ {preview.weather.temp}°C
+                    </span>
+                  )}
+                </div>
               </div>
               <ArrowRight size={14} style={{ color: "#2563EB", flexShrink: 0, marginTop: 2 }} />
             </Link>

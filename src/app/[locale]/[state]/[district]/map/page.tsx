@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useTaluks, useOverview } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, SectionLabel, LoadingShell } from "@/components/district/ui";
 import TalukMap from "@/components/map/TalukMap";
+import { getStateConfig } from "@/lib/constants/state-config";
 
 function MapWithFallback({ locale, state, district, talukList }: { locale: string; state: string; district: string; talukList: { slug: string; name: string; villageCount: number }[] }) {
   const [hasGeoJSON, setHasGeoJSON] = useState<boolean | null>(null);
@@ -28,7 +29,7 @@ function MapWithFallback({ locale, state, district, talukList }: { locale: strin
       <div style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 14, padding: 24, marginBottom: 24, textAlign: "center" }}>
         <Map size={32} style={{ color: "#9B9B9B", margin: "0 auto 12px" }} />
         <div style={{ fontSize: 15, fontWeight: 600, color: "#1A1A1A", marginBottom: 6 }}>Interactive map coming soon for this district</div>
-        <div style={{ fontSize: 13, color: "#9B9B9B", marginBottom: 16 }}>GeoJSON boundary data is being prepared. In the meantime, explore the taluk list below.</div>
+        <div style={{ fontSize: 13, color: "#9B9B9B", marginBottom: 16 }}>GeoJSON boundary data is being prepared. In the meantime, explore the list below.</div>
       </div>
     );
   }
@@ -43,6 +44,10 @@ function MapWithFallback({ locale, state, district, talukList }: { locale: strin
 export default function MapPage({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
   const base = `/${locale}/${state}/${district}`;
+  const stateConfig = getStateConfig(state);
+  const subUnit = stateConfig?.subDistrictUnit ?? "Taluk";
+  const subUnitPlural = stateConfig?.subDistrictUnitPlural ?? "Taluks";
+  const hideVillages = stateConfig?.showVillages === false;
   const { data: taluksData, isLoading: taluksLoading } = useTaluks(district, state);
   const { data: overviewData, isLoading: overviewLoading } = useOverview(district, state);
 
@@ -58,24 +63,24 @@ export default function MapPage({ params }: { params: Promise<{ locale: string; 
 
   return (
     <div style={{ padding: 24 }}>
-      <ModuleHeader icon={Map} title="District Map" description="Interactive taluk map — click to explore each taluk" backHref={base} />
+      <ModuleHeader icon={Map} title="District Map" description={`Interactive ${subUnit.toLowerCase()} map — click to explore each ${subUnit.toLowerCase()}`} backHref={base} />
       {isLoading && <LoadingShell rows={4} />}
 
       {!isLoading && (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>
-            <StatCard label="Taluks" value={taluks.length} icon={Map} />
-            <StatCard label="Villages" value={taluks.reduce((s, t) => s + t._count.villages, 0).toLocaleString("en-IN")} />
+            <StatCard label={subUnitPlural} value={taluks.length} icon={Map} />
+            {!hideVillages && <StatCard label="Villages" value={taluks.reduce((s, t) => s + t._count.villages, 0).toLocaleString("en-IN")} />}
             {overview?.area && <StatCard label="Area" value={`${overview.area.toLocaleString("en-IN")} km²`} />}
             {overview?.population && <StatCard label="Population" value={`${(overview.population / 1000000).toFixed(2)}M`} />}
           </div>
 
           {/* D3 Geographic Map — with fallback for districts without GeoJSON */}
-          <SectionLabel>Taluk Map</SectionLabel>
+          <SectionLabel>{subUnit} Map</SectionLabel>
           <MapWithFallback locale={locale} state={state} district={district} talukList={talukList} />
 
           {/* Taluk list with village details */}
-          <SectionLabel>Taluks & Villages</SectionLabel>
+          <SectionLabel>{subUnitPlural}{hideVillages ? "" : " & Villages"}</SectionLabel>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {taluks.map((t) => (
               <div key={t.id} style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 12, overflow: "hidden" }}>
@@ -88,7 +93,7 @@ export default function MapPage({ params }: { params: Promise<{ locale: string; 
                     {t.nameLocal && <div style={{ fontSize: 12, color: "#9B9B9B", fontFamily: "var(--font-regional)" }}>{t.nameLocal}</div>}
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 13, color: "#6B6B6B" }}>{t._count.villages} villages</span>
+                    {!hideVillages && <span style={{ fontSize: 13, color: "#6B6B6B" }}>{t._count.villages} villages</span>}
                     <ChevronRight size={16} style={{ color: "#C0C0C0" }} />
                   </div>
                 </Link>

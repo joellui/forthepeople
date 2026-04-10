@@ -12,7 +12,7 @@ import { ModuleHeader, StatCard, ProgressBar, LoadingShell, ErrorBlock } from "@
 import AIInsightCard from "@/components/common/AIInsightCard";
 import DataSourceBanner from "@/components/common/DataSourceBanner";
 import NoDataCard from "@/components/common/NoDataCard";
-import { getModuleSources } from "@/lib/constants/state-config";
+import { getModuleSources, getStateConfig } from "@/lib/constants/state-config";
 
 export default function GramPanchayatPage({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -38,9 +38,40 @@ export default function GramPanchayatPage({ params }: { params: Promise<{ locale
       <AIInsightCard module="gram-panchayat" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}
-      {!isLoading && !error && gps.length === 0 && (
-        <NoDataCard module="gram-panchayat" district={district} state={state} isUrban={true} />
-      )}
+      {!isLoading && !error && gps.length === 0 && (() => {
+        const sc = getStateConfig(state);
+        if (sc && !sc.gramPanchayatApplicable && sc.municipalBody) {
+          const districtName = district.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+          return (
+            <div>
+              <div style={{ background: "linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)", border: "1px solid #BFDBFE", borderRadius: 14, padding: "18px 20px", marginBottom: 20 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#1D4ED8", marginBottom: 6 }}>🏛️ Municipal Governance</div>
+                <div style={{ fontSize: 13, color: "#1E40AF", lineHeight: 1.7 }}>
+                  {districtName} is a fully urban district governed by a Municipal Corporation. Gram Panchayat and MGNREGA data applies only to rural areas.
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10, marginBottom: 20 }}>
+                <div style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 12, padding: "14px 16px" }}>
+                  <div style={{ fontSize: 11, color: "#9B9B9B", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.06em", marginBottom: 4 }}>Municipal Body</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A" }}>{sc.municipalBody}</div>
+                  <div style={{ fontSize: 12, color: "#6B6B6B", marginTop: 4 }}>Responsible for urban governance, civic amenities, and infrastructure in {districtName}</div>
+                </div>
+                {sc.waterBoard && (
+                  <div style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 12, padding: "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "#9B9B9B", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.06em", marginBottom: 4 }}>Water Supply</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A" }}>{sc.waterBoard}</div>
+                    <div style={{ fontSize: 12, color: "#6B6B6B", marginTop: 4 }}>Municipal water supply and sewerage management</div>
+                  </div>
+                )}
+              </div>
+              <div style={{ background: "#FAFAF8", border: "1px solid #E8E8E4", borderRadius: 10, padding: "12px 16px", fontSize: 12, color: "#9B9B9B" }}>
+                📌 Data sourced from District NIC Portal and Municipal Corporation website.
+              </div>
+            </div>
+          );
+        }
+        return <NoDataCard module="gram-panchayat" district={district} state={state} isUrban={true} />;
+      })()}
 
       {!isLoading && gps.length > 0 && (
         <>

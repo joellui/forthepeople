@@ -29,6 +29,11 @@ export interface Taluk {
   villages?: Village[];
 }
 
+export interface DistrictBadge {
+  emoji: string;
+  label: string;
+}
+
 export interface District {
   slug: string;
   name: string;
@@ -42,6 +47,7 @@ export interface District {
   villageCount?: number;
   literacy?: number;
   sexRatio?: number;
+  badges?: DistrictBadge[];
   taluks: Taluk[];
 }
 
@@ -63,6 +69,11 @@ const MANDYA_DISTRICT: District = {
   tagline: "Sugar Capital of Karnataka",
   taglineLocal: "ಕರ್ನಾಟಕದ ಸಕ್ಕರೆ ನಗರ",
   active: true,
+  badges: [
+    { emoji: "🏭", label: "Sugar Capital of Karnataka" },
+    { emoji: "🌊", label: "Home of KRS Dam" },
+    { emoji: "🌾", label: "Kaveri Basin Heartland" },
+  ],
   population: 1940428,
   area: 4961,
   talukCount: 7,
@@ -178,6 +189,12 @@ const BENGALURU_URBAN_DISTRICT: District = {
   tagline: "Silicon Valley of India",
   taglineLocal: "ಭಾರತದ ಸಿಲಿಕಾನ್ ಕಣಿವೆ",
   active: true,
+  badges: [
+    { emoji: "💻", label: "Startup Capital of India" },
+    { emoji: "🌳", label: "Garden City" },
+    { emoji: "🔬", label: "ISRO & HAL Headquarters" },
+    { emoji: "🚀", label: "India's Silicon Valley" },
+  ],
   population: 12765000,
   area: 741,
   talukCount: 4,
@@ -260,6 +277,13 @@ const MYSURU_DISTRICT: District = {
   tagline: "City of Palaces",
   taglineLocal: "ಅರಮನೆಗಳ ನಗರ",
   active: true,
+  badges: [
+    { emoji: "🏆", label: "India's Cleanest City" },
+    { emoji: "🏛️", label: "City of Palaces" },
+    { emoji: "🎪", label: "Dasara Heritage" },
+    { emoji: "🐘", label: "Wildlife Capital" },
+    { emoji: "🧼", label: "Mysore Sandal Soap" },
+  ],
   population: 3248000,
   area: 6854,
   talukCount: 7,
@@ -425,6 +449,11 @@ const NEW_DELHI_DISTRICT: District = {
   tagline: "Capital of India",
   taglineLocal: "भारत की राजधानी",
   active: true,
+  badges: [
+    { emoji: "🇮🇳", label: "National Capital" },
+    { emoji: "🏛️", label: "UNESCO World Heritage" },
+    { emoji: "🏗️", label: "Lutyens Architecture" },
+  ],
   population: 1173902,
   area: 35,
   talukCount: 3,
@@ -488,6 +517,12 @@ const MUMBAI_DISTRICT: District = {
   tagline: "Financial Capital of India",
   taglineLocal: "भारत की वित्तीय राजधानी",
   active: true,
+  badges: [
+    { emoji: "💰", label: "Financial Capital of India" },
+    { emoji: "🎬", label: "Bollywood" },
+    { emoji: "🌊", label: "Gateway of India" },
+    { emoji: "🚂", label: "World's Busiest Suburban Rail" },
+  ],
   population: 12442373,
   area: 603,
   talukCount: 5,
@@ -583,6 +618,12 @@ const CHENNAI_DISTRICT: District = {
   tagline: "Gateway to South India",
   taglineLocal: "தென்னிந்தியாவின் நுழைவாயில்",
   active: true,
+  badges: [
+    { emoji: "🚗", label: "Detroit of India" },
+    { emoji: "🏖️", label: "Marina Beach" },
+    { emoji: "🏥", label: "India's Health Capital" },
+    { emoji: "🎵", label: "Carnatic Music Heritage" },
+  ],
   population: 7088000,
   area: 426,
   talukCount: 4,
@@ -663,6 +704,11 @@ const KOLKATA_DISTRICT: District = {
   tagline: "Cultural Capital of India",
   taglineLocal: "ভারতের সংস্কৃতি রাজধানী",
   active: true,
+  badges: [
+    { emoji: "🎭", label: "Cultural Capital of India" },
+    { emoji: "🏆", label: "Nobel Laureate City" },
+    { emoji: "🎊", label: "Durga Puja UNESCO Heritage" },
+  ],
   population: 4496694,
   area: 205,
   talukCount: 4,
@@ -743,6 +789,12 @@ const LUCKNOW_DISTRICT: District = {
   tagline: "City of Nawabs",
   taglineLocal: "नवाबों का शहर",
   active: true,
+  badges: [
+    { emoji: "🏛️", label: "City of Nawabs" },
+    { emoji: "🧵", label: "Chikankari Heritage" },
+    { emoji: "🍢", label: "Kebab Capital" },
+    { emoji: "🏛️", label: "State Capital of UP" },
+  ],
   population: 4589838,
   area: 2528,
   talukCount: 4,
@@ -819,6 +871,13 @@ const HYDERABAD_DISTRICT: District = {
   tagline: "City of Pearls",
   taglineLocal: "ముత్యాల నగరం",
   active: true,
+  badges: [
+    { emoji: "💎", label: "City of Pearls" },
+    { emoji: "🧬", label: "Genome Valley" },
+    { emoji: "🏰", label: "Nizam Heritage" },
+    { emoji: "💻", label: "India's GCC Hub" },
+    { emoji: "🍗", label: "Biryani Capital" },
+  ],
   population: 4500000,
   area: 217,
   talukCount: 16,

@@ -13,7 +13,7 @@ import { ModuleHeader, StatCard, SectionLabel, ProgressBar, LoadingShell, ErrorB
 import AIInsightCard from "@/components/common/AIInsightCard";
 import DataSourceBanner from "@/components/common/DataSourceBanner";
 import NoDataCard from "@/components/common/NoDataCard";
-import { getModuleSources } from "@/lib/constants/state-config";
+import { getModuleSources, getStateConfig } from "@/lib/constants/state-config";
 
 export default function JJMPage({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -44,9 +44,24 @@ export default function JJMPage({ params }: { params: Promise<{ locale: string; 
       <AIInsightCard module="jjm" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}
-      {!isLoading && !error && villages.length === 0 && (
-        <NoDataCard module="jjm" district={district} state={state} isUrban={true} />
-      )}
+      {!isLoading && !error && villages.length === 0 && (() => {
+        const sc = getStateConfig(state);
+        if (sc && !sc.jjmApplicable && sc.waterBoard) {
+          const districtName = district.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+          return (
+            <div style={{ background: "linear-gradient(135deg, #ECFEFF 0%, #EFF6FF 100%)", border: "1px solid #A5F3FC", borderRadius: 14, padding: "18px 20px", marginBottom: 20 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#0E7490", marginBottom: 6 }}>💧 Municipal Water Supply</div>
+              <div style={{ fontSize: 13, color: "#155E75", lineHeight: 1.7, marginBottom: 12 }}>
+                Jal Jeevan Mission provides tap water connections to rural households. {districtName} is an urban district — its water supply is managed by <strong>{sc.waterBoard}</strong>.
+              </div>
+              <div style={{ fontSize: 12, color: "#9B9B9B" }}>
+                📌 For water supply complaints and information, contact {sc.waterBoard} or visit the {sc.municipalBody ?? "municipal corporation"} portal.
+              </div>
+            </div>
+          );
+        }
+        return <NoDataCard module="jjm" district={district} state={state} isUrban={true} />;
+      })()}
 
       {!isLoading && villages.length > 0 && (
         <>

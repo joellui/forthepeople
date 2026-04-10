@@ -46,6 +46,14 @@ ForThePeople.in aggregates publicly available Indian government data and present
 - [Mandya Schools](https://forthepeople.in/en/karnataka/mandya/schools) — SSLC pass rates, enrollment
 - [Mandya Schemes](https://forthepeople.in/en/karnataka/mandya/schemes) — PM-KISAN, PMAY, central + state schemes
 - [File RTI](https://forthepeople.in/en/karnataka/mandya/rti) — RTI templates and filing guide
+- [Hyderabad Dashboard](https://forthepeople.in/en/telangana/hyderabad) — Telangana district data hub
+- [Hyderabad Elections](https://forthepeople.in/en/telangana/hyderabad/elections) — 2023 Telangana assembly results
+- [Hyderabad Health](https://forthepeople.in/en/telangana/hyderabad/health) — Aarogyasri, hospitals, helplines
+- [Hyderabad Finance](https://forthepeople.in/en/telangana/hyderabad/finance) — District budget and utilisation
+- [Hyderabad Transport](https://forthepeople.in/en/telangana/hyderabad/transport) — TSRTC bus routes and trains
+- [Lucknow Dashboard](https://forthepeople.in/en/uttar-pradesh/lucknow) — UP district data hub
+- [Lucknow Crop Prices](https://forthepeople.in/en/uttar-pradesh/lucknow/crops) — AGMARKNET live prices
+- [Lucknow Weather](https://forthepeople.in/en/uttar-pradesh/lucknow/weather) — IMD weather data
 - [District Comparison](https://forthepeople.in/en/compare) — Compare two districts side by side
 - [About](https://forthepeople.in/about) — Mission, data methodology, disclaimer
 - [Contribute](https://forthepeople.in/contribute) — How to help improve the platform

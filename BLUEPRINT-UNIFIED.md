@@ -177,7 +177,7 @@ LOCK BEHAVIOR:
   Active district:  Full data, clickable
   Locked district:  Grayed out, "Coming Soon"
 
-8 ACTIVE PILOT DISTRICTS (6 states):
+10 ACTIVE PILOT DISTRICTS (7 states):
   Mandya (ಮಂಡ್ಯ)          — "Sugar Capital of Karnataka"
   Mysuru (ಮೈಸೂರು)         — "City of Palaces"
   Bengaluru Urban (ಬೆಂಗಳೂರು) — "Silicon Valley of India"
@@ -626,7 +626,7 @@ FeatureVoteWidget.tsx — Top-voted feature requests widget
 - Link to `/en/[state]/[district]` using dynamic state slug
 
 ### Stats Bar
-- Active districts: 8 (Mandya, Bengaluru Urban, Mysuru, Chennai, Mumbai, Kolkata, New Delhi, Lucknow)
+- Active districts: 10 (Mandya, Bengaluru Urban, Mysuru, Chennai, Mumbai, Kolkata, New Delhi, Hyderabad, Lucknow)
 - Data modules: 29
 - Records in DB: ~50,000+
 - Contributor count from Contribution table
@@ -1397,7 +1397,8 @@ Post-launch: Feedback            COMPLETE
   - FeedbackModal + floating button + admin management
 
 Post-launch: Scale               COMPLETE
-  - 4 pilot districts active (Mandya, Mysuru, Bengaluru Urban + New Delhi)
+  - 9 pilot districts active (Karnataka: Mandya, Mysuru, Bengaluru Urban; Delhi: New Delhi;
+    Maharashtra: Mumbai; West Bengal: Kolkata; Tamil Nadu: Chennai; Telangana: Hyderabad)
   - 10 additional Delhi districts ready to activate
   - All scrapers DB-driven (not hardcoded)
   - Health scores pre-computed for all 3 Karnataka districts
@@ -1521,6 +1522,73 @@ National Scraper Integration  COMPLETE (2026-04-10)
   - manifest.ts updated to reference new icon paths
   - sw.js updated to cache new icon paths
   - Dynamic icon.tsx disabled (renamed to .bak)
+
+Hyderabad Audit & State-Aware Fixes  COMPLETE (2026-04-11)
+  SESSION 1 — Hardcoded Karnataka Backend Fixes:
+    - state-config.ts: Added subDistrictUnitPlural, healthSubLabel, villageLabel,
+      showVillages, gramPanchayatApplicable, jjmApplicable, municipalBody, waterBoard,
+      stateHealthScheme, lastElectionYear, lastElectionType for all 6 states
+    - OverviewClient.tsx: Dynamic Taluks→Mandals/Blocks/Tehsils label, hide Villages for urban
+    - map/page.tsx: Dynamic sub-district labels, hide villages column for urban districts
+    - health/page.tsx: State-aware health schemes (Aarogyasri for Telangana, not Arogya Karnataka),
+      iCALL national helpline (replaced NIMHANS), dynamic hospital type labels
+    - elections/page.tsx: State-aware "most recent election" text
+    - gram-panchayat/page.tsx: Municipal Governance content for urban districts (GHMC, HMWSSB)
+    - jjm/page.tsx: Urban water supply messaging with municipal water board name
+    - Header.tsx: Dynamic "Select Mandal/Taluk/Tehsil" dropdown label
+    - citizen-corner/page.tsx: Ward Committee instead of Gram Sabha for urban districts
+    - transport/page.tsx: Fixed "Every Every" frequency display bug
+    - news/page.tsx: HTML entity stripping (cleanHtml for &nbsp; etc.)
+    - responsibility-content.ts: Added Hyderabad-specific urban responsibility content
+  SESSION 2 — Hyderabad Data Quality:
+    NEW FILES:
+      scripts/fix-hyderabad-crops.ts    — Delete Apple/Avocado, round prices to integers
+    UPDATED:
+      scripts/fix-hyderabad-data.ts     — Population history (4 census years), dam readings
+        (Osmansagar + Himayatsagar), crime stats, traffic revenue, leader VERIFY placeholders
+        filled (Collector: Dasari Harichandana, CP: V.C. Sajjanar, CJ: Aparesh Kumar Singh),
+        10 missing assembly constituencies added, RTI statistics, HMWSSB alert fix
+  SESSION 3 — Cross-Cutting Features:
+    NEW FILES:
+      src/components/district/ModuleNews.tsx  — Related news at bottom of module pages
+      scripts/generate-hyderabad-insights.ts  — AI insight generation for Hyderabad only
+    CHANGES:
+      - ModuleNews added to 10 module pages (health, elections, finance, transport, exams,
+        water, police, infrastructure, crops, population, schemes)
+      - Exams page: Central/State/Banking category filter tabs
+      - Finance page: State-specific data source attribution text
+  SESSION 4 — District Polish (2026-04-11):
+    NEW FILES:
+      scripts/seed-subdistrict-populations.ts  — Updates population+area on all Taluk DB records
+      src/components/district/DistrictBadges.tsx — Achievement badge pills with per-district color avoidance
+      src/components/district/DistrictHeroIllustration.tsx — SVG hero with per-district palette + landmark
+    CHANGES:
+      - districts.ts: Added DistrictBadge interface + badges for all 9 active districts
+      - OverviewClient.tsx: Replaced plain header with SVG hero illustration + gradient overlay
+      - Sponsor CTA: Toned down from hot pink gradient to plain subtle bar (#FFF on #FAFAF8)
+      - HomeDrilldown.tsx: District cards show badges instead of crop prices/dam levels
+      - Each district has unique palette (Mandya=sage green, Mysuru=gold, Bengaluru=teal,
+        Hyderabad=terracotta, Chennai=ocean teal, Delhi=sandstone, Mumbai=steel blue, Kolkata=ochre)
+      - Badge colors avoid clashing with district palette via badgeAvoid mapping
+      - SVG approach: 3-5KB inline SVGs, no external images, zero 404 risk
+
+Lucknow (#10) Full Data Seeding  COMPLETE (2026-04-11)
+  NEW FILES:
+    prisma/seed-lucknow-data.ts              — Full Lucknow seed (19 modules)
+    scripts/fix-lucknow-crops.ts             — Round crop price decimals
+  CHANGES:
+    - state-config.ts: Added Uttar Pradesh (7th active state) with Tehsil labels,
+      UPPCL/LESA power, Jal Kal Vibhag water, UPSRTC/LMRC transport, UP Board exams
+    - districts.ts: Lucknow badges (City of Nawabs, Chikankari, Kebab Capital, State Capital)
+    - DistrictHeroIllustration.tsx: Lucknow mauve palette + Rumi Darwaza SVG
+    - DistrictBadges.tsx: Lucknow badge avoidance (no pink/purple)
+    - health/page.tsx: Added Ayushman Bharat UP to state health schemes
+    - seed-subdistrict-populations.ts: Added Lucknow 4 tehsils
+    - Seeded: leadership (MP, 9 MLAs, Governor, CM, DM, CP), budget (10 sectors),
+      infrastructure (8 projects), police (15 stations), schools (15 institutions),
+      offices (10), schemes (10), elections (2024 LS + 2022 Assembly 9 constituencies),
+      RTI (templates + stats), famous personalities, industries, transport (bus + train),
+      services, courts, crime stats, traffic revenue, alerts, population history
 ```
 
 ---

@@ -11,7 +11,7 @@ import { ModuleHeader, SectionLabel, LoadingShell } from "@/components/district/
 import AIInsightCard from "@/components/common/AIInsightCard";
 import DataSourceBanner from "@/components/common/DataSourceBanner";
 import NoDataCard from "@/components/common/NoDataCard";
-import { getModuleSources } from "@/lib/constants/state-config";
+import { getModuleSources, getStateConfig } from "@/lib/constants/state-config";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -38,14 +38,20 @@ const HELPLINES = [
   { name: "PM KISAN Helpline", number: "155261", icon: "🌾" },
 ];
 
-const RIGHTS = [
-  { right: "Right to Information (RTI)", desc: "Any citizen can request government documents within 30 days. Fee: ₹10.", icon: "📄" },
-  { right: "Right to Food", desc: "BPL families entitled to subsidised grain under NFSA at Rs 2–3/kg.", icon: "🌾" },
-  { right: "Right to Education", desc: "Free & compulsory education for children 6–14 years under RTE Act.", icon: "📚" },
-  { right: "MGNREGA", desc: "100 days of guaranteed wage employment per rural household per year.", icon: "⛏️" },
-  { right: "Gram Sabha", desc: "Attend your village's Gram Sabha meetings — held quarterly.", icon: "🏛️" },
-  { right: "Consumer Rights", desc: "File consumer complaint online at consumerhelpline.gov.in.", icon: "⚖️" },
-];
+function getRights(stateSlug: string) {
+  const sc = getStateConfig(stateSlug);
+  const isUrban = sc ? !sc.gramPanchayatApplicable : false;
+  return [
+    { right: "Right to Information (RTI)", desc: "Any citizen can request government documents within 30 days. Fee: ₹10.", icon: "📄" },
+    { right: "Right to Food", desc: "BPL families entitled to subsidised grain under NFSA at Rs 2–3/kg.", icon: "🌾" },
+    { right: "Right to Education", desc: "Free & compulsory education for children 6–14 years under RTE Act.", icon: "📚" },
+    { right: "MGNREGA", desc: "100 days of guaranteed wage employment per rural household per year.", icon: "⛏️" },
+    isUrban
+      ? { right: "Ward Committee", desc: `Participate in your ward committee meetings. Held quarterly by your municipal corporation${sc?.municipalBody ? ` (${sc.municipalBody})` : ""}.`, icon: "🏛️" }
+      : { right: "Gram Sabha", desc: "Attend your village's Gram Sabha meetings — held quarterly.", icon: "🏛️" },
+    { right: "Consumer Rights", desc: "File consumer complaint online at consumerhelpline.gov.in.", icon: "⚖️" },
+  ];
+}
 
 interface CitizenTip {
   category: string;
@@ -236,7 +242,7 @@ export default function CitizenCornerPage({ params }: { params: Promise<{ locale
         <>
           <SectionLabel>Know Your Rights</SectionLabel>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10 }}>
-            {RIGHTS.map((r) => (
+            {getRights(state).map((r) => (
               <div key={r.right} style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 10, padding: "12px 14px" }}>
                 <div style={{ fontSize: 22, marginBottom: 6 }}>{r.icon}</div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "#1A1A1A", marginBottom: 4 }}>{r.right}</div>

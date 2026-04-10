@@ -9,29 +9,66 @@ import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import AIInsightCard from "@/components/common/AIInsightCard";
 import DataSourceBanner from "@/components/common/DataSourceBanner";
 import NoDataCard from "@/components/common/NoDataCard";
-import { getModuleSources } from "@/lib/constants/state-config";
+import { getModuleSources, getStateConfig } from "@/lib/constants/state-config";
 import StaffingWidget from "@/components/district/StaffingWidget";
+import ModuleNews from "@/components/district/ModuleNews";
 import { use } from "react";
 import { Heart, Phone, ExternalLink } from "lucide-react";
 import { ModuleHeader, SectionLabel } from "@/components/district/ui";
 
-// Static health helplines for India
+// Static health helplines for India — national numbers only
 const HELPLINES = [
   { name: "National Emergency", number: "112", color: "#DC2626" },
   { name: "Ambulance", number: "108", color: "#DC2626" },
-  { name: "NIMHANS (Mental Health)", number: "080-46110007", color: "#7C3AED" },
+  { name: "iCALL (Mental Health)", number: "9152987821", color: "#7C3AED" },
   { name: "Anti-Poison (AIIMS)", number: "1800-116-117", color: "#D97706" },
   { name: "Ayushman Bharat", number: "14555", color: "#16A34A" },
   { name: "National Health Helpline", number: "1800-180-1104", color: "#2563EB" },
 ];
 
-const HOSPITAL_TYPES = [
-  { type: "Government District Hospital", description: "Primary referral hospital with emergency, OPD, and specialty services" },
-  { type: "Taluk Hospitals", description: "Secondary care hospitals at taluk level" },
-  { type: "PHC (Primary Health Centres)", description: "Primary care centers covering ~30,000 population" },
-  { type: "Sub-Health Centres", description: "Basic health services at village level" },
-  { type: "Private Hospitals", description: "Empanelled under Ayushman Bharat Yojana" },
+// State-specific health schemes — always show national + state schemes
+const STATE_HEALTH_SCHEMES: Record<string, Array<{ name: string; desc: string; color: string; url: string | null }>> = {
+  karnataka: [
+    { name: "Arogya Karnataka", desc: "State health assurance scheme for Karnataka residents", color: "#2563EB", url: "https://arogyakarnataka.gov.in" },
+  ],
+  telangana: [
+    { name: "Aarogyasri", desc: "₹5 lakh health coverage for BPL families, covering 2,500+ procedures at 1,100+ empanelled hospitals", color: "#2563EB", url: "https://aarogyasri.telangana.gov.in" },
+  ],
+  "tamil-nadu": [
+    { name: "CMCHIS", desc: "Chief Minister's Comprehensive Health Insurance Scheme — cashless treatment up to ₹5 lakh", color: "#2563EB", url: null },
+  ],
+  delhi: [
+    { name: "Delhi Arogya Kosh", desc: "Financial assistance for treatment of serious illnesses for Delhi residents", color: "#2563EB", url: null },
+  ],
+  maharashtra: [
+    { name: "MJPJAY", desc: "Mahatma Jyotiba Phule Jan Arogya Yojana — cashless treatment for BPL families", color: "#2563EB", url: null },
+  ],
+  "west-bengal": [
+    { name: "Swasthya Sathi", desc: "Universal health coverage for all families in West Bengal — ₹5 lakh per family", color: "#2563EB", url: null },
+  ],
+  "uttar-pradesh": [
+    { name: "Ayushman Bharat UP", desc: "Health coverage for BPL families in UP — ₹5 lakh per family, extended state coverage", color: "#2563EB", url: null },
+  ],
+};
+
+const NATIONAL_SCHEMES = [
+  { name: "Ayushman Bharat PM-JAY", desc: "₹5 lakh health coverage per family per year", color: "#16A34A", url: "https://pmjay.gov.in" },
+  { name: "Janani Suraksha Yojana", desc: "Cash incentive for institutional deliveries", color: "#D97706", url: null },
+  { name: "RBSK", desc: "Rashtriya Bal Swasthya Karyakram for children", color: "#7C3AED", url: null },
 ];
+
+function getHospitalTypes(stateSlug: string) {
+  const config = getStateConfig(stateSlug);
+  const healthSubLabel = config?.healthSubLabel ?? "Taluk Hospitals";
+  const subUnit = config?.subDistrictUnit ?? "Taluk";
+  return [
+    { type: "Government District Hospital", description: "Primary referral hospital with emergency, OPD, and specialty services" },
+    { type: healthSubLabel, description: `Secondary care hospitals at ${subUnit.toLowerCase()} level` },
+    { type: "PHC (Primary Health Centres)", description: "Primary care centers covering ~30,000 population" },
+    { type: "Sub-Health Centres", description: "Basic health services at village level" },
+    { type: "Private Hospitals", description: "Empanelled under Ayushman Bharat Yojana" },
+  ];
+}
 
 function HealthPageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -72,15 +109,10 @@ function HealthPageInner({ params }: { params: Promise<{ locale: string; state: 
         ))}
       </div>
 
-      {/* Health schemes */}
+      {/* Health schemes — national + state-specific */}
       <SectionLabel>Government Health Schemes</SectionLabel>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10, marginBottom: 24 }}>
-        {[
-          { name: "Ayushman Bharat PM-JAY", desc: "₹5 lakh health coverage per family per year", color: "#16A34A", url: "https://pmjay.gov.in" },
-          { name: "Arogya Karnataka", desc: "State health assurance scheme for Karnataka residents", color: "#2563EB", url: "https://arogyakarnataka.gov.in" },
-          { name: "Janani Suraksha Yojana", desc: "Cash incentive for institutional deliveries", color: "#D97706", url: null },
-          { name: "RBSK", desc: "Rashtriya Bal Swasthya Karyakram for children", color: "#7C3AED", url: null },
-        ].map((s) => (
+        {[...NATIONAL_SCHEMES, ...(STATE_HEALTH_SCHEMES[state] ?? [])].map((s) => (
           <div key={s.name} style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 12, padding: "14px 16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A", marginBottom: 4 }}>{s.name}</div>
@@ -101,7 +133,7 @@ function HealthPageInner({ params }: { params: Promise<{ locale: string; state: 
       {/* Hospital types */}
       <SectionLabel>Healthcare Infrastructure</SectionLabel>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {HOSPITAL_TYPES.map((h) => (
+        {getHospitalTypes(state).map((h) => (
           <div key={h.type} style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 10, padding: "12px 14px", display: "flex", gap: 10 }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#DC2626", flexShrink: 0, marginTop: 5 }} />
             <div>
@@ -111,6 +143,8 @@ function HealthPageInner({ params }: { params: Promise<{ locale: string; state: 
           </div>
         ))}
       </div>
+
+      <ModuleNews district={district} state={state} locale={locale} module="health" />
 
       {/* Find hospital */}
       <div style={{ marginTop: 24, background: "linear-gradient(135deg, #FFF5F5, #FFF)", border: "1px solid #FECACA", borderRadius: 12, padding: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
