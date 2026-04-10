@@ -8,16 +8,17 @@ description: "Complete blueprint for ForThePeople.in — India's citizen transpa
 ## CURRENT STATE
 
 ```
-STATUS:           Sections 1-10 COMPLETE + Post-launch features + Security hardening. Fully deployed.
+STATUS:           Sections 1-10 COMPLETE + Contributor system + All states unlocked. Fully deployed.
 LIVE URL:         https://forthepeople.in
 GITHUB:           https://github.com/jayanthmb14/forthepeople (PUBLIC — clean history, MIT with Attribution)
 VERCEL:           zurvoapp Pro (scope: zurvoapps-projects)
-PILOT DISTRICTS:  8 active across 6 states (Karnataka: Mandya, Mysuru, Bengaluru Urban;
+ACTIVE DISTRICTS: 9 across 7 states (Karnataka: Mandya, Mysuru, Bengaluru Urban;
                   Delhi: New Delhi; Maharashtra: Mumbai;
                   West Bengal: Kolkata; Tamil Nadu: Chennai;
-                  Telangana: Hyderabad)
-                  + 10 Delhi districts ready to activate
-                  + 4 Telangana districts ready to activate
+                  Uttar Pradesh: Lucknow; Telangana: Hyderabad)
+ALL STATES:       36 states/UTs browsable (locked ones show preview + sponsor CTA)
+ALL DISTRICTS:    152 districts in DB (locked ones show LockedDistrictPreview)
+STATE MAPS:       33 GeoJSON maps from DataMeet Census 2011 + Karnataka hand-tuned
 PROJECT ID:       FTP-JMB-2026-IN (watermark ID)
 LAST UPDATED:     April 10, 2026
 ```
@@ -448,8 +449,11 @@ DATABASE_URL=<neon-prod-url> npx tsx scripts/calculate-health-scores.ts
 `AdminAuth` (2FA + backup codes, encrypted), `AdminAPIKey` (AES-256 encrypted keys),
 `AIProviderSettings` (singleton: active provider + models), `ScraperLog`
 
-### Payments (2 models)
-`Contribution` (Razorpay order/payment IDs, paise), `Supporter` (synced from Razorpay)
+### Payments & Sponsors (2 models)
+`Contribution` (Razorpay order/payment IDs, paise),
+`Supporter` (extended: razorpaySubscriptionId, subscriptionStatus, activatedAt, expiresAt,
+  districtId FK→District, stateId FK→State, socialLink, socialPlatform, badgeType, badgeLevel,
+  isRecurring, isPublic, message. Reverse relations: District.supporters[], State.supporters[])
 
 ### Other (5 models)
 `Feedback`, `DistrictRequest`, `DataRefresh`, `NewsIntelligenceLog`, `MarketData`
@@ -469,11 +473,11 @@ Desktop: 2-col grid (60% map + 40% district cards), Mobile: stacked.
 
 ```
 1. Header (Logo + nav + district selector)
-2. MarketTicker (40px bar: SENSEX, NIFTY, Gold, Silver, Crude, USD/INR — 5min market hours, 30min off-hours)
-3. HomepageStats (animated counters: 8 districts, 29 modules, data points)
+2. MarketTicker (40px bar: Gold, Silver(/g), Petrol, Diesel, USD/INR, SENSEX, NIFTY, Crude — 5min market hours, 30min off-hours)
+3. HomepageStats (animated counters: 9 districts, 29 modules, data points)
 4. DrillDownMap + ActiveDistrictsCard (2-col on desktop, stacked on mobile)
    - Map: India states, click to drill into state
-   - District cards: all 8 active districts with health grade, weather, dam, crop snippets
+   - District cards: all 9 active districts with health grade, weather, dam, crop snippets
 5. LiveDataPreview (horizontally scrollable preview cards, links to active districts)
 6. HowItWorks (3-column explainer)
 7. DistrictRequestSection (vote to add new districts)
@@ -520,9 +524,11 @@ Tab 5 — Feedback:
   - Admin note field per submission
 
 Tab 6 — Supporters:
-  - Contributions table (all tiers, amount in paise → display ₹)
-  - "Sync Razorpay" button (fetches last 100 captured payments)
-  - router.refresh() after sync to update Server Component counts
+  - Summary: Active Subscriptions, Monthly Revenue, One-Time Total, Expiring This Week
+  - Filters: Tier, Status, Sort (newest/oldest/amount/tenure)
+  - Flat list view (full table) + Grouped view (State→District hierarchy)
+  - CSV export button
+  - SupportersTable.tsx client component with all interactivity
 ```
 
 ---
@@ -549,6 +555,125 @@ npx prisma db push                    # apply schema
 npx prisma generate                   # regenerate client
 npx tsx prisma/seed.ts                # seed Mandya data
 npx tsx prisma/seed-hierarchy.ts      # seed State→District→Taluk (safe for prod)
+```
+
+---
+
+## CONTRIBUTOR & SPONSOR SYSTEM
+
+### 6 Tiers (src/lib/constants/razorpay-plans.ts)
+```
+☕ Chai           ₹50 one-time     accent #F97316
+🏛️ District       ₹200/mo          accent #2563EB  featured  requiresDistrict
+🇮🇳 State          ₹2,000/mo        accent #7C3AED  requiresState
+🌟 Patron         ₹10,000/mo       accent #DC2626
+👑 Founder        ₹50,000/mo       accent #D97706  platinum badge immediately
+💝 Custom         ₹10+ one-time    accent #374151
+```
+
+### Razorpay Integration
+```
+Live keys on Vercel (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, NEXT_PUBLIC_RAZORPAY_KEY_ID)
+4 subscription plans (RAZORPAY_PLAN_DISTRICT/STATE/PATRON/FOUNDER)
+Webhook: forthepeople.in/api/webhooks/razorpay (6 events)
+  payment.captured, payment.failed
+  subscription.charged (extends expiry +30d, recalc badge)
+  subscription.halted (→expired), subscription.cancelled, subscription.paused
+```
+
+### Badge Progression (src/lib/badge-level.ts)
+```
+Bronze  3+ months  |  Silver 6+ months  |  Gold 12+ months  |  Platinum 24+ months
+Founders get platinum immediately regardless of tenure
+```
+
+### Key API Routes
+```
+POST /api/payment/create-subscription    — creates Razorpay subscription
+POST /api/payment/verify-subscription    — verifies + creates Supporter record
+GET  /api/data/contributors              — ?district=&state= | ?type=leaderboard | ?type=all | ?type=district-rankings
+GET  /api/data/resolve-ids               — ?state=slug&district=slug → DB IDs
+```
+
+### Key Components
+```
+src/components/support/SupportCheckout.tsx         — Payment flow (one-time + subscription + auto-scroll from URL params)
+src/components/common/DistrictSponsorBanner.tsx    — Gold banner on district pages (max 6, tier-colored borders)
+src/components/common/PatronCard.tsx               — Premium card for founders (👑 gold gradient) and patrons (🌟)
+src/components/common/BadgeExplainer.tsx            — Collapsible tier + badge explanation
+src/components/support/SupporterQuotes.tsx          — Shows supporter messages on support page
+src/app/[locale]/contributors/                     — Global leaderboard + district rankings + filters
+src/app/[locale]/[state]/[district]/contributors/  — District-level contributor page
+```
+
+### Social Link Detection (src/lib/social-detect.ts)
+```
+detectAndCleanSocialLink(rawInput) handles:
+  @handle → Instagram, bare usernames, reel/post URLs, LinkedIn /in/ and /company/,
+  Twitter/X.com, GitHub, generic websites. Cleans to canonical profile URL.
+```
+
+### Sponsor Flow
+```
+District pages: "❤️ Sponsor Mandya — ₹200/mo →" (pink gradient button)
+  + "or: Sponsor Karnataka — ₹2,000/mo →" + "or: Sponsor India — ₹10,000/mo →"
+  All link to /support?tier=district&state=karnataka&district=mandya (auto-fills + auto-scrolls)
+Locked districts: same CTA with "Sponsor this district" → LockedDistrictPreview
+```
+
+---
+
+## ALL STATES + LOCKED DISTRICTS
+
+### Browsable Preview Mode
+```
+All 36 states navigable from header dropdown
+All 152 districts in DB — locked ones show LockedDistrictPreview:
+  - District header (name, population, area, literacy, taluks from districts.ts)
+  - "29 dashboards waiting to be unlocked" CTA
+  - Sponsor CTA with URL params
+  - Sponsors waiting section (if any)
+  - 29 locked module cards (lock icon + module icon + label)
+When district.active flips to true → preview disappears, full dashboard shows. Zero code changes.
+```
+
+### State District Maps (33 states)
+```
+Source: DataMeet Census 2011 district boundaries (CC-BY 4.0)
+Files: public/geo/{state-slug}-districts.json (33 files, Karnataka separate)
+Component: src/components/map/GenericStateMap.tsx
+  - Auto center/scale from GeoJSON bounds
+  - Active districts: blue fill, clickable
+  - Locked districts: gray fill, clickable → preview
+  - Falls back if GeoJSON doesn't load
+StateMapSection.tsx: KarnatakaMap for Karnataka, GenericStateMap for others
+```
+
+### Scripts
+```
+scripts/sync-all-districts.ts          — Syncs districts.ts → DB (upsert, never downgrades active)
+scripts/setup-razorpay-plans.ts        — Creates subscription plans on Razorpay
+scripts/setup-state-maps.ts            — Processes GeoJSON into per-state files
+scripts/seed-test-contributors.ts      — Seeds 20 test contributors (dev only)
+scripts/cleanup-test-contributors.ts   — Removes [TEST] records before deploy
+```
+
+---
+
+## SUPPORT PAGE STRUCTURE (src/app/support/page.tsx)
+
+```
+1. Hero (₹1.50/district/day at full scale + cost disclaimer)
+2. International disclaimer at TOP (@forthepeople_in Instagram)
+3. 6 tier cards (from TIER_CONFIG, "MOST POPULAR" on District Champion)
+4. Contributor wall (scrolling subscribers + one-time list)
+5. Supporter quotes (from DB messages)
+6. Personal bio (Jayanth M B)
+7. Scale section + "Early supporters lock in current rates"
+8. Cost at Scale (3 cards)
+9. Where Your Money Goes (cost breakdown bars)
+10. Other Ways to Help (GitHub, share, contribute, feedback)
+11. Bottom CTA + small international reminder
 ```
 
 ---
