@@ -97,14 +97,22 @@ function SchemesPageInner({ params }: { params: Promise<{ locale: string; state:
                     </div>
                   )}
                   {s.level && <div style={{ fontSize: 12, color: "#9B9B9B", marginTop: 8 }}>Level: {s.level}</div>}
-                  {s.applyUrl && (
+                  {s.applyUrl ? (
                     <a href={s.applyUrl.startsWith("http") ? s.applyUrl : `https://${s.applyUrl}`} target="_blank" rel="noopener noreferrer" style={{
                       display: "inline-flex", alignItems: "center", gap: 5, marginTop: 12,
-                      padding: "7px 14px", background: color, color: "#FFF",
-                      borderRadius: 8, fontSize: 12, fontWeight: 600, textDecoration: "none",
+                      padding: "7px 14px", background: "#0f6e56", color: "#FFF",
+                      borderRadius: 8, fontSize: 13, fontWeight: 500, textDecoration: "none",
                     }}>
                       Apply Online <ExternalLink size={11} />
                     </a>
+                  ) : (
+                    <span style={{
+                      display: "inline-flex", alignItems: "center", gap: 5, marginTop: 12,
+                      padding: "7px 14px", background: "#F5F5F0", color: "#9B9B9B",
+                      borderRadius: 8, fontSize: 12, fontWeight: 500,
+                    }}>
+                      Link unavailable
+                    </span>
                   )}
                 </div>
               );

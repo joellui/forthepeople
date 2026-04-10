@@ -142,8 +142,10 @@ export default function OverviewClient({ locale, stateSlug, districtSlug, stateN
     .filter((p) => p.status === "ongoing" || p.status === "active" || p.status === "under_construction")
     .slice(0, 4);
 
-  // Finance summary
-  const budgetEntries = budgetData?.data?.entries ?? [];
+  // Finance summary — use latest fiscal year only (matches finance page)
+  const allBudgetEntries = budgetData?.data?.entries ?? [];
+  const latestFY = allBudgetEntries.length > 0 ? allBudgetEntries[0].fiscalYear : null;
+  const budgetEntries = latestFY ? allBudgetEntries.filter((e) => e.fiscalYear === latestFY) : [];
   const totalAllocated = budgetEntries.reduce((s, e) => s + e.allocated, 0);
   const totalSpent = budgetEntries.reduce((s, e) => s + e.spent, 0);
   const spentPct = totalAllocated > 0 ? (totalSpent / totalAllocated) * 100 : 0;
