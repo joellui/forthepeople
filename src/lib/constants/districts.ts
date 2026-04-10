@@ -811,6 +811,173 @@ const LUCKNOW_DISTRICT: District = {
   ],
 };
 
+// ── Hyderabad District ──────────────────────────────────────
+const HYDERABAD_DISTRICT: District = {
+  slug: "hyderabad",
+  name: "Hyderabad",
+  nameLocal: "హైదరాబాద్",
+  tagline: "City of Pearls",
+  taglineLocal: "ముత్యాల నగరం",
+  active: true,
+  population: 4500000,
+  area: 217,
+  talukCount: 16,
+  villageCount: 0,
+  literacy: 83.25,
+  sexRatio: 954,
+  taluks: [
+    {
+      slug: "charminar", name: "Charminar", nameLocal: "చార్మినార్",
+      tagline: "Icon of Hyderabad", population: 260000, area: 8, villageCount: 0,
+      villages: [
+        { slug: "charminar-area", name: "Charminar", nameLocal: "చార్మినార్", population: 85000, pincode: "500002" },
+        { slug: "laad-bazaar", name: "Laad Bazaar", nameLocal: "లాడ్ బజార్", population: 60000, pincode: "500002" },
+        { slug: "mecca-masjid", name: "Mecca Masjid Area", nameLocal: "మక్కా మసీదు", population: 55000, pincode: "500002" },
+        { slug: "pathergatti", name: "Pathergatti", nameLocal: "పత్తర్ఘట్టి", population: 60000, pincode: "500002" },
+      ],
+    },
+    {
+      slug: "secunderabad", name: "Secunderabad", nameLocal: "సికింద్రాబాద్",
+      tagline: "Twin City", population: 305000, area: 15, villageCount: 0,
+      villages: [
+        { slug: "secunderabad-junction", name: "Secunderabad Junction", nameLocal: "సికింద్రాబాద్ జంక్షన్", population: 95000, pincode: "500003" },
+        { slug: "paradise", name: "Paradise", nameLocal: "పారడైజ్", population: 70000, pincode: "500003" },
+        { slug: "trimulgherry", name: "Trimulgherry", nameLocal: "తిరుమల్ఘెర్రీ", population: 80000, pincode: "500015" },
+        { slug: "rp-road", name: "RP Road", nameLocal: "ఆర్పీ రోడ్", population: 60000, pincode: "500003" },
+      ],
+    },
+    {
+      slug: "nampally", name: "Nampally", nameLocal: "నాంపల్లి",
+      tagline: "Administrative Center", population: 245000, area: 11, villageCount: 0,
+      villages: [
+        { slug: "abids", name: "Abids", nameLocal: "అబిడ్స్", population: 65000, pincode: "500001" },
+        { slug: "nampally-station", name: "Nampally Station", nameLocal: "నాంపల్లి స్టేషన్", population: 55000, pincode: "500001" },
+        { slug: "public-gardens", name: "Public Gardens", nameLocal: "పబ్లిక్ గార్డెన్స్", population: 45000, pincode: "500004" },
+        { slug: "mozamjahi-market", name: "Mozamjahi Market", nameLocal: "మొజాంజాహి మార్కెట్", population: 40000, pincode: "500001" },
+      ],
+    },
+    {
+      slug: "khairatabad", name: "Khairatabad", nameLocal: "ఖైరతాబాద్",
+      tagline: "Legislative District", population: 210000, area: 9, villageCount: 0,
+      villages: [
+        { slug: "secretariat", name: "Secretariat", nameLocal: "సచివాలయం", population: 45000, pincode: "500004" },
+        { slug: "lakdi-ka-pul", name: "Lakdi Ka Pul", nameLocal: "లకడీ కా పూల్", population: 55000, pincode: "500004" },
+        { slug: "saifabad", name: "Saifabad", nameLocal: "సైఫాబాద్", population: 50000, pincode: "500004" },
+        { slug: "ac-guards", name: "AC Guards", nameLocal: "ఏసీ గార్డ్స్", population: 60000, pincode: "500004" },
+      ],
+    },
+    {
+      slug: "amberpet", name: "Amberpet", nameLocal: "అంబర్‌పేట్",
+      tagline: "Heart of Central Hyderabad", population: 320000, area: 12, villageCount: 0,
+      villages: [
+        { slug: "amberpet-centre", name: "Amberpet", nameLocal: "అంబర్‌పేట్", population: 100000, pincode: "500013" },
+        { slug: "ramanthapur", name: "Ramanthapur", nameLocal: "రామంతపూర్", population: 85000, pincode: "500013" },
+        { slug: "kacheguda", name: "Kacheguda", nameLocal: "కాచిగూడ", population: 75000, pincode: "500027" },
+        { slug: "vidyanagar", name: "Vidyanagar", nameLocal: "విద్యానగర్", population: 60000, pincode: "500044" },
+      ],
+    },
+    {
+      slug: "asifnagar", name: "Asifnagar", nameLocal: "ఆసిఫ్‌నగర్",
+      tagline: "Old City Gateway", population: 280000, area: 15, villageCount: 0,
+      villages: [
+        { slug: "mehdipatnam", name: "Mehdipatnam", nameLocal: "మెహదీపట్నం", population: 95000, pincode: "500028" },
+        { slug: "masab-tank", name: "Masab Tank", nameLocal: "మసబ్ ట్యాంక్", population: 65000, pincode: "500028" },
+        { slug: "rethibowli", name: "Rethibowli", nameLocal: "రేతిబౌలి", population: 70000, pincode: "500028" },
+      ],
+    },
+    {
+      slug: "bahadurpura", name: "Bahadurpura", nameLocal: "బహదూర్‌పురా",
+      tagline: "Historic Old City", population: 468000, area: 22, villageCount: 0,
+      villages: [
+        { slug: "falaknuma", name: "Falaknuma", nameLocal: "ఫలక్‌నుమా", population: 120000, pincode: "500053" },
+        { slug: "chandrayangutta", name: "Chandrayangutta", nameLocal: "చంద్రాయణగుట్ట", population: 150000, pincode: "500005" },
+        { slug: "bahadurpura-centre", name: "Bahadurpura", nameLocal: "బహదూర్‌పురా", population: 100000, pincode: "500064" },
+        { slug: "yakutpura", name: "Yakutpura", nameLocal: "యాకుత్‌పురా", population: 98000, pincode: "500023" },
+      ],
+    },
+    {
+      slug: "bandlaguda", name: "Bandlaguda", nameLocal: "బండ్లగూడ",
+      tagline: "Southern Growth Corridor", population: 350000, area: 30, villageCount: 0,
+      villages: [
+        { slug: "bandlaguda-centre", name: "Bandlaguda", nameLocal: "బండ్లగూడ", population: 120000, pincode: "500005" },
+        { slug: "sagar-road", name: "Sagar Road", nameLocal: "సాగర్ రోడ్", population: 110000, pincode: "500058" },
+        { slug: "katedan", name: "Katedan", nameLocal: "కాటేదాన్", population: 120000, pincode: "500077" },
+      ],
+    },
+    {
+      slug: "golkonda", name: "Golkonda", nameLocal: "గోల్కొండ",
+      tagline: "Fort of Diamonds", population: 310000, area: 20, villageCount: 0,
+      villages: [
+        { slug: "golkonda-fort", name: "Golkonda Fort", nameLocal: "గోల్కొండ కోట", population: 80000, pincode: "500008" },
+        { slug: "langar-houz", name: "Langar Houz", nameLocal: "లంగర్ హౌజ్", population: 95000, pincode: "500008" },
+        { slug: "toli-chowki", name: "Toli Chowki", nameLocal: "తోలి చౌకి", population: 85000, pincode: "500008" },
+      ],
+    },
+    {
+      slug: "himayatnagar", name: "Himayatnagar", nameLocal: "హిమాయత్‌నగర్",
+      tagline: "Commercial Hub", population: 220000, area: 10, villageCount: 0,
+      villages: [
+        { slug: "himayatnagar-centre", name: "Himayatnagar", nameLocal: "హిమాయత్‌నగర్", population: 75000, pincode: "500029" },
+        { slug: "narayanguda", name: "Narayanguda", nameLocal: "నారాయణగూడ", population: 80000, pincode: "500029" },
+        { slug: "domalguda", name: "Domalguda", nameLocal: "దొమలగూడ", population: 65000, pincode: "500029" },
+      ],
+    },
+    {
+      slug: "musheerabad", name: "Musheerabad", nameLocal: "ముషీరాబాద్",
+      tagline: "Cultural Crossroads", population: 295000, area: 14, villageCount: 0,
+      villages: [
+        { slug: "musheerabad-centre", name: "Musheerabad", nameLocal: "ముషీరాబాద్", population: 90000, pincode: "500048" },
+        { slug: "gandhi-nagar", name: "Gandhi Nagar", nameLocal: "గాంధీ నగర్", population: 85000, pincode: "500080" },
+        { slug: "bholakpur", name: "Bholakpur", nameLocal: "భోలక్‌పూర్", population: 70000, pincode: "500010" },
+      ],
+    },
+    {
+      slug: "saidabad", name: "Saidabad", nameLocal: "సాయిదాబాద్",
+      tagline: "Musi River Banks", population: 275000, area: 16, villageCount: 0,
+      villages: [
+        { slug: "saidabad-centre", name: "Saidabad", nameLocal: "సాయిదాబాద్", population: 90000, pincode: "500059" },
+        { slug: "malakpet", name: "Malakpet", nameLocal: "మలక్‌పేట్", population: 95000, pincode: "500036" },
+        { slug: "chaderghat", name: "Chaderghat", nameLocal: "చాదర్‌ఘాట్", population: 90000, pincode: "500024" },
+      ],
+    },
+    {
+      slug: "ameerpet", name: "Ameerpet", nameLocal: "అమీర్‌పేట్",
+      tagline: "Coaching Hub of India", population: 59000, area: 4, villageCount: 0,
+      villages: [
+        { slug: "ameerpet-centre", name: "Ameerpet", nameLocal: "అమీర్‌పేట్", population: 30000, pincode: "500016" },
+        { slug: "sr-nagar", name: "SR Nagar", nameLocal: "ఎస్ఆర్ నగర్", population: 29000, pincode: "500038" },
+      ],
+    },
+    {
+      slug: "tirumalagiri", name: "Tirumalagiri", nameLocal: "తిరుమలగిరి",
+      tagline: "Cantonment Heritage", population: 180000, area: 12, villageCount: 0,
+      villages: [
+        { slug: "tirumalagiri-centre", name: "Tirumalagiri", nameLocal: "తిరుమలగిరి", population: 60000, pincode: "500015" },
+        { slug: "karkhana", name: "Karkhana", nameLocal: "కార్ఖానా", population: 65000, pincode: "500009" },
+        { slug: "picket", name: "Picket", nameLocal: "పికెట్", population: 55000, pincode: "500026" },
+      ],
+    },
+    {
+      slug: "maredpally", name: "Maredpally", nameLocal: "మారేడ్‌పల్లి",
+      tagline: "Secunderabad Core", population: 195000, area: 10, villageCount: 0,
+      villages: [
+        { slug: "maredpally-centre", name: "Maredpally", nameLocal: "మారేడ్‌పల్లి", population: 70000, pincode: "500026" },
+        { slug: "lalaguda", name: "Lalaguda", nameLocal: "లాలాగూడ", population: 65000, pincode: "500017" },
+        { slug: "padmarao-nagar", name: "Padmarao Nagar", nameLocal: "పద్మారావ్ నగర్", population: 60000, pincode: "500025" },
+      ],
+    },
+    {
+      slug: "shaikpet", name: "Shaikpet", nameLocal: "షైక్‌పేట్",
+      tagline: "HITEC City Gateway", population: 230000, area: 18, villageCount: 0,
+      villages: [
+        { slug: "shaikpet-centre", name: "Shaikpet", nameLocal: "షైక్‌పేట్", population: 75000, pincode: "500008" },
+        { slug: "tolichowki", name: "Tolichowki", nameLocal: "తోలిచౌకి", population: 80000, pincode: "500008" },
+        { slug: "film-nagar", name: "Film Nagar", nameLocal: "ఫిల్మ్ నగర్", population: 75000, pincode: "500008" },
+      ],
+    },
+  ],
+};
+
 // ── Helper to create a locked district ───────────────────
 function lockedDistrict(slug: string, name: string): District {
   return { slug, name, nameLocal: name, active: false, taluks: [] };
@@ -843,9 +1010,9 @@ export const INDIA_STATES: State[] = [
   },
   {
     slug: "telangana", name: "Telangana", nameLocal: "తెలంగాణ",
-    active: false, capital: "Hyderabad", type: "state",
+    active: true, capital: "Hyderabad", type: "state",
     districts: [
-      lockedDistrict("hyderabad", "Hyderabad"),
+      HYDERABAD_DISTRICT,
       lockedDistrict("warangal", "Warangal"),
       lockedDistrict("nizamabad", "Nizamabad"),
       lockedDistrict("karimnagar", "Karimnagar"),

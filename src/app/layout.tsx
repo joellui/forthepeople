@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   keywords: [
     "government data India", "district dashboard", "RTI India",
     "crop prices", "government schemes", "citizen transparency",
-    "Karnataka districts", "Mandya", "gram panchayat",
+    "district dashboard", "Hyderabad", "gram panchayat",
     "India civic data", "public data India", "government transparency",
   ],
   authors: [{ name: "Jayanth M B", url: BASE_URL }],
@@ -117,7 +117,7 @@ const organizationLd = {
   "@type": "Organization",
   "name": "ForThePeople.in",
   "url": BASE_URL,
-  "logo": `${BASE_URL}/icon-512.png`,
+  "logo": `${BASE_URL}/android-chrome-512x512.png`,
   "description": "India's citizen transparency platform providing free district-level government data — budgets, crop prices, water levels, government schemes, and more.",
   "foundingDate": "2026",
   "founder": {
@@ -166,7 +166,7 @@ const faqLd = {
       "name": "Which districts are covered on ForThePeople.in?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "ForThePeople.in currently covers 20+ Karnataka districts including Mandya, Bengaluru Urban, Mysuru, Tumakuru, Hassan, Kolar, and more. The platform plans to expand to all 780+ Indian districts. Each district has live data on weather, crops, water, budget, schools, elections, leadership, and 25+ other civic categories.",
+        "text": "ForThePeople.in currently covers districts across Karnataka (Mandya, Bengaluru Urban, Mysuru), Delhi, Maharashtra (Mumbai), West Bengal (Kolkata), Tamil Nadu (Chennai), and Telangana (Hyderabad). The platform plans to expand to all 780+ Indian districts. Each district has live data on weather, crops, water, budget, schools, elections, leadership, and 25+ other civic categories.",
       },
     },
     {
@@ -209,7 +209,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="ForThePeople" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       </head>
       <body className="antialiased">
         {/* Skip navigation link for keyboard / screen-reader users */}

@@ -21,20 +21,30 @@
 5. Move to next phase
 ```
 
-## CURRENT PROJECT STATE (March 18, 2026)
+## CURRENT PROJECT STATE (April 10, 2026)
 
 ```
 LIVE:           https://forthepeople.in
-STACK:          Next.js 16 + TypeScript + Tailwind v4 + Prisma + Neon DB + Upstash Redis
-MAPS:           Leaflet.js (BROKEN — replacing in Phase 1)
-AI ENGINE:      Gemini 2.5 Flash
-DEPLOYMENT:     Vercel (free tier)
-SCRAPER:        Not yet live (Railway pending — 12hr activation)
-MODULES:        29 dashboard modules built
-SECTIONS 1-10:  All COMPLETE
-RECENT FIXES:   Mysuru taluk slugs, finance totalLapsed, weather scraper, HomeDrilldown
-INSPIRATION:    worldmonitor.app — AI-powered intelligence synthesis, real-time dashboards,
-                composite scoring, data freshness tracking, clean panel-based UI
+GITHUB:         https://github.com/jayanthmb14/forthepeople (PUBLIC, MIT with Attribution)
+STACK:          Next.js 16 + TypeScript + Tailwind v4 + Prisma 7 + Neon PostgreSQL + Upstash Redis
+MAPS:           react-simple-maps (D3-based, GeoJSON per district)
+AI ENGINE:      Anthropic Claude (default) + Google Gemini (fallback)
+DEPLOYMENT:     Vercel Pro (zurvoapp) + Railway (scraper)
+MODULES:        30 dashboard modules
+ACTIVE:         8 districts across 6 states
+                Karnataka: Mandya, Mysuru, Bengaluru Urban
+                Delhi: New Delhi
+                Maharashtra: Mumbai
+                West Bengal: Kolkata
+                Tamil Nadu: Chennai
+                Telangana: Hyderabad
+RECENT:         Multi-state scalability overhaul, state-config.ts, DataSourceBanner,
+                NoDataCard, IBJA gold prices, exams dedup, Hyderabad expansion
+
+KEY NEW FILES:
+  src/lib/constants/state-config.ts      — Per-state configuration (single source of truth)
+  src/components/common/DataSourceBanner.tsx — Data source attribution on all module pages
+  src/components/common/NoDataCard.tsx    — Universal empty state component
 ```
 
 ---

@@ -11,6 +11,8 @@ import { Cloud, Download } from "lucide-react";
 import { useWeather, useRainfall } from "@/hooks/useRealtimeData";
 import { ModuleHeader, SectionLabel, LoadingShell, LiveBadge, DataTable, LastUpdatedBadge } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import { getModuleSources } from "@/lib/constants/state-config";
 import ShareButtons from "@/components/common/ShareButtons";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import { downloadCSV, todayISO } from "@/lib/csv";
@@ -57,8 +59,9 @@ function WeatherPageInner({ params }: { params: Promise<{ locale: string; state:
 
       {/* AI-crawler readable summary */}
       <p style={{ fontSize: 13, color: "#6B6B6B", lineHeight: 1.7, marginBottom: 16, padding: "12px 16px", background: "#FAFAF8", borderRadius: 8, borderLeft: "3px solid #2563EB" }}>
-        This page shows live weather readings and monthly rainfall history for this district, sourced from India Meteorological Department (IMD). Temperature is in Celsius, rainfall in millimetres. The district falls in the South Interior Karnataka agro-climatic zone and receives both southwest (June–September) and northeast (October–December) monsoon rainfall.
+        This page shows live weather readings and monthly rainfall history for this district, sourced from India Meteorological Department (IMD) and OpenWeatherMap. Temperature is in Celsius, rainfall in millimetres. Data is updated every 5 minutes during active monitoring.
       </p>
+      {(() => { const _src = getModuleSources("weather", state); return <DataSourceBanner moduleName="weather" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="weather" district={district} />
 
       {/* Current Weather */}

@@ -10,6 +10,9 @@ import { Leaf } from "lucide-react";
 import { useSoil } from "@/hooks/useRealtimeData";
 import { ModuleHeader, SectionLabel, LoadingShell, ErrorBlock } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 const PH_LABEL = (ph: number) => ph < 6 ? "Acidic" : ph > 7.5 ? "Alkaline" : "Neutral";
 const PH_COLOR = (ph: number) => ph < 6 ? "#DC2626" : ph > 7.5 ? "#D97706" : "#16A34A";
@@ -30,11 +33,15 @@ export default function FarmPage({ params }: { params: Promise<{ locale: string;
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Leaf} title="Farm & Soil" description="Soil health reports and agri advisory for farmers" backHref={base} />
+      {(() => { const _src = getModuleSources("farm", state); return <DataSourceBanner moduleName="farm" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="farm" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}
+      {!isLoading && !error && soilData.length === 0 && advisories.length === 0 && (
+        <NoDataCard module="farm" district={district} state={state} />
+      )}
 
-      {!isLoading && (
+      {!isLoading && (soilData.length > 0 || advisories.length > 0) && (
         <>
           {/* Active advisories */}
           {activeAdvisories.length > 0 && (

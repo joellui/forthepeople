@@ -80,7 +80,7 @@ const SCALE_COSTS = [
 
 const COST_BREAKDOWN = [
   { label: "Servers & Database (Vercel + Neon + Railway)", pct: 40, color: "#2563EB" },
-  { label: "Data APIs & Scraping Infrastructure", pct: 25, color: "#16A34A" },
+  { label: "Data APIs & Collection Infrastructure", pct: 25, color: "#16A34A" },
   { label: "Development & Maintenance", pct: 20, color: "#7C3AED" },
   { label: "Domain, CDN & Security", pct: 15, color: "#F59E0B" },
 ];
@@ -305,7 +305,7 @@ export default function SupportPage() {
               <p style={{ fontSize: 14, color: "#1A1A1A", lineHeight: 1.8, margin: 0 }}>
                 &ldquo;I&apos;m a solo developer from Karnataka who believes government data should be free
                 and accessible to every citizen — not buried in PDF reports and broken portals.
-                I built ForThePeople.in entirely by myself: every scraper, every API, every dashboard,
+                I built ForThePeople.in entirely by myself: every data pipeline, every API, every dashboard,
                 every line of code.
                 <br /><br />
                 This is <strong>not a startup</strong>. This is <strong>not for profit</strong>. This is a
@@ -405,7 +405,7 @@ export default function SupportPage() {
             Even ₹50 helps.
           </div>
           <p style={{ fontSize: 14, color: "#4B4B4B", lineHeight: 1.7, marginBottom: 20 }}>
-            It pays for one day of scraping data for a district — weather updates, crop prices, dam levels,
+            It pays for one day of collecting data for a district — weather updates, crop prices, dam levels,
             and 26 more data streams. Free for every citizen in that district.
           </p>
           <div style={{ display: "inline-block", minWidth: 220 }}>

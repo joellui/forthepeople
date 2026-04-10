@@ -524,6 +524,113 @@ async function main() {
     console.log(`✓ ${def.name} + ${def.taluks.length} taluks`);
   }
 
+  // ── Telangana State ─────────────────────────────────────
+  console.log("\n🌱 Upserting Telangana hierarchy...");
+
+  const telangana = await prisma.state.upsert({
+    where: { slug: "telangana" },
+    update: { active: true },
+    create: { name: "Telangana", nameLocal: "తెలంగాణ", slug: "telangana", active: true, capital: "Hyderabad" },
+  });
+  console.log("✓ Telangana state");
+
+  const telanganaDistricts = [
+    {
+      slug: "hyderabad",
+      name: "Hyderabad", nameLocal: "హైదరాబాద్",
+      tagline: "City of Pearls", taglineLocal: "ముత్యాల నగరం",
+      population: 4500000, area: 217, talukCount: 16, villageCount: 0,
+      literacy: 83.25, sexRatio: 954, density: 18172,
+      active: true,
+      taluks: [
+        { slug: "charminar",     name: "Charminar",     nameLocal: "చార్మినార్",     tagline: "Icon of Hyderabad",         pop: 260000, area: 8,  villages: 0 },
+        { slug: "secunderabad",  name: "Secunderabad",  nameLocal: "సికింద్రాబాద్",   tagline: "Twin City",                pop: 305000, area: 15, villages: 0 },
+        { slug: "nampally",      name: "Nampally",      nameLocal: "నాంపల్లి",       tagline: "Administrative Center",     pop: 245000, area: 11, villages: 0 },
+        { slug: "khairatabad",   name: "Khairatabad",   nameLocal: "ఖైరతాబాద్",      tagline: "Legislative District",      pop: 210000, area: 9,  villages: 0 },
+        { slug: "amberpet",      name: "Amberpet",      nameLocal: "అంబర్‌పేట్",      tagline: "Heart of Central Hyderabad", pop: 320000, area: 12, villages: 0 },
+        { slug: "asifnagar",     name: "Asifnagar",     nameLocal: "ఆసిఫ్‌నగర్",      tagline: "Old City Gateway",          pop: 280000, area: 15, villages: 0 },
+        { slug: "bahadurpura",   name: "Bahadurpura",   nameLocal: "బహదూర్‌పురా",     tagline: "Historic Old City",         pop: 468000, area: 22, villages: 0 },
+        { slug: "bandlaguda",    name: "Bandlaguda",    nameLocal: "బండ్లగూడ",        tagline: "Southern Growth Corridor",  pop: 350000, area: 30, villages: 0 },
+        { slug: "golkonda",      name: "Golkonda",      nameLocal: "గోల్కొండ",        tagline: "Fort of Diamonds",          pop: 310000, area: 20, villages: 0 },
+        { slug: "himayatnagar",  name: "Himayatnagar",  nameLocal: "హిమాయత్‌నగర్",    tagline: "Commercial Hub",            pop: 220000, area: 10, villages: 0 },
+        { slug: "musheerabad",   name: "Musheerabad",   nameLocal: "ముషీరాబాద్",      tagline: "Cultural Crossroads",       pop: 295000, area: 14, villages: 0 },
+        { slug: "saidabad",      name: "Saidabad",      nameLocal: "సాయిదాబాద్",      tagline: "Musi River Banks",          pop: 275000, area: 16, villages: 0 },
+        { slug: "ameerpet",      name: "Ameerpet",      nameLocal: "అమీర్‌పేట్",      tagline: "Coaching Hub of India",     pop: 59000,  area: 4,  villages: 0 },
+        { slug: "tirumalagiri",  name: "Tirumalagiri",  nameLocal: "తిరుమలగిరి",      tagline: "Cantonment Heritage",       pop: 180000, area: 12, villages: 0 },
+        { slug: "maredpally",    name: "Maredpally",    nameLocal: "మారేడ్‌పల్లి",     tagline: "Secunderabad Core",         pop: 195000, area: 10, villages: 0 },
+        { slug: "shaikpet",      name: "Shaikpet",      nameLocal: "షైక్‌పేట్",        tagline: "HITEC City Gateway",        pop: 230000, area: 18, villages: 0 },
+      ],
+    },
+    {
+      slug: "warangal", name: "Warangal", nameLocal: "వరంగల్",
+      tagline: "City of Orugallu", population: 3522644, area: 2175,
+      literacy: 65.11, sexRatio: 998, density: 1620, active: false,
+      talukCount: 0, villageCount: 0, taluks: [],
+    },
+    {
+      slug: "nizamabad", name: "Nizamabad", nameLocal: "నిజామాబాద్",
+      tagline: "Turmeric City", population: 2551335, area: 4288,
+      literacy: 60.13, sexRatio: 1040, density: 595, active: false,
+      talukCount: 0, villageCount: 0, taluks: [],
+    },
+    {
+      slug: "karimnagar", name: "Karimnagar", nameLocal: "కరీంనగర్",
+      tagline: "Silver Filigree City", population: 3776269, area: 11823,
+      literacy: 56.45, sexRatio: 1008, density: 319, active: false,
+      talukCount: 0, villageCount: 0, taluks: [],
+    },
+    {
+      slug: "khammam", name: "Khammam", nameLocal: "ఖమ్మం",
+      tagline: "Gateway to Dandakaranya", population: 2798164, area: 4453,
+      literacy: 63.56, sexRatio: 1017, density: 628, active: false,
+      talukCount: 0, villageCount: 0, taluks: [],
+    },
+  ];
+
+  for (const def of telanganaDistricts) {
+    const district = await prisma.district.upsert({
+      where: { stateId_slug: { stateId: telangana.id, slug: def.slug } },
+      update: { active: def.active ?? false },
+      create: {
+        stateId: telangana.id,
+        slug: def.slug,
+        name: def.name,
+        nameLocal: def.nameLocal,
+        tagline: def.tagline,
+        population: def.population,
+        area: def.area,
+        talukCount: def.talukCount ?? 0,
+        villageCount: def.villageCount ?? 0,
+        literacy: def.literacy,
+        sexRatio: def.sexRatio,
+        density: def.density,
+        active: def.active ?? false,
+      },
+    });
+
+    for (const t of def.taluks) {
+      await prisma.taluk.upsert({
+        where: { districtId_slug: { districtId: district.id, slug: t.slug } },
+        update: {},
+        create: {
+          districtId: district.id,
+          slug: t.slug,
+          name: t.name,
+          nameLocal: t.nameLocal,
+          tagline: t.tagline,
+          population: t.pop,
+          area: t.area,
+          villageCount: t.villages,
+        },
+      });
+    }
+    if (def.taluks.length > 0) {
+      console.log(`✓ ${def.name} + ${def.taluks.length} mandals`);
+    } else {
+      console.log(`✓ ${def.name} (inactive — no mandals seeded)`);
+    }
+  }
+
   console.log("\n✅ Hierarchy upsert complete — no data deleted.");
 }
 

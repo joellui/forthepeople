@@ -40,6 +40,8 @@ import { scrapeTransport } from "./jobs/transport";
 import { scrapeSchemes } from "./jobs/schemes";
 import { scrapeSoil } from "./jobs/soil";
 import { scrapeElections } from "./jobs/elections";
+// ── Weekly scrapers (continued) ──────────────────────────
+import { scrapeBudget } from "./jobs/budget";
 // ── 12-hour scrapers ─────────────────────────────────────
 import { scrapeExams } from "./jobs/exams";
 
@@ -172,6 +174,9 @@ async function scheduleJobs() {
       await runJob("transport", scrapeTransport, ctx, ["transport"]);
       await runJob("schemes", scrapeSchemes, ctx, ["schemes"]);
     });
+
+    // ── Weekly Monday 6 AM: Budget collection ─────────────
+    cron.schedule("0 6 * * 1", () => runJob("budget", scrapeBudget, ctx, ["finance"]));
 
     // ── Monthly 15th, 3 AM: Soil, Elections ──────────────
     cron.schedule("0 3 15 * *", async () => {

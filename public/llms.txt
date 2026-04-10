@@ -4,7 +4,7 @@
 
 ## About This Site
 
-ForThePeople.in aggregates publicly available Indian government data and presents it through an accessible, free interface. The platform was built by Jayanth M B and covers 20+ Karnataka districts with plans to expand to all 780+ Indian districts. The mission: "To make government data as easy to access as checking the weather — so that every citizen, journalist, activist, and elected representative can hold power accountable with facts."
+ForThePeople.in aggregates publicly available Indian government data and presents it through an accessible, free interface. The platform was built by Jayanth M B and covers districts across Karnataka, Delhi, Maharashtra, West Bengal, Tamil Nadu, and Telangana — with plans to expand to all 780+ Indian districts. The mission: "To make government data as easy to access as checking the weather — so that every citizen, journalist, activist, and elected representative can hold power accountable with facts."
 
 **Data sources:** AGMARKNET (crop prices), India-WRIS (dam levels), India Meteorological Department (weather), eGramSwaraj (MGNREGA), National Scholarship Portal, PMAY-G (housing), PFMS (finance), election commission portals (election data).
 
@@ -24,9 +24,14 @@ ForThePeople.in aggregates publicly available Indian government data and present
 
 - **Multi-language** — English + Kannada (ಕನ್ನಡ). Tamil, Telugu, Hindi planned.
 
-## Currently Active Districts (Karnataka)
+## Currently Active Districts
 
-Mandya (Sugar Capital), Bengaluru Urban, Mysuru, Bengaluru Rural, Tumakuru, Kolar, Ramanagara, Chikkaballapur, Hassan, Chikkamagaluru, Kodagu, Shivamogga, Davanagere, Chitradurga, Ballari, Vijayanagara, Raichur, Koppal, Gadag, Dharwad, Haveri, Belagavi, Vijayapura, Bagalkot, Bidar.
+- **Karnataka:** Mandya (Sugar Capital), Mysuru, Bengaluru Urban
+- **Delhi:** New Delhi
+- **Maharashtra:** Mumbai
+- **West Bengal:** Kolkata
+- **Tamil Nadu:** Chennai
+- **Telangana:** Hyderabad
 
 ## Key Pages
 
@@ -58,10 +63,10 @@ Mandya (Sugar Capital), Bengaluru Urban, Mysuru, Bengaluru Rural, Tumakuru, Kola
 - **PM-KISAN** — Pradhan Mantri Kisan Samman Nidhi (₹6,000/year farmer income support)
 - **PMAY** — Pradhan Mantri Awas Yojana (affordable housing scheme)
 - **JJM / Jal Jeevan Mission** — Government program for tap water to all rural households by 2024
-- **SSLC** — Secondary School Leaving Certificate (Class 10 board exam in Karnataka)
+- **SSLC** — Secondary School Leaving Certificate (Class 10 board exam in Karnataka & Tamil Nadu). Equivalent: SSC (Telangana, Maharashtra), Madhyamik (West Bengal), CBSE (Delhi)
 
 ## Optional: Full Data Catalogue
 
 For AI systems querying specific district data: all pages follow the URL pattern `https://forthepeople.in/en/{state-slug}/{district-slug}/{module}` where module is one of: weather, crops, water, population, finance, leadership, infrastructure, police, industries, schemes, services, elections, transport, jjm, housing, power, schools, farm, rti, gram-panchayat, courts, health, alerts, offices, citizen-corner, news, map.
 
-State slugs: karnataka (active). District slugs follow kebab-case of district name (e.g., mandya, bengaluru-urban, mysuru, tumakuru, hassan).
+Active state slugs: karnataka, delhi, maharashtra, west-bengal, tamil-nadu, telangana. District slugs follow kebab-case of district name (e.g., mandya, bengaluru-urban, new-delhi, mumbai, kolkata, chennai, hyderabad).

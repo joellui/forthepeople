@@ -9,6 +9,9 @@ import { use, useState, useEffect } from "react";
 import { Users } from "lucide-react";
 import { ModuleHeader, SectionLabel, LoadingShell } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -88,6 +91,7 @@ export default function CitizenCornerPage({ params }: { params: Promise<{ locale
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Users} title="Citizen Corner" description="AI-powered civic tips, rights, and emergency helplines" backHref={base} />
+      {(() => { const _src = getModuleSources("citizen-corner", state); return <DataSourceBanner moduleName="citizen-corner" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="citizen-corner" district={district} />
 
       {/* Tab switcher */}

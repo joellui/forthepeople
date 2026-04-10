@@ -13,6 +13,9 @@ import { useRTI } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, SectionLabel, ProgressBar, LoadingShell, ErrorBlock, DataTable } from "@/components/district/ui";
 import Link from "next/link";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 function RTIPageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -37,6 +40,7 @@ function RTIPageInner({ params }: { params: Promise<{ locale: string; state: str
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={FileText} title="RTI Statistics" description="Right to Information filing statistics by department" backHref={base} />
+      {(() => { const _src = getModuleSources("rti", state); return <DataSourceBanner moduleName="rti" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="rti" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}

@@ -77,7 +77,7 @@ const PROVIDERS = [
     icon: "✨",
     name: "Google Gemini",
     tagline: "Best for news analysis",
-    desc: "Google's Gemini is excellent for news scraping, summarisation, and high-throughput pipelines. 1M token context.",
+    desc: "Google's Gemini is excellent for news analysis, summarisation, and high-throughput pipelines. 1M token context.",
     keyName: "gemini",
     keyLabel: "Gemini API Key",
     keyPlaceholder: "AIza…",

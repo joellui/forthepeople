@@ -7,6 +7,9 @@
 "use client";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 import StaffingWidget from "@/components/district/StaffingWidget";
 import { use, useState } from "react";
 import { GraduationCap } from "lucide-react";
@@ -54,8 +57,9 @@ function SchoolsPageInner({ params }: { params: Promise<{ locale: string; state:
 
       {/* AI-crawler readable summary */}
       <p style={{ fontSize: 13, color: "#6B6B6B", lineHeight: 1.7, marginBottom: 16, padding: "12px 16px", background: "#FAFAF8", borderRadius: 8, borderLeft: "3px solid #16A34A" }}>
-        This page shows school-level data for this district including SSLC (Class 10) pass rates, student enrollment, teacher count, and student-teacher ratios. Data is sourced from UDISE+ (Unified District Information System for Education). Government schools data includes all Karnataka state schools; private-aided and private-unaided school data is from the National School Directory.
+        This page shows school-level data for this district including Class 10 board exam pass rates, student enrollment, teacher count, and student-teacher ratios. Data is sourced from UDISE+ (Unified District Information System for Education). Government and private school data is from the National School Directory.
       </p>
+      {(() => { const _src = getModuleSources("schools", state); return <DataSourceBanner moduleName="schools" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="schools" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}

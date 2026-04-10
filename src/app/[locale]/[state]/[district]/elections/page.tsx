@@ -7,6 +7,9 @@
 "use client";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 import { use, useState } from "react";
 import { Vote } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
@@ -48,6 +51,7 @@ function ElectionsPageInner({ params }: { params: Promise<{ locale: string; stat
       <p style={{ fontSize: 13, color: "#6B6B6B", lineHeight: 1.7, marginBottom: 16, padding: "12px 16px", background: "#FAFAF8", borderRadius: 8, borderLeft: "3px solid #D97706" }}>
         This page shows assembly and parliamentary election results for constituencies in this district, sourced from the Election Commission of India (ECI). Results include winner names, party affiliations, vote counts, margins of victory, and voter turnout percentages. The 2023 Karnataka assembly election results are the most recent.
       </p>
+      {(() => { const _src = getModuleSources("elections", state); return <DataSourceBanner moduleName="elections" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="elections" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}

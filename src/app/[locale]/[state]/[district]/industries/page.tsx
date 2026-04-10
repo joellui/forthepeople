@@ -20,6 +20,9 @@ interface LocalIndustry {
   details?: Record<string, string | number | null | undefined> | null;
 }
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 // ── District-specific metadata ────────────────────────────
 function getIndustryMeta(district: string) {
@@ -35,11 +38,26 @@ function getIndustryMeta(district: string) {
     icon: Landmark,
     mode: "heritage" as const,
   };
-  return {
+  if (district === "hyderabad") return {
+    title: "IT, Pharma & GCCs",
+    description: "Hyderabad's tech parks, biotech clusters, GCCs, and major markets",
+    icon: Cpu,
+    mode: "general" as const,
+  };
+  // Karnataka sugar belt districts (Mandya, etc.)
+  const sugarDistricts = ["mandya", "mysuru-rural", "chamarajanagar", "kodagu"];
+  if (sugarDistricts.includes(district)) return {
     title: "Local Industries",
     description: "Sugar factories, crushing season data, and farmer arrears tracker",
     icon: Factory,
     mode: "sugar" as const,
+  };
+  // Default: generic industries view using LocalIndustries data
+  return {
+    title: "Local Industries",
+    description: "Major industries, business hubs, and economic activity in this district",
+    icon: Factory,
+    mode: "general" as const,
   };
 }
 
@@ -320,6 +338,52 @@ function HeritageView({ district, state }: { district: string; state: string }) 
   );
 }
 
+// ── General Industries View (Hyderabad, etc.) ───────────
+function GeneralView({ district, state }: { district: string; state: string }) {
+  const { data, isLoading, error } = useLocalIndustries(district, state);
+  const industries = (data?.data ?? []) as LocalIndustry[];
+
+  if (isLoading) return <LoadingShell rows={5} />;
+  if (error) return <ErrorBlock />;
+  if (industries.length === 0) return <p style={{ color: "#9B9B9B", fontSize: 14 }}>No industry data available for this district yet.</p>;
+
+  return (
+    <>
+      <SectionLabel>Major Industries & Business Hubs ({industries.length})</SectionLabel>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 14 }}>
+        {industries.map((p) => {
+          const d = p.details ?? {};
+          return (
+            <div key={p.id} style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 14, padding: 18, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                <div style={{ width: 40, height: 40, background: "#EFF6FF", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <Building2 size={20} style={{ color: "#2563EB" }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A" }}>{p.name}</div>
+                  {p.type && <div style={{ fontSize: 12, color: "#9B9B9B", marginTop: 2 }}>{p.type}</div>}
+                  {p.location && (
+                    <div style={{ fontSize: 12, color: "#9B9B9B", marginTop: 3, display: "flex", alignItems: "center", gap: 4 }}>
+                      <MapPin size={10} />{p.location}
+                    </div>
+                  )}
+                </div>
+              </div>
+              {d.employees && (
+                <div style={{ marginTop: 12, background: "#FAFAF8", borderRadius: 8, padding: "8px 12px", display: "inline-block" }}>
+                  <span style={{ fontSize: 11, color: "#9B9B9B" }}>Employees: </span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: "#2563EB", fontFamily: "var(--font-mono)" }}>{Number(d.employees) >= 1000 ? `${(Number(d.employees) / 1000).toFixed(0)}K+` : d.employees}</span>
+                </div>
+              )}
+              {d.description && <div style={{ fontSize: 12, color: "#6B6B6B", marginTop: 10, lineHeight: 1.5 }}>{d.description}</div>}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────
 export default function IndustriesPage({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -330,10 +394,12 @@ export default function IndustriesPage({ params }: { params: Promise<{ locale: s
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Icon} title={meta.title} description={meta.description} backHref={base} />
+      {(() => { const _src = getModuleSources("industries", state); return <DataSourceBanner moduleName="industries" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="industries" district={district} />
       {meta.mode === "sugar" && <SugarView district={district} state={state} />}
       {meta.mode === "tech" && <TechView district={district} state={state} />}
       {meta.mode === "heritage" && <HeritageView district={district} state={state} />}
+      {meta.mode === "general" && <GeneralView district={district} state={state} />}
     </div>
   );
 }

@@ -10,6 +10,9 @@ import { Building2 } from "lucide-react";
 import { usePanchayats } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, ProgressBar, LoadingShell, ErrorBlock } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 export default function GramPanchayatPage({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -31,11 +34,15 @@ export default function GramPanchayatPage({ params }: { params: Promise<{ locale
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Building2} title="Gram Panchayats" description="Panchayat-level data on population, water, MGNREGA, and funds" backHref={base} />
+      {(() => { const _src = getModuleSources("gram-panchayat", state); return <DataSourceBanner moduleName="gram-panchayat" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="gram-panchayat" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}
+      {!isLoading && !error && gps.length === 0 && (
+        <NoDataCard module="gram-panchayat" district={district} state={state} isUrban={true} />
+      )}
 
-      {!isLoading && (
+      {!isLoading && gps.length > 0 && (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>
             <StatCard label="GPs" value={gps.length} icon={Building2} />

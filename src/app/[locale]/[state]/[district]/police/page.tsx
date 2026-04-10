@@ -12,6 +12,9 @@ import { Shield, Phone, MapPin } from "lucide-react";
 import { usePolice } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, SectionLabel, LoadingShell, ErrorBlock, DataTable } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 import StaffingWidget from "@/components/district/StaffingWidget";
 
 function PolicePageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
@@ -41,6 +44,7 @@ function PolicePageInner({ params }: { params: Promise<{ locale: string; state: 
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Shield} title="Police & Traffic" description="Police stations, crime statistics, and traffic revenue" backHref={base} />
+      {(() => { const _src = getModuleSources("police", state); return <DataSourceBanner moduleName="police" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="police" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}
@@ -49,8 +53,8 @@ function PolicePageInner({ params }: { params: Promise<{ locale: string; state: 
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>
             <StatCard label="Stations" value={stations.length} icon={Shield} />
-            <StatCard label={`Crimes (${latestYear})`} value={totalCrimes.toLocaleString("en-IN")} />
-            <StatCard label="Traffic Revenue" value={`₹${(totalTraffic / 100000).toFixed(1)}L`} />
+            <StatCard label={`Crimes (${latestYear})`} value={totalCrimes > 0 ? totalCrimes.toLocaleString("en-IN") : "No data"} />
+            <StatCard label="Traffic Revenue" value={totalTraffic > 0 ? `₹${(totalTraffic / 100000).toFixed(1)}L` : "—"} />
           </div>
 
           {/* Sanctioned vs. Filled staffing widget */}

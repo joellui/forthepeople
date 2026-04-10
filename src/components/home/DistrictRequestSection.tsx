@@ -24,6 +24,9 @@ export default function DistrictRequestSection() {
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
+  // Dynamic count of active districts from constants
+  const activeCount = INDIA_STATES.reduce((sum, s) => sum + s.districts.filter(d => d.active).length, 0);
+
   const { data } = useQuery<{ top: TopRequest[] }>({
     queryKey: ["district-requests"],
     queryFn: () => fetch("/api/district-request").then((r) => r.json()),
@@ -69,13 +72,13 @@ export default function DistrictRequestSection() {
             Expanding to 780+ Districts
           </span>
           <span style={{ fontSize: 11, color: "#9B9B9B", fontFamily: "var(--font-mono, monospace)" }}>
-            3 / 780 live
+            {activeCount} / 780 live
           </span>
         </div>
         <div style={{ background: "#F5F5F0", borderRadius: 4, height: 6, overflow: "hidden", marginBottom: 12 }}>
           <div
             style={{
-              width: `${(3 / 780) * 100}%`,
+              width: `${(activeCount / 780) * 100}%`,
               height: "100%",
               background: "linear-gradient(90deg, #2563EB, #7C3AED)",
               borderRadius: 4,

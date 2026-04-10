@@ -10,6 +10,9 @@ import { Building, Phone, Mail, Globe, MapPin, Clock } from "lucide-react";
 import { useOffices } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, LoadingShell, ErrorBlock } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 function isOpenNow() {
   const now = new Date();
@@ -38,6 +41,7 @@ export default function OfficesPage({ params }: { params: Promise<{ locale: stri
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Building} title="Government Offices" description="Directory of government offices — addresses, contacts, and services" backHref={base} />
+      {(() => { const _src = getModuleSources("offices", state); return <DataSourceBanner moduleName="offices" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="offices" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}

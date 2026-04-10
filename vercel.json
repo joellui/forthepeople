@@ -47,6 +47,10 @@
       "schedule": "0 */4 * * *"
     },
     {
+      "path": "/api/cron/scrape-budget",
+      "schedule": "0 6 * * 1"
+    },
+    {
       "path": "/api/cron/generate-citizen-tips",
       "schedule": "0 6 * * 0"
     }

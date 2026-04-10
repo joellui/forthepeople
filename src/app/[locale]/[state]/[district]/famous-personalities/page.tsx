@@ -11,6 +11,9 @@ import { Star, ExternalLink, MapPin } from "lucide-react";
 import { useFamousPersonalities } from "@/hooks/useRealtimeData";
 import { ModuleHeader, SectionLabel, LoadingShell, ErrorBlock, LastUpdated } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 const CATEGORY_EMOJI: Record<string, string> = {
   Politician:  "🏛️",
@@ -205,6 +208,7 @@ export default function FamousPersonalitiesPage({
       >
         <LastUpdated updatedAt={data?.meta?.updatedAt} />
       </ModuleHeader>
+      {(() => { const _src = getModuleSources("famous-personalities", state); return <DataSourceBanner moduleName="famous-personalities" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="famous-personalities" district={district} />
 
       {isLoading && <LoadingShell rows={4} />}

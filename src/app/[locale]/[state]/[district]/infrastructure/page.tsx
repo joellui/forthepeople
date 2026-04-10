@@ -11,6 +11,9 @@ import { Map } from "lucide-react";
 import { useInfrastructure, useAIInsight } from "@/hooks/useRealtimeData";
 import { ModuleHeader, LoadingShell, ErrorBlock, EmptyBlock, ProgressBar, InfoCard, AIInsightBanner, LastUpdatedBadge } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 const STATUS_COLORS: Record<string, [string, string]> = {
   completed: ["#16A34A", "#DCFCE7"],
@@ -51,6 +54,7 @@ function InfrastructurePageInner({ params }: { params: Promise<{ locale: string;
           createdAt={aiInsight.createdAt}
         />
       )}
+      {(() => { const _src = getModuleSources("infrastructure", state); return <DataSourceBanner moduleName="infrastructure" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="infrastructure" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}

@@ -12,6 +12,9 @@ import { Newspaper, ExternalLink, Clock } from "lucide-react";
 import { useNews, useAIInsight } from "@/hooks/useRealtimeData";
 import { ModuleHeader, LoadingShell, ErrorBlock, AIInsightBanner } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 const CAT_COLORS: Record<string, string> = {
   politics: "#DC2626", development: "#2563EB", agriculture: "#16A34A", crime: "#7C3AED",
@@ -99,6 +102,7 @@ function NewsPageInner({ params }: { params: Promise<{ locale: string; state: st
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Newspaper} title="Local News" description="Latest news and developments from the district" backHref={base} liveTag />
+      {(() => { const _src = getModuleSources("news", state); return <DataSourceBanner moduleName="news" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="news" district={district} />
       {aiInsight && (
         <AIInsightBanner
@@ -114,13 +118,7 @@ function NewsPageInner({ params }: { params: Promise<{ locale: string; state: st
       {error && <ErrorBlock />}
 
       {!isLoading && !error && news.length === 0 && (
-        <div style={{ padding: "48px 0", textAlign: "center" }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>📰</div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A", marginBottom: 8 }}>No news yet</div>
-          <div style={{ fontSize: 13, color: "#9B9B9B", maxWidth: 320, margin: "0 auto", lineHeight: 1.6 }}>
-            Our news scraper checks Google News every hour. Check back soon for the latest developments in the district.
-          </div>
-        </div>
+        <NoDataCard module="news" district={district} state={state} />
       )}
 
       {!isLoading && news.length > 0 && (

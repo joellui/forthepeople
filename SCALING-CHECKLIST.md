@@ -2,7 +2,7 @@
 # How to Add New Districts and States
 #
 # Generated: 2026-03-29
-# Status: Pilot (Karnataka: Mandya ✅ | Mysuru ✅ | Bengaluru Urban ✅ | Delhi: New Delhi ✅ | Maharashtra: Mumbai ✅ | West Bengal: Kolkata ✅ | Tamil Nadu: Chennai ✅)
+# Status: Pilot (Karnataka: Mandya ✅ | Mysuru ✅ | Bengaluru Urban ✅ | Delhi: New Delhi ✅ | Maharashtra: Mumbai ✅ | West Bengal: Kolkata ✅ | Tamil Nadu: Chennai ✅ | Telangana: Hyderabad ✅)
 # ─────────────────────────────────────────────────────────────────────
 
 ---
@@ -493,5 +493,34 @@ npx tsx prisma/seed-features.ts
 
 ---
 
-*Last updated: 2026-04-01*
-*7 pilot districts active across 5 states/UTs (Mandya, Mysuru, Bengaluru Urban, New Delhi, Mumbai, Kolkata, Chennai). 10 Delhi districts ready to activate.*
+## TELANGANA EXPANSION (April 2026)
+
+- [x] State hierarchy seeded (Telangana + Hyderabad + 16 mandals)
+- [x] Static constants updated (Telangana active, HYDERABAD_DISTRICT constant)
+- [x] Weather/crop overrides configured
+- [x] Telugu font imported (Noto Sans Telugu)
+- [x] Hyderabad district: full data seeded (leadership, budget, infra, schools, police, schemes, elections, courts, RTI, offices, transport, industries, famous, services)
+- [x] Activation script created (scripts/activate-telangana-districts.ts)
+- [x] Multi-state scalability overhaul (state-config.ts, DataSourceBanner, NoDataCard)
+- [x] Scrapers made state-aware (power, dams, transport — graceful skip for non-Karnataka)
+- [x] Exams dedup + state filtering fix
+- [x] Budget expenditure, crime stats, traffic revenue seeded for Hyderabad
+- [x] Local testing verified
+- [ ] Production deployment
+- [ ] Additional Telangana districts (Warangal, Nizamabad, Karimnagar, Khammam)
+- [ ] TGSPDCL power data integration
+- [ ] Telangana GeoJSON mandal boundaries
+
+## NEW ARCHITECTURE PATTERNS (April 2026)
+
+- `src/lib/constants/state-config.ts` — Single source of truth for per-state config (add new states here only)
+- `src/components/common/DataSourceBanner.tsx` — Data attribution on every module page
+- `src/components/common/NoDataCard.tsx` — Universal empty state with module-specific messages
+- Industries page: data-driven mode selection (sugar/tech/heritage/general) instead of hardcoded
+- Data sources page: dynamic per-state sources from state-config
+- All user-facing text uses "collected"/"sourced" (never "scraped")
+
+---
+
+*Last updated: 2026-04-10*
+*8 pilot districts active across 6 states/UTs (Mandya, Mysuru, Bengaluru Urban, New Delhi, Mumbai, Kolkata, Chennai, Hyderabad). 10 Delhi districts + 4 Telangana districts ready to activate.*

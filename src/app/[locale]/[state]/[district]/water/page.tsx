@@ -11,6 +11,9 @@ import { Waves } from "lucide-react";
 import { useWater } from "@/hooks/useRealtimeData";
 import { ModuleHeader, SectionLabel, LoadingShell, ErrorBlock, LiveBadge, DataTable, ProgressBar, LastUpdatedBadge } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 
 function WaterPageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
@@ -43,11 +46,15 @@ function WaterPageInner({ params }: { params: Promise<{ locale: string; state: s
 
       {/* AI-crawler readable summary */}
       <p style={{ fontSize: 13, color: "#6B6B6B", lineHeight: 1.7, marginBottom: 16, padding: "12px 16px", background: "#FAFAF8", borderRadius: 8, borderLeft: "3px solid #2563EB" }}>
-        This page shows live dam storage levels and canal release schedules for this district, updated every 30 minutes from India-WRIS (Water Resources Information System). Storage levels are shown as a percentage of total capacity. The key dam serving this is KRS (Krishna Raja Sagara), which is critical for irrigation and drinking water supply across Mandya, Mysuru, and Bengaluru.
+        This page shows live dam storage levels and canal release schedules for this district, updated every 30 minutes from India-WRIS (Water Resources Information System). Storage levels are shown as a percentage of total capacity. Data includes reservoir inflow, outflow, and current storage levels for dams and reservoirs serving this district.
       </p>
+      {(() => { const _src = getModuleSources("water", state); return <DataSourceBanner moduleName="water" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="water" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}
+      {!isLoading && !error && dams.length === 0 && canals.length === 0 && (
+        <NoDataCard module="water" district={district} state={state} />
+      )}
 
       {!isLoading && damList.length > 0 && (
         <>

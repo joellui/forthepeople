@@ -78,7 +78,7 @@ export default async function StatePage({
               }}
             >
               <Lock size={11} />
-              Coming Soon — pilot launching in Karnataka first
+              Coming Soon
             </div>
           )}
         </div>

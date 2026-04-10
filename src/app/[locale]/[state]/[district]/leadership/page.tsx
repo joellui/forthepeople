@@ -12,6 +12,8 @@ import { Users, Phone, Mail } from "lucide-react";
 import { useLeaders, useAIInsight } from "@/hooks/useRealtimeData";
 import { ModuleHeader, SectionLabel, LoadingShell, ErrorBlock, AIInsightBanner } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 const TIER_LABELS: Record<number, string> = {
   1: "Parliament (MP)",
@@ -139,6 +141,7 @@ function LeadershipPageInner({
           createdAt={aiInsight.createdAt}
         />
       )}
+      {(() => { const _src = getModuleSources("leaders", state); return <DataSourceBanner moduleName="leaders" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="leaders" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}

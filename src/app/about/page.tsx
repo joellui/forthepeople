@@ -118,7 +118,7 @@ export default function AboutPage() {
         ForThePeople.in aggregates data exclusively from official Indian government portals under the{" "}
         <strong>National Data Sharing and Accessibility Policy (NDSAP) 2012</strong>, which requires
         government departments to proactively publish non-sensitive data in open, machine-readable formats.
-        No data is scraped from unofficial sources or estimated.
+        No data is collected from unofficial sources or estimated.
       </p>
       <div style={{ display: "grid", gap: 8, marginBottom: 40 }}>
         {DATA_SOURCES.map((s) => (

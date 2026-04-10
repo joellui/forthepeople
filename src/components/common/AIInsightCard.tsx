@@ -7,6 +7,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getInsightFrequencyLabel } from "@/lib/constants/state-config";
 
 type Severity = "good" | "watch" | "alert" | "critical";
 
@@ -191,10 +192,14 @@ export default function AIInsightCard({ module, district }: AIInsightCardProps) 
       </div>
 
       {/* Footer */}
-      <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${cfg.border}`, display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${cfg.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
         <span style={{ fontSize: 10, color: "#9B9B9B" }}>
           📰 Source-verified by {insight.aiProvider === "anthropic" ? "Claude AI" : "Gemini AI"}
           {insight.aiModel ? ` (${insight.aiModel})` : ""} · ForThePeople.in
+        </span>
+        <span style={{ fontSize: 10, color: "#9B9B9B" }}>
+          🕐 {age !== null ? (age === 0 ? "Analysis from just now" : age < 60 ? `Analysis from ${age}m ago` : `Analysis from ${Math.round(age / 60)}h ago`) : ""}
+          {" · "}{getInsightFrequencyLabel(module)}
         </span>
       </div>
     </div>

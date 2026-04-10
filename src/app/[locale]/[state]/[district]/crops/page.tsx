@@ -11,6 +11,9 @@ import { Wheat, TrendingUp, TrendingDown, Download } from "lucide-react";
 import { useCropPrices } from "@/hooks/useRealtimeData";
 import { ModuleHeader, SectionLabel, LoadingShell, ErrorBlock, LiveBadge, DataTable, LastUpdatedBadge } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 import ShareButtons from "@/components/common/ShareButtons";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import { downloadCSV, todayISO } from "@/lib/csv";
@@ -54,6 +57,7 @@ function CropsPageInner({ params }: { params: Promise<{ locale: string; state: s
       <p style={{ fontSize: 13, color: "#6B6B6B", lineHeight: 1.7, marginBottom: 16, padding: "12px 16px", background: "#FAFAF8", borderRadius: 8, borderLeft: "3px solid #16A34A" }}>
         This page shows live agricultural mandi prices for this district, sourced daily from AGMARKNET (Agricultural Marketing Information Network), India&apos;s official government portal for regulated market prices. Prices shown are in Indian Rupees (₹) per quintal. Data covers all commodities traded at APMC (Agricultural Produce Market Committee) mandis in the district, including paddy, sugarcane, ragi, and other major crops.
       </p>
+      {(() => { const _src = getModuleSources("crops", state); return <DataSourceBanner moduleName="crops" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="crops" district={district} />
 
       {isLoading && <LoadingShell rows={5} />}

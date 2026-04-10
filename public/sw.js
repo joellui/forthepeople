@@ -4,8 +4,8 @@ const STATIC_ASSETS = [
   "/",
   "/about",
   "/offline",
-  "/icon-192.png",
-  "/icon-512.png",
+  "/android-chrome-192x192.png",
+  "/android-chrome-512x512.png",
 ];
 
 // ── Install: cache static shell ────────────────────────────
@@ -94,8 +94,8 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: "/icon-192.png",
-      badge: "/icon-192.png",
+      icon: "/android-chrome-192x192.png",
+      badge: "/android-chrome-192x192.png",
       tag: "ftp-alert",
       renotify: true,
       data: { url: data.district ? `/en/karnataka/${data.district}/alerts` : "/en" },

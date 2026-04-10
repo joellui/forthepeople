@@ -11,6 +11,9 @@ import { ScrollText, ExternalLink } from "lucide-react";
 import { useSchemes } from "@/hooks/useRealtimeData";
 import { ModuleHeader, LoadingShell, ErrorBlock, EmptyBlock } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 function SchemesPageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -30,6 +33,7 @@ function SchemesPageInner({ params }: { params: Promise<{ locale: string; state:
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={ScrollText} title="Government Schemes" description="Active central and state schemes with eligibility and application links" backHref={base} />
+      {(() => { const _src = getModuleSources("schemes", state); return <DataSourceBanner moduleName="schemes" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="schemes" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}

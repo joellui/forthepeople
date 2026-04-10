@@ -7,6 +7,9 @@
 "use client";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 import { use, useState } from "react";
 import { Bus, Train, Clock, MapPin } from "lucide-react";
 import { useTransport } from "@/hooks/useRealtimeData";
@@ -30,6 +33,7 @@ function TransportPageInner({ params }: { params: Promise<{ locale: string; stat
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Bus} title="Transport" description="Bus routes and train schedules serving the district" backHref={base} />
+      {(() => { const _src = getModuleSources("transport", state); return <DataSourceBanner moduleName="transport" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="transport" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}

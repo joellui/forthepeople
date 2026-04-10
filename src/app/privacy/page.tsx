@@ -36,7 +36,7 @@ export default function PrivacyPage() {
     },
     {
       title: "Data retention",
-      content: `We retain scraped government data for a rolling 90-day period for live modules (weather, crop prices, news). Historical data (elections, census, budget) is retained indefinitely as it is public record. Server logs are retained for 7 days.`,
+      content: `We retain collected government data for a rolling 90-day period for live modules (weather, crop prices, news). Historical data (elections, census, budget) is retained indefinitely as it is public record. Server logs are retained for 7 days.`,
     },
     {
       title: "Your rights",

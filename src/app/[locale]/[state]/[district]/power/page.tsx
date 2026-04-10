@@ -11,6 +11,9 @@ import { Zap, Clock, MapPin } from "lucide-react";
 import { usePower } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, SectionLabel, LoadingShell, ErrorBlock } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -30,11 +33,15 @@ function PowerPageInner({ params }: { params: Promise<{ locale: string; state: s
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Zap} title="Power Outages" description="Planned and unplanned power cut notifications and history" backHref={base} />
+      {(() => { const _src = getModuleSources("power", state); return <DataSourceBanner moduleName="power" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="power" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}
+      {!isLoading && !error && outages.length === 0 && (
+        <NoDataCard module="power" district={district} state={state} />
+      )}
 
-      {!isLoading && (
+      {!isLoading && outages.length > 0 && (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>
             <StatCard label="Active Outages" value={active.length} accent={active.length > 0 ? "#DC2626" : "#16A34A"} icon={Zap} />

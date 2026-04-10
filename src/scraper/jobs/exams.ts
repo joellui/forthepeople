@@ -339,6 +339,46 @@ async function upsertExam(
   }
 }
 
+// ── Upsert national exam (no stateId, level=national) ───────────
+async function upsertNationalExam(exam: ExamRecord): Promise<boolean> {
+  const titlePrefix = exam.title.split(" ").slice(0, 5).join(" ");
+  const existing = await prisma.governmentExam.findFirst({
+    where: { level: "national", title: { contains: titlePrefix, mode: "insensitive" } },
+  });
+
+  const data = {
+    level: "national" as const,
+    stateId: null,
+    districtId: null,
+    title: exam.title,
+    department: exam.department,
+    vacancies: exam.vacancies ?? null,
+    qualification: exam.qualification ?? null,
+    ageLimit: exam.ageLimit ?? null,
+    applicationFee: exam.applicationFee ?? null,
+    selectionProcess: exam.selectionProcess ?? null,
+    payScale: exam.payScale ?? null,
+    applyUrl: exam.applyUrl ?? null,
+    notificationUrl: exam.notificationUrl ?? null,
+    syllabusUrl: exam.syllabusUrl ?? null,
+    status: exam.status,
+    announcedDate: exam.announcedDate ?? null,
+    startDate: exam.startDate ?? null,
+    endDate: exam.endDate ?? null,
+    admitCardDate: exam.admitCardDate ?? null,
+    examDate: exam.examDate ?? null,
+    resultDate: exam.resultDate ?? null,
+  };
+
+  if (existing) {
+    await prisma.governmentExam.update({ where: { id: existing.id }, data });
+    return false;
+  } else {
+    await prisma.governmentExam.create({ data });
+    return true;
+  }
+}
+
 // ── Main job ─────────────────────────────────────────────────────
 export async function scrapeExams(ctx: JobContext): Promise<ScraperResult> {
   try {
@@ -347,24 +387,27 @@ export async function scrapeExams(ctx: JobContext): Promise<ScraperResult> {
 
     ctx.log(`Scraping exams for ${ctx.districtName}, ${ctx.stateName}`);
 
-    // ── 1. State-level exams (from KPSC + Karnataka state exams) ──
-    const karnatakaExams = await scrapeKarnatakaStateExams(ctx);
-    for (const exam of karnatakaExams) {
-      const isNew = await upsertExam(exam, "state", ctx);
-      if (isNew) newCount++; else updatedCount++;
-    }
+    // ── 1. State-level exams (only for Karnataka currently) ──
+    if (ctx.stateSlug === "karnataka") {
+      const karnatakaExams = await scrapeKarnatakaStateExams(ctx);
+      for (const exam of karnatakaExams) {
+        const isNew = await upsertExam(exam, "state", ctx);
+        if (isNew) newCount++; else updatedCount++;
+      }
 
-    // ── 2. Central exams (apply to all states) ─────────────────────
+      // KPSC homepage scrape (Karnataka-specific notifications)
+      const kpscExams = await scrapeKPSC(ctx);
+      for (const exam of kpscExams) {
+        const isNew = await upsertExam(exam, "state", ctx);
+        if (isNew) newCount++; else updatedCount++;
+      }
+    }
+    // TODO: Add state exam scrapers for telangana (TSPSC), delhi (DSSSB), etc.
+
+    // ── 2. Central/national exams (run once, not per-state) ─────────
     const centralExams = await scrapeCentralExams();
     for (const exam of centralExams) {
-      const isNew = await upsertExam(exam, "state", ctx);
-      if (isNew) newCount++; else updatedCount++;
-    }
-
-    // ── 3. KPSC homepage scrape (additional notifications) ─────────
-    const kpscExams = await scrapeKPSC(ctx);
-    for (const exam of kpscExams) {
-      const isNew = await upsertExam(exam, "state", ctx);
+      const isNew = await upsertNationalExam(exam);
       if (isNew) newCount++; else updatedCount++;
     }
 

@@ -11,6 +11,9 @@ import { BarChart3 } from "lucide-react";
 import { usePopulation, useRainfall } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, SectionLabel, LoadingShell, ErrorBlock, DataTable } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 export default function PopulationPage({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -33,6 +36,7 @@ export default function PopulationPage({ params }: { params: Promise<{ locale: s
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={BarChart3} title="Population & Demographics" description="Census data, literacy rates, sex ratio, and rainfall history" backHref={base} />
+      {(() => { const _src = getModuleSources("population", state); return <DataSourceBanner moduleName="population" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="population" district={district} />
 
       {isLoading && <LoadingShell rows={4} />}

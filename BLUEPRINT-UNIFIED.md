@@ -177,7 +177,7 @@ LOCK BEHAVIOR:
   Active district:  Full data, clickable
   Locked district:  Grayed out, "Coming Soon"
 
-7 ACTIVE PILOT DISTRICTS:
+8 ACTIVE PILOT DISTRICTS (6 states):
   Mandya (ಮಂಡ್ಯ)          — "Sugar Capital of Karnataka"
   Mysuru (ಮೈಸೂರು)         — "City of Palaces"
   Bengaluru Urban (ಬೆಂಗಳೂರು) — "Silicon Valley of India"
@@ -185,6 +185,7 @@ LOCK BEHAVIOR:
   Mumbai (मुंबई)           — "Financial Capital of India"
   Kolkata (কলকাতা)         — "City of Joy"
   Chennai (சென்னை)         — "Gateway to South India"
+  Hyderabad (హైదరాబాద్)    — "City of Pearls" [Added 2026-04-10]
 
 MANDYA TALUKS (7):
   1. Mandya        — "Sugar Capital of Karnataka"
@@ -1430,6 +1431,96 @@ Leadership Fix + Zero-Credit AI Lockdown  COMPLETE (2026-03-31)
   - /api/ai/insight: READ-ONLY (Redis cache only, never live AI on public GET)
   - /api/ai/citizen-tips: READ-ONLY (Redis cache only, never live AI on public GET)
   - cron routes: protected by x-cron-secret: CRON_SECRET header
+
+Open Source & Community Setup  COMPLETE (2026-04-08)
+  - CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md created
+  - GitHub repo made contributor-friendly (labels, starter issues, branch protection)
+  - Instagram walkthrough reel linked in README
+  - Broken GitHub links fixed on contribute page
+  - 15 npm dependency vulnerabilities fixed
+
+Gold/Silver Prices Fix  COMPLETE (2026-04-08)
+  - Switched from Yahoo Finance conversion to IBJA (India Bullion Association) scraping
+  - Gold shown per gram (not per 10g)
+  - Daily change calculated from IBJA historical data
+
+Multi-State Scalability Overhaul  COMPLETE (2026-04-09/10)
+  NEW FILES:
+    src/lib/constants/state-config.ts    — Per-state config (DISCOM, transport, water, board exam, RTI, data sources)
+    src/components/common/DataSourceBanner.tsx — Data source attribution banner on every module page
+    src/components/common/NoDataCard.tsx  — Universal empty state component with module-specific messages
+  CHANGES:
+    - DataSourceBanner added to all 28 module pages
+    - State-config created for 6 states (Karnataka, Telangana, Delhi, Maharashtra, WB, TN)
+    - All "scrape"/"scraped" removed from user-facing text → "collected"/"sourced"
+    - Industries page: dynamic mode (sugar/tech/heritage/general) based on data
+    - Data sources page: dynamic per-state sources
+    - Water/weather/schools descriptions: removed Karnataka-specific hardcoding
+    - Scrapers made state-aware (power, dams, transport — graceful skip for non-Karnataka)
+    - Map page: GeoJSON fallback when file missing
+    - District counter: dynamic from INDIA_STATES (not hardcoded "3")
+    - layout.tsx JSON-LD: FAQ updated to list all 6 states
+    - llms.txt: updated with all active states/districts
+    - AI insight card: shows "Analysis from Xh ago · Updated every 2 hours" footer
+
+Hyderabad (Telangana) Expansion  COMPLETE (2026-04-10)
+  NEW FILES:
+    prisma/seed-hyderabad-data.ts        — Full Hyderabad district data seed
+    scripts/activate-telangana-districts.ts — Future district activation script
+    scripts/fix-hyderabad-data.ts        — Budget expenditure + crime + traffic fix
+  CHANGES:
+    - Telangana state added (6th active state) with 5 districts (1 active, 4 inactive)
+    - Hyderabad district: 16 mandals, full data seeded (leadership, budget, infra, schools,
+      police, offices, schemes, elections, RTI, famous personalities, industries, transport,
+      service guides, court stats)
+    - seed-hierarchy.ts: Telangana + Hyderabad + 16 mandals
+    - districts.ts: HYDERABAD_DISTRICT constant with all mandals + localities
+    - Telugu font (Noto Sans Telugu) imported in globals.css
+    - README.md updated with Telangana
+
+Exams Dedup & State Filtering Fix  COMPLETE (2026-04-10)
+  - 50 duplicate exam records removed (114 → 64)
+  - National exams (UPSC/SSC/IBPS/RBI/RRB/SBI) set to level='national', stateId=null
+  - Karnataka exams (KSP/KEA) restricted to Karnataka stateId only
+  - API: queries national + state-specific exams separately (no cross-state leaking)
+  - Scraper: upsertNationalExam() for central exams, Karnataka scraper gated by state
+
+Data Quality & Empty State Fix  COMPLETE (2026-04-10)
+  - NoDataCard shows for water, power, farm, gram-panchayat, jjm, news when empty
+  - Finance: "₹0Cr" → "Data pending", "0%" → "Pending" when expenditure missing
+  - Police: "0" → "No data", "₹0.0L" → "—" when traffic data missing
+  - Hyderabad: crime stats (18 records), traffic revenue (12 records), budget expenditure seeded
+
+Favicon Replacement  COMPLETE (2026-04-10)
+  - New FTP logo favicon.ico, apple-touch-icon, android-chrome icons deployed
+  - manifest.ts updated, sw.js updated, dynamic icon.tsx disabled
+
+National Scraper Integration  COMPLETE (2026-04-10)
+  NEW FILES:
+    src/lib/constants/dam-config.ts         — Dam-to-district mapping for all 8 districts
+    src/scraper/jobs/budget.ts              — National budget data collector (PFMS/data.gov.in)
+    src/app/api/cron/scrape-budget/route.ts — Vercel cron route (Monday 6 AM UTC)
+  CHANGES:
+    - Dam scraper (dams.ts): Rewritten with national architecture
+      Karnataka: uses working state portal API (water.karnataka.gov.in)
+      Other states: graceful skip with documented research findings
+      (India-WRIS has no public REST API — confirmed 2026-04-10)
+    - Power scraper (power.ts): DISCOM plugin architecture
+      DISCOMParser interface — each state has its own parser function
+      Currently: BESCOM (Karnataka). Adding new DISCOMs = add parser to array.
+    - Transport scraper (transport.ts): already state-aware from earlier session
+    - Budget scraper registered in scheduler.ts (Monday 6 AM, weekly)
+    - vercel.json: scrape-budget cron added
+  RESEARCH NOTES:
+    - India-WRIS: No public REST API. GIS-based internal queries only.
+    - CWC RSMS: Old ASP portal with TLS issues. Daily bulletin as PDF/HTML.
+    - PFMS: No public API. ASP.NET forms behind session cookies.
+    - data.gov.in: No live reservoir or district expenditure datasets found.
+    - Karnataka water portal: ONLY working live state portal (POST API, GeoJSON)
+  - New FTP logo favicon.ico, apple-touch-icon, android-chrome icons deployed
+  - manifest.ts updated to reference new icon paths
+  - sw.js updated to cache new icon paths
+  - Dynamic icon.tsx disabled (renamed to .bak)
 ```
 
 ---

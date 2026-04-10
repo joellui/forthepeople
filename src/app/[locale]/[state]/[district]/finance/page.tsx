@@ -12,6 +12,8 @@ import { PiggyBank } from "lucide-react";
 import { useBudget, useRevenue, useAIInsight } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, SectionLabel, LoadingShell, DataTable, ProgressBar, AIInsightBanner } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 function FinancePageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -62,16 +64,23 @@ function FinancePageInner({ params }: { params: Promise<{ locale: string; state:
           createdAt={aiInsight.createdAt}
         />
       )}
+      {(() => { const _src = getModuleSources("budget", state); return <DataSourceBanner moduleName="budget" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="budget" district={district} />
       {bLoading && <LoadingShell rows={4} />}
       {!bLoading && (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10, marginBottom: 24 }}>
             <StatCard label="Total Budget" value={`₹${(totalAllocated / 10000000).toFixed(0)}Cr`} icon={PiggyBank} />
-            <StatCard label="Spent" value={`₹${(totalSpent / 10000000).toFixed(0)}Cr`} accent="#16A34A" />
-            <StatCard label="Utilisation" value={totalAllocated > 0 ? `${Math.round((totalSpent / totalAllocated) * 100)}%` : "—"} />
-            <StatCard label="Lapsed Funds" value={`₹${(totalLapsed / 10000000).toFixed(1)}Cr`} accent="#DC2626" sub="Funds not utilised" trend="down" />
+            <StatCard label="Spent" value={totalSpent === 0 && totalAllocated > 0 ? "Data pending" : `₹${(totalSpent / 10000000).toFixed(0)}Cr`} accent="#16A34A" />
+            <StatCard label="Utilisation" value={totalAllocated > 0 ? (totalSpent === 0 ? "Pending" : `${Math.round((totalSpent / totalAllocated) * 100)}%`) : "—"} />
+            <StatCard label="Lapsed Funds" value={totalSpent === 0 && totalLapsed === 0 ? "—" : `₹${(totalLapsed / 10000000).toFixed(1)}Cr`} accent="#DC2626" sub="Funds not utilised" trend="down" />
           </div>
+
+          {totalSpent === 0 && totalAllocated > 0 && (
+            <div style={{ fontSize: 12, color: "#6B6B6B", background: "#F9FAFB", border: "1px solid #E8E8E4", borderRadius: 8, padding: "10px 14px", marginBottom: 20, borderLeft: "3px solid #2563EB" }}>
+              Allocation data is available. Expenditure tracking from PFMS/state treasury will be updated as data becomes available.
+            </div>
+          )}
 
           {/* Sector-wise chart */}
           {budgetChart.length > 0 && (

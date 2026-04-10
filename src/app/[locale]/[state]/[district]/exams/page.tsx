@@ -7,6 +7,9 @@
 "use client";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 import ExamStepper from "@/components/district/ExamStepper";
 import { ModuleHeader, SectionLabel, LoadingShell, ErrorBlock, EmptyBlock } from "@/components/district/ui";
 import { useDistrictData } from "@/hooks/useDistrictData";
@@ -357,6 +360,7 @@ function ExamsPageInner({ params }: { params: Promise<{ locale: string; state: s
         description="Government exam notifications, eligibility, fees, and department staffing data"
         backHref={base}
       />
+      {(() => { const _src = getModuleSources("exams", state); return <DataSourceBanner moduleName="exams" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="exams" district={district} />
 
       {isLoading && <LoadingShell rows={4} />}
@@ -408,7 +412,7 @@ function ExamsPageInner({ params }: { params: Promise<{ locale: string; state: s
           )}
 
           {!allExams.length && (
-            <EmptyBlock icon="📝" message="No exam notifications yet. Check back after the next scraping cycle." />
+            <EmptyBlock icon="📝" message="No exam notifications yet. Check back after the next data update." />
           )}
         </>
       )}

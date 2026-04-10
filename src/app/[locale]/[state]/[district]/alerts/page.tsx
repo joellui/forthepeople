@@ -7,6 +7,9 @@
 "use client";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 import { use } from "react";
 import { Bell } from "lucide-react";
 import { useAlerts } from "@/hooks/useRealtimeData";
@@ -46,6 +49,7 @@ function AlertsPageInner({ params }: { params: Promise<{ locale: string; state: 
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Bell} title="Local Alerts" description="Active alerts and advisories for the district" backHref={base} liveTag />
+      {(() => { const _src = getModuleSources("alerts", state); return <DataSourceBanner moduleName="alerts" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="alerts" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}

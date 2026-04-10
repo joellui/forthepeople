@@ -12,12 +12,14 @@ STATUS:           Sections 1-10 COMPLETE + Post-launch features + Security harde
 LIVE URL:         https://forthepeople.in
 GITHUB:           https://github.com/jayanthmb14/forthepeople (PUBLIC — clean history, MIT with Attribution)
 VERCEL:           zurvoapp Pro (scope: zurvoapps-projects)
-PILOT DISTRICTS:  7 active (Karnataka: Mandya, Mysuru, Bengaluru Urban;
+PILOT DISTRICTS:  8 active across 6 states (Karnataka: Mandya, Mysuru, Bengaluru Urban;
                   Delhi: New Delhi; Maharashtra: Mumbai;
-                  West Bengal: Kolkata; Tamil Nadu: Chennai)
+                  West Bengal: Kolkata; Tamil Nadu: Chennai;
+                  Telangana: Hyderabad)
                   + 10 Delhi districts ready to activate
+                  + 4 Telangana districts ready to activate
 PROJECT ID:       FTP-JMB-2026-IN (watermark ID)
-LAST UPDATED:     April 1, 2026
+LAST UPDATED:     April 10, 2026
 ```
 
 ---

@@ -53,16 +53,16 @@ export async function GET(req: NextRequest) {
 
     const stateId = district.state.id;
 
-    // Fetch both state-level and district-level exams in parallel
-    const [stateExams, districtExams, staffing] = await Promise.all([
+    // Fetch national, state-level, and district-level exams in parallel
+    const [nationalExams, stateExams, districtExams, staffing] = await Promise.all([
+      // National exams (UPSC, SSC, IBPS, RBI, RRB, SBI, NTA) — show for ALL districts
       prisma.governmentExam.findMany({
-        where: {
-          OR: [
-            { stateId },
-            // Also include national exams (no stateId but level=state)
-            { level: "state", stateId: null },
-          ],
-        },
+        where: { level: "national" },
+        orderBy: [{ status: "asc" }, { announcedDate: "desc" }],
+      }),
+      // State-specific exams — only for THIS state
+      prisma.governmentExam.findMany({
+        where: { stateId, level: "state" },
         orderBy: [{ status: "asc" }, { announcedDate: "desc" }],
       }),
       prisma.governmentExam.findMany({
@@ -75,15 +75,17 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
+    // Merge national + state exams for the "stateExams" field (backwards-compatible)
+    const allExams = [...nationalExams, ...stateExams];
     const result = {
-      stateExams,
+      stateExams: allExams,
       districtExams,
       staffing,
       summary: {
-        totalStateExams: stateExams.length,
+        totalStateExams: allExams.length,
         totalDistrictExams: districtExams.length,
-        openExams: [...stateExams, ...districtExams].filter((e) => e.status === "open").length,
-        upcomingExams: [...stateExams, ...districtExams].filter((e) => e.status === "upcoming").length,
+        openExams: [...allExams, ...districtExams].filter((e) => e.status === "open").length,
+        upcomingExams: [...allExams, ...districtExams].filter((e) => e.status === "upcoming").length,
         totalStaffingRecords: staffing.length,
       },
     };

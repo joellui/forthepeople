@@ -5,12 +5,40 @@
  */
 
 "use client";
-import { use } from "react";
+import { use, useState, useEffect } from "react";
 import { Map, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useTaluks, useOverview } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, SectionLabel, LoadingShell } from "@/components/district/ui";
 import TalukMap from "@/components/map/TalukMap";
+
+function MapWithFallback({ locale, state, district, talukList }: { locale: string; state: string; district: string; talukList: { slug: string; name: string; villageCount: number }[] }) {
+  const [hasGeoJSON, setHasGeoJSON] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch(`/geo/${district}-taluks.json`, { method: "HEAD" })
+      .then((r) => setHasGeoJSON(r.ok))
+      .catch(() => setHasGeoJSON(false));
+  }, [district]);
+
+  if (hasGeoJSON === null) return <LoadingShell rows={2} />;
+
+  if (!hasGeoJSON) {
+    return (
+      <div style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 14, padding: 24, marginBottom: 24, textAlign: "center" }}>
+        <Map size={32} style={{ color: "#9B9B9B", margin: "0 auto 12px" }} />
+        <div style={{ fontSize: 15, fontWeight: 600, color: "#1A1A1A", marginBottom: 6 }}>Interactive map coming soon for this district</div>
+        <div style={{ fontSize: 13, color: "#9B9B9B", marginBottom: 16 }}>GeoJSON boundary data is being prepared. In the meantime, explore the taluk list below.</div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 14, padding: 16, marginBottom: 24 }}>
+      <TalukMap locale={locale} state={state} district={district} taluks={talukList} />
+    </div>
+  );
+}
 
 export default function MapPage({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -42,11 +70,9 @@ export default function MapPage({ params }: { params: Promise<{ locale: string; 
             {overview?.population && <StatCard label="Population" value={`${(overview.population / 1000000).toFixed(2)}M`} />}
           </div>
 
-          {/* D3 Geographic Map */}
+          {/* D3 Geographic Map — with fallback for districts without GeoJSON */}
           <SectionLabel>Taluk Map</SectionLabel>
-          <div style={{ background: "#FFF", border: "1px solid #E8E8E4", borderRadius: 14, padding: 16, marginBottom: 24 }}>
-            <TalukMap locale={locale} state={state} district={district} taluks={talukList} />
-          </div>
+          <MapWithFallback locale={locale} state={state} district={district} talukList={talukList} />
 
           {/* Taluk list with village details */}
           <SectionLabel>Taluks & Villages</SectionLabel>

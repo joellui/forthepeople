@@ -11,6 +11,9 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import { useJJM } from "@/hooks/useRealtimeData";
 import { ModuleHeader, StatCard, SectionLabel, ProgressBar, LoadingShell, ErrorBlock } from "@/components/district/ui";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 
 export default function JJMPage({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -37,11 +40,15 @@ export default function JJMPage({ params }: { params: Promise<{ locale: string; 
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Droplets} title="Jal Jeevan Mission" description="Tap water connection coverage across villages" backHref={base} />
+      {(() => { const _src = getModuleSources("jjm", state); return <DataSourceBanner moduleName="jjm" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="jjm" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}
+      {!isLoading && !error && villages.length === 0 && (
+        <NoDataCard module="jjm" district={district} state={state} isUrban={true} />
+      )}
 
-      {!isLoading && (
+      {!isLoading && villages.length > 0 && (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>
             <StatCard label="Villages Tracked" value={villages.length} icon={Droplets} />

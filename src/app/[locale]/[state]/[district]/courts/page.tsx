@@ -7,6 +7,9 @@
 "use client";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import AIInsightCard from "@/components/common/AIInsightCard";
+import DataSourceBanner from "@/components/common/DataSourceBanner";
+import NoDataCard from "@/components/common/NoDataCard";
+import { getModuleSources } from "@/lib/constants/state-config";
 import { use } from "react";
 import { Scale } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
@@ -38,6 +41,7 @@ function CourtsPageInner({ params }: { params: Promise<{ locale: string; state: 
   return (
     <div style={{ padding: 24 }}>
       <ModuleHeader icon={Scale} title="Courts" description="Case pendency and disposal statistics for district courts" backHref={base} />
+      {(() => { const _src = getModuleSources("courts", state); return <DataSourceBanner moduleName="courts" sources={_src.sources} updateFrequency={_src.frequency} isLive={_src.isLive} />; })()}
       <AIInsightCard module="courts" district={district} />
       {isLoading && <LoadingShell rows={4} />}
       {error && <ErrorBlock />}
