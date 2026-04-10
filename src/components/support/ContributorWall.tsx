@@ -6,22 +6,44 @@
 
 "use client";
 
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { Instagram, Linkedin, Github, Twitter, ExternalLink } from "lucide-react";
 import type { ContributorsResponse, ContributorItem } from "@/app/api/payment/contributors/route";
 
 const TIER_EMOJI: Record<string, string> = {
   chai: "☕",
   supporter: "🙏",
+  monthly: "🙏",
   district: "🏛️",
   state: "🇮🇳",
-  patron: "🌏",
+  patron: "🌟",
   custom: "💝",
   "Buy me a Chai": "☕",
   "Monthly Supporter": "🙏",
   "District Sponsor": "🏛️",
+  "District Champion": "🏛️",
   "State Champion": "🇮🇳",
-  "All-India Patron": "🌏",
+  "All-India Patron": "🌟",
 };
+
+const SOCIAL_ICONS: Record<string, typeof Instagram> = {
+  instagram: Instagram,
+  linkedin: Linkedin,
+  github: Github,
+  twitter: Twitter,
+  website: ExternalLink,
+};
+
+interface SubscriberItem {
+  id: string;
+  name: string;
+  tier: string;
+  badgeLevel: string | null;
+  socialLink: string | null;
+  socialPlatform: string | null;
+  monthsActive: number;
+}
 
 function amountColor(rupees: number): string {
   if (rupees >= 10000) return "#D97706";
@@ -45,54 +67,20 @@ function ContributorCard({ item }: { item: ContributorItem }) {
   return (
     <div
       style={{
-        width: 120,
-        minWidth: 120,
-        background: "#FFFFFF",
-        border: "1px solid #E8E8E4",
-        borderRadius: 12,
-        padding: "14px 12px",
-        flexShrink: 0,
+        width: 120, minWidth: 120, background: "#FFFFFF",
+        border: "1px solid #E8E8E4", borderRadius: 12,
+        padding: "14px 12px", flexShrink: 0,
       }}
     >
       <div style={{ fontSize: 22, marginBottom: 6 }}>{emoji}</div>
-      <div
-        style={{
-          fontSize: 13,
-          fontWeight: 700,
-          color: "#1A1A1A",
-          marginBottom: 4,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-      >
+      <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {item.name}
       </div>
-      <div
-        style={{
-          fontSize: 14,
-          fontWeight: 800,
-          color,
-          fontFamily: "var(--font-mono, monospace)",
-          marginBottom: 4,
-          letterSpacing: "-0.3px",
-        }}
-      >
+      <div style={{ fontSize: 14, fontWeight: 800, color, fontFamily: "var(--font-mono, monospace)", marginBottom: 4, letterSpacing: "-0.3px" }}>
         ₹{item.amountRupees.toLocaleString("en-IN")}
       </div>
       {item.message && (
-        <div
-          style={{
-            fontSize: 10,
-            color: "#6B6B6B",
-            lineHeight: 1.4,
-            marginBottom: 4,
-            overflow: "hidden",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-          }}
-        >
+        <div style={{ fontSize: 10, color: "#6B6B6B", lineHeight: 1.4, marginBottom: 4, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
           &ldquo;{item.message.slice(0, 30)}{item.message.length > 30 ? "…" : ""}&rdquo;
         </div>
       )}
@@ -101,35 +89,54 @@ function ContributorCard({ item }: { item: ContributorItem }) {
   );
 }
 
-function SkeletonCard() {
+function SubscriberCard({ item }: { item: SubscriberItem }) {
+  const emoji = TIER_EMOJI[item.tier] || "🙏";
+  const SocialIcon = item.socialPlatform ? SOCIAL_ICONS[item.socialPlatform] : null;
   return (
     <div
       style={{
-        width: 120,
-        minWidth: 120,
-        background: "#F5F5F0",
-        borderRadius: 12,
-        padding: "14px 12px",
-        flexShrink: 0,
+        width: 130, minWidth: 130, background: "#FFFFFF",
+        border: "1px solid #E8E8E4", borderRadius: 12,
+        padding: "12px", flexShrink: 0,
       }}
     >
+      <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
+        <span style={{ fontSize: 18 }}>{emoji}</span>
+        {item.badgeLevel && (
+          <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 4px", borderRadius: 3, background: "#FEF3C7", color: "#92400E", textTransform: "uppercase" }}>
+            {item.badgeLevel}
+          </span>
+        )}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 3, marginBottom: 2 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+          {item.name}
+        </span>
+        {SocialIcon && item.socialLink && (
+          <a href={item.socialLink} target="_blank" rel="noopener noreferrer" style={{ color: "#9B9B9B", lineHeight: 0, flexShrink: 0 }}>
+            <SocialIcon size={12} />
+          </a>
+        )}
+      </div>
+      {item.monthsActive > 0 && (
+        <div style={{ fontSize: 10, color: "#9B9B9B" }}>{item.monthsActive}mo active</div>
+      )}
+    </div>
+  );
+}
+
+function SkeletonCard() {
+  return (
+    <div style={{ width: 120, minWidth: 120, background: "#F5F5F0", borderRadius: 12, padding: "14px 12px", flexShrink: 0 }}>
       {[22, 40, 14, 10].map((h, i) => (
-        <div
-          key={i}
-          style={{
-            height: h,
-            background: "#E8E8E4",
-            borderRadius: 4,
-            marginBottom: 6,
-            animation: "pulse 1.5s ease-in-out infinite",
-          }}
-        />
+        <div key={i} style={{ height: h, background: "#E8E8E4", borderRadius: 4, marginBottom: 6, animation: "pulse 1.5s ease-in-out infinite" }} />
       ))}
     </div>
   );
 }
 
 export default function ContributorWall() {
+  // Existing one-time contributors (from Contribution model)
   const { data, isLoading } = useQuery<ContributorsResponse>({
     queryKey: ["contributors"],
     queryFn: () => fetch("/api/payment/contributors").then((r) => r.json()),
@@ -137,8 +144,17 @@ export default function ContributorWall() {
     staleTime: 50_000,
   });
 
+  // Active subscribers (from Supporter model)
+  const { data: subData } = useQuery<{ subscribers: SubscriberItem[] }>({
+    queryKey: ["contributors-all"],
+    queryFn: () => fetch("/api/data/contributors?type=all").then((r) => r.json()),
+    staleTime: 120_000,
+  });
+
   const contributors = data?.contributors ?? [];
+  const subscribers = subData?.subscribers ?? [];
   const shouldScroll = contributors.length >= 4;
+  const shouldScrollSubs = subscribers.length >= 4;
 
   return (
     <>
@@ -156,10 +172,36 @@ export default function ContributorWall() {
       `}</style>
 
       <div style={{ marginTop: 48 }}>
-        {/* Header */}
+        {/* ── Active Subscribers Ticker ── */}
+        {subscribers.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1A1A1A", letterSpacing: "-0.3px", margin: 0 }}>
+                🙏 Active Supporters
+              </h2>
+              <Link href="/en/contributors" style={{ fontSize: 12, color: "#2563EB", textDecoration: "none", fontWeight: 600 }}>
+                View all →
+              </Link>
+            </div>
+            <div style={{ background: "#FAFAF8", border: "1px solid #E8E8E4", borderRadius: 14, padding: "16px", overflow: "hidden" }}>
+              <div style={{ overflow: "hidden" }}>
+                <div
+                  className={shouldScrollSubs ? "wall-track" : undefined}
+                  style={{ display: "flex", gap: 12, width: shouldScrollSubs ? "max-content" : undefined }}
+                >
+                  {(shouldScrollSubs ? [...subscribers, ...subscribers] : subscribers).map((item, i) => (
+                    <SubscriberCard key={`${item.id}-${i}`} item={item} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── One-Time Contributions ── */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1A1A1A", letterSpacing: "-0.3px", margin: 0 }}>
-            🎉 Live Contributions
+            🎉 {subscribers.length > 0 ? "One-Time Contributions" : "Live Contributions"}
           </h2>
           {!isLoading && data && data.count > 0 && (
             <div style={{ fontSize: 12, color: "#6B6B6B" }}>
@@ -173,17 +215,7 @@ export default function ContributorWall() {
           )}
         </div>
 
-        {/* Scrolling track */}
-        <div
-          style={{
-            background: "#FAFAF8",
-            border: "1px solid #E8E8E4",
-            borderRadius: 14,
-            padding: "16px",
-            overflow: "hidden",
-            position: "relative",
-          }}
-        >
+        <div style={{ background: "#FAFAF8", border: "1px solid #E8E8E4", borderRadius: 14, padding: "16px", overflow: "hidden", position: "relative" }}>
           {isLoading ? (
             <div style={{ display: "flex", gap: 12 }}>
               {Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)}
@@ -194,9 +226,7 @@ export default function ContributorWall() {
               <div style={{ fontSize: 15, fontWeight: 600, color: "#1A1A1A", marginBottom: 6 }}>
                 Be the first to support ForThePeople.in!
               </div>
-              <div style={{ fontSize: 13, color: "#6B6B6B" }}>
-                Your name will appear here.
-              </div>
+              <div style={{ fontSize: 13, color: "#6B6B6B" }}>Your name will appear here.</div>
             </div>
           ) : (
             <div style={{ overflow: "hidden" }}>

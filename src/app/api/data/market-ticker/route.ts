@@ -13,7 +13,7 @@
 import { NextResponse } from "next/server";
 import { cacheGet, cacheSet } from "@/lib/cache";
 
-const CACHE_KEY = "ftp:market-ticker:v2";
+const CACHE_KEY = "ftp:market-ticker:v3";
 // Fuel prices removed — not universal across districts
 
 export interface TickerItem {
@@ -180,11 +180,13 @@ async function fetchIBJAPrices(): Promise<{
 
 // Fallback static data (last known realistic values — used when all sources fail)
 const FALLBACK: TickerItem[] = [
+  { symbol: "GOLD", label: "Gold (24K)", value: "₹14,779", change: "–", changePct: 0, direction: "flat", unit: "/g" },
+  { symbol: "SILVER", label: "Silver", value: "₹239.93", change: "–", changePct: 0, direction: "flat", unit: "/g" },
+  { symbol: "PETROL", label: "Petrol", value: "₹104.61", change: "–", changePct: 0, direction: "flat", unit: "/L" },
+  { symbol: "DIESEL", label: "Diesel", value: "₹92.27", change: "–", changePct: 0, direction: "flat", unit: "/L" },
+  { symbol: "USD_INR", label: "USD/INR", value: "₹84.52", change: "+0.08", changePct: 0.09, direction: "up", unit: "" },
   { symbol: "SENSEX", label: "Sensex", value: "74,248", change: "+312", changePct: 0.42, direction: "up", unit: "" },
   { symbol: "NIFTY50", label: "Nifty 50", value: "22,519", change: "+87", changePct: 0.39, direction: "up", unit: "" },
-  { symbol: "GOLD", label: "Gold (24K)", value: "₹14,779", change: "–", changePct: 0, direction: "flat", unit: "/g" },
-  { symbol: "SILVER", label: "Silver", value: "₹2,30,881", change: "–", changePct: 0, direction: "flat", unit: "/kg" },
-  { symbol: "USD_INR", label: "USD/INR", value: "₹84.52", change: "+0.08", changePct: 0.09, direction: "up", unit: "" },
   { symbol: "CRUDE", label: "Crude", value: "$78.40", change: "-0.90", changePct: -1.14, direction: "down", unit: "/bbl" },
 ];
 
@@ -283,26 +285,52 @@ export async function GET() {
   }
   if (ibja.silver) {
     fetchedAny = true;
+    // IBJA gives silver price per kg — convert to per gram
+    const silverPerGram = ibja.silver.price / 1000;
+    const silverChangePerGram = ibja.silver.change / 1000;
     items.push({
       symbol: "SILVER",
       label: "Silver",
-      value: `₹${fmt(Math.round(ibja.silver.price))}`,
-      change: ibja.silver.change !== 0
-        ? `${ibja.silver.change >= 0 ? "+" : ""}₹${fmt(Math.round(Math.abs(ibja.silver.change)))}`
+      value: `₹${fmt(silverPerGram, 2)}`,
+      change: silverChangePerGram !== 0
+        ? `${silverChangePerGram >= 0 ? "+" : ""}₹${fmt(Math.abs(silverChangePerGram), 2)}`
         : "–",
       changePct: ibja.silver.changePct,
       direction: ibja.silver.change > 0 ? "up" : ibja.silver.change < 0 ? "down" : "flat",
-      unit: "/kg",
+      unit: "/g",
     });
   }
 
-  // Order: Sensex, Nifty, Gold, Silver, USD/INR, Crude (universal only)
+  // Petrol & Diesel — static India averages
+  // TODO: Make dynamic via fuel price API when a reliable free source is available
+  items.push({
+    symbol: "PETROL",
+    label: "Petrol",
+    value: "₹104.61",
+    change: "–",
+    changePct: 0,
+    direction: "flat",
+    unit: "/L",
+  });
+  items.push({
+    symbol: "DIESEL",
+    label: "Diesel",
+    value: "₹92.27",
+    change: "–",
+    changePct: 0,
+    direction: "flat",
+    unit: "/L",
+  });
+
+  // Order: Gold, Silver, Petrol, Diesel, USD/INR, Sensex, Nifty, Crude
   const ordered: TickerItem[] = [
-    items.find((i) => i.symbol === "SENSEX"),
-    items.find((i) => i.symbol === "NIFTY50"),
     items.find((i) => i.symbol === "GOLD"),
     items.find((i) => i.symbol === "SILVER"),
+    items.find((i) => i.symbol === "PETROL"),
+    items.find((i) => i.symbol === "DIESEL"),
     items.find((i) => i.symbol === "USD_INR"),
+    items.find((i) => i.symbol === "SENSEX"),
+    items.find((i) => i.symbol === "NIFTY50"),
     items.find((i) => i.symbol === "CRUDE"),
   ].filter(Boolean) as TickerItem[];
 

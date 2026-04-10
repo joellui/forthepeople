@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac } from "crypto";
 import { prisma } from "@/lib/db";
+import { calculateBadgeLevel } from "@/lib/badge-level";
 
 export async function POST(req: NextRequest) {
   // If Razorpay keys aren't configured yet, return 200 gracefully
@@ -42,8 +43,10 @@ export async function POST(req: NextRequest) {
 
   const event = payload.event;
   const paymentEntity = payload.payload?.payment?.entity;
+  const subscriptionEntity = payload.payload?.subscription?.entity;
 
   try {
+    // ── Payment events (one-time) ─────────────────────────────
     if (event === "payment.captured" && paymentEntity) {
       await prisma.supporter.upsert({
         where: { paymentId: String(paymentEntity.id ?? "") },
@@ -78,7 +81,48 @@ export async function POST(req: NextRequest) {
           razorpayData: paymentEntity as object,
         },
       });
+
+    // ── Subscription events ───────────────────────────────────
+    } else if (event === "subscription.charged" && subscriptionEntity) {
+      const subId = String(subscriptionEntity.id);
+      const supporter = await prisma.supporter.findFirst({
+        where: { razorpaySubscriptionId: subId },
+      });
+      if (supporter) {
+        const badgeLevel = calculateBadgeLevel(supporter.activatedAt);
+        await prisma.supporter.update({
+          where: { id: supporter.id },
+          data: {
+            subscriptionStatus: "active",
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            badgeLevel,
+            // Update amount if charge amount changed
+            ...(subscriptionEntity.current_end
+              ? {}
+              : {}),
+          },
+        });
+      }
+    } else if (event === "subscription.halted" && subscriptionEntity) {
+      const subId = String(subscriptionEntity.id);
+      await prisma.supporter.updateMany({
+        where: { razorpaySubscriptionId: subId },
+        data: { subscriptionStatus: "expired" },
+      });
+    } else if (event === "subscription.cancelled" && subscriptionEntity) {
+      const subId = String(subscriptionEntity.id);
+      await prisma.supporter.updateMany({
+        where: { razorpaySubscriptionId: subId },
+        data: { subscriptionStatus: "cancelled" },
+      });
+    } else if (event === "subscription.paused" && subscriptionEntity) {
+      const subId = String(subscriptionEntity.id);
+      await prisma.supporter.updateMany({
+        where: { razorpaySubscriptionId: subId },
+        data: { subscriptionStatus: "paused" },
+      });
     }
+
     return NextResponse.json({ ok: true, event });
   } catch (err) {
     console.error("[razorpay-webhook]", event, err);

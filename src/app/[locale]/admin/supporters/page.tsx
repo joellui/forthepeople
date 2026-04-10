@@ -6,16 +6,12 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { SyncButton } from "./SyncButton";
+import SupportersTable from "./SupportersTable";
 
 const COOKIE = "ftp_admin_v1";
 type Params = Promise<{ locale: string }>;
-
-function fmtDate(d: Date) {
-  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
 
 export default async function SupportersPage({ params }: { params: Params }) {
   const { locale } = await params;
@@ -24,47 +20,74 @@ export default async function SupportersPage({ params }: { params: Params }) {
 
   const supporters = await prisma.supporter.findMany({
     orderBy: { createdAt: "desc" },
-    take: 100,
+    take: 500,
+    include: {
+      sponsoredDistrict: { select: { name: true, slug: true, stateId: true } },
+      sponsoredState: { select: { name: true, slug: true } },
+    },
   });
 
   const successList = supporters.filter((s) => s.status === "success");
+  const activeSubscriptions = successList.filter((s) => s.isRecurring && s.subscriptionStatus === "active");
   const totalRevenue = successList.reduce((t, s) => t + s.amount, 0);
 
   const now = new Date();
-  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const thisMonthRevenue = successList
-    .filter((s) => s.createdAt >= thisMonthStart)
-    .reduce((t, s) => t + s.amount, 0);
-  const recurringCount = successList.filter((s) => s.isRecurring).length;
+  const oneWeekOut = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const expiringThisWeek = activeSubscriptions.filter(
+    (s) => s.expiresAt && s.expiresAt <= oneWeekOut
+  ).length;
 
-  const STATUS_COLORS: Record<string, string> = {
-    success: "#16A34A",
-    failed: "#DC2626",
-    pending: "#D97706",
-    refunded: "#7C3AED",
-  };
+  const monthlyRecurring = activeSubscriptions.reduce((t, s) => t + s.amount, 0);
+  const oneTimeTotal = successList.filter((s) => !s.isRecurring).reduce((t, s) => t + s.amount, 0);
+
+  // Serialize for client component
+  const serialized = supporters.map((s) => ({
+    id: s.id,
+    name: s.name,
+    email: s.email,
+    phone: s.phone,
+    amount: s.amount,
+    tier: s.tier,
+    status: s.status,
+    method: s.method,
+    isRecurring: s.isRecurring,
+    subscriptionStatus: s.subscriptionStatus,
+    activatedAt: s.activatedAt?.toISOString() ?? null,
+    expiresAt: s.expiresAt?.toISOString() ?? null,
+    districtName: s.sponsoredDistrict?.name ?? null,
+    districtSlug: s.sponsoredDistrict?.slug ?? null,
+    stateName: s.sponsoredState?.name ?? null,
+    stateSlug: s.sponsoredState?.slug ?? null,
+    socialLink: s.socialLink,
+    badgeLevel: s.badgeLevel,
+    badgeType: s.badgeType,
+    message: s.message,
+    isPublic: s.isPublic,
+    createdAt: s.createdAt.toISOString(),
+  }));
 
   return (
-    <div style={{ padding: 24, maxWidth: 1100, margin: "0 auto" }}>
+    <div style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
       <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1A1A1A", margin: 0 }}>
             💰 Supporters
           </h1>
           <div style={{ fontSize: 13, color: "#6B6B6B", marginTop: 4 }}>
-            All payment records from Razorpay webhook
+            All payment records — subscriptions, one-time, and historical
           </div>
         </div>
         <SyncButton />
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Total Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, color: "#2563EB" },
-          { label: "Total Supporters", value: successList.length.toString(), color: "#16A34A" },
-          { label: "This Month", value: `₹${thisMonthRevenue.toLocaleString("en-IN")}`, color: "#D97706" },
-          { label: "Recurring", value: recurringCount.toString(), color: "#7C3AED" },
+          { label: "Active Subscriptions", value: activeSubscriptions.length.toString(), color: "#16A34A" },
+          { label: "Monthly Revenue", value: `₹${monthlyRecurring.toLocaleString("en-IN")}`, color: "#2563EB" },
+          { label: "One-Time Total", value: `₹${oneTimeTotal.toLocaleString("en-IN")}`, color: "#D97706" },
+          { label: "Expiring This Week", value: expiringThisWeek.toString(), color: expiringThisWeek > 0 ? "#DC2626" : "#9B9B9B" },
+          { label: "All-Time Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, color: "#7C3AED" },
         ].map((s) => (
           <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E8E8E4", borderRadius: 10, padding: 16 }}>
             <div style={{ fontSize: 11, color: "#9B9B9B", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>
@@ -77,69 +100,7 @@ export default async function SupportersPage({ params }: { params: Params }) {
         ))}
       </div>
 
-      {/* Table */}
-      {supporters.length === 0 ? (
-        <div
-          style={{
-            background: "#FFFFFF",
-            border: "1px solid #E8E8E4",
-            borderRadius: 12,
-            padding: 40,
-            textAlign: "center",
-            fontSize: 13,
-            color: "#9B9B9B",
-          }}
-        >
-          <div style={{ fontSize: 28, marginBottom: 8 }}>💰</div>
-          No supporters yet. Share your{" "}
-          <Link href="/support" style={{ color: "#2563EB" }}>/support</Link> page to start receiving contributions.
-        </div>
-      ) : (
-        <div style={{ background: "#FFFFFF", border: "1px solid #E8E8E4", borderRadius: 12, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid #E8E8E4", background: "#FAFAF8" }}>
-                {["Name", "Email", "Amount (₹)", "Tier", "Method", "Date", "Status", "Message"].map((h) => (
-                  <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#9B9B9B", textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {supporters.map((s, i) => (
-                <tr
-                  key={s.id}
-                  style={{ borderBottom: i < supporters.length - 1 ? "1px solid #F5F5F0" : "none" }}
-                >
-                  <td style={{ padding: "10px 14px", fontWeight: 500 }}>{s.name}</td>
-                  <td style={{ padding: "10px 14px", color: "#6B6B6B" }}>{s.email ?? "—"}</td>
-                  <td style={{ padding: "10px 14px", fontFamily: "var(--font-mono, monospace)", fontWeight: 600, color: "#2563EB" }}>
-                    ₹{s.amount.toLocaleString("en-IN")}
-                  </td>
-                  <td style={{ padding: "10px 14px", color: "#6B6B6B" }}>{s.tier}</td>
-                  <td style={{ padding: "10px 14px", color: "#6B6B6B" }}>{s.method ?? "—"}</td>
-                  <td style={{ padding: "10px 14px", color: "#6B6B6B", whiteSpace: "nowrap" }}>{fmtDate(s.createdAt)}</td>
-                  <td style={{ padding: "10px 14px" }}>
-                    <span
-                      style={{
-                        background: `${STATUS_COLORS[s.status] ?? "#9B9B9B"}15`,
-                        color: STATUS_COLORS[s.status] ?? "#9B9B9B",
-                        padding: "3px 8px", borderRadius: 6, fontSize: 11, fontWeight: 600,
-                      }}
-                    >
-                      {s.status}
-                    </span>
-                  </td>
-                  <td style={{ padding: "10px 14px", color: "#6B6B6B", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {s.message ?? "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <SupportersTable supporters={serialized} />
     </div>
   );
 }

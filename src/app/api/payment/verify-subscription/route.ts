@@ -1,0 +1,112 @@
+/**
+ * ForThePeople.in — Your District. Your Data. Your Right.
+ * © 2026 Jayanth M B. MIT License with Attribution.
+ * https://github.com/jayanthmb14/forthepeople
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
+import prisma from "@/lib/db";
+import { cacheSet } from "@/lib/cache";
+import { TIER_CONFIG } from "@/lib/constants/razorpay-plans";
+import { detectSocialPlatform } from "@/lib/social-detect";
+
+const CONTRIBUTORS_CACHE_KEY = "ftp:contributors:v1";
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const {
+      razorpay_subscription_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      name,
+      email,
+      tier,
+      districtId,
+      stateId,
+      socialLink,
+      message,
+      isPublic,
+    } = body as {
+      razorpay_subscription_id: string;
+      razorpay_payment_id: string;
+      razorpay_signature: string;
+      name: string;
+      email?: string;
+      tier: string;
+      districtId?: string;
+      stateId?: string;
+      socialLink?: string;
+      message?: string;
+      isPublic?: boolean;
+    };
+
+    if (!razorpay_subscription_id || !razorpay_payment_id || !razorpay_signature) {
+      return NextResponse.json({ success: false, error: "Missing fields" }, { status: 400 });
+    }
+
+    // Verify HMAC SHA256 signature
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (!keySecret) {
+      return NextResponse.json({ success: false, error: "Server misconfiguration" }, { status: 500 });
+    }
+
+    const expectedSignature = crypto
+      .createHmac("sha256", keySecret)
+      .update(`${razorpay_payment_id}|${razorpay_subscription_id}`)
+      .digest("hex");
+
+    const signaturesMatch =
+      expectedSignature.length === razorpay_signature.length &&
+      crypto.timingSafeEqual(
+        Buffer.from(expectedSignature, "hex"),
+        Buffer.from(razorpay_signature, "hex"),
+      );
+
+    if (!signaturesMatch) {
+      return NextResponse.json({ success: false, error: "Invalid signature" }, { status: 400 });
+    }
+
+    // Detect social platform
+    const social = socialLink?.trim() ? detectSocialPlatform(socialLink.trim()) : null;
+
+    // Get badge type from tier config
+    const tierConfig = TIER_CONFIG[tier];
+    const badgeType = tierConfig?.badgeType ?? null;
+    const amount = tierConfig?.amount ?? 0;
+
+    // Create Supporter record
+    await prisma.supporter.create({
+      data: {
+        name: name.trim(),
+        email: email?.trim() || null,
+        amount,
+        tier,
+        paymentId: razorpay_payment_id,
+        razorpaySubscriptionId: razorpay_subscription_id,
+        isRecurring: true,
+        subscriptionStatus: "active",
+        activatedAt: new Date(),
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        districtId: districtId || null,
+        stateId: stateId || null,
+        socialLink: socialLink?.trim() || null,
+        socialPlatform: social?.platform ?? null,
+        badgeType,
+        badgeLevel: null, // too early for a badge
+        message: message?.trim().slice(0, 100) || null,
+        isPublic: isPublic !== false,
+        status: "success",
+      },
+    });
+
+    // Invalidate contributors cache
+    await cacheSet(CONTRIBUTORS_CACHE_KEY, null, 1);
+
+    return NextResponse.json({ success: true, message: "Subscription verified" });
+  } catch (err) {
+    console.error("[verify-subscription]", err);
+    return NextResponse.json({ success: false, error: "Verification failed" }, { status: 500 });
+  }
+}

@@ -1,0 +1,109 @@
+/**
+ * ForThePeople.in — Your District. Your Data. Your Right.
+ * © 2026 Jayanth M B. MIT License with Attribution.
+ * https://github.com/jayanthmb14/forthepeople
+ */
+
+"use client";
+
+import { Instagram, Linkedin, Github, Twitter, ExternalLink } from "lucide-react";
+import { BADGE_COLORS } from "@/lib/badge-level";
+
+interface Patron {
+  id: string;
+  name: string;
+  badgeLevel: string | null;
+  socialLink: string | null;
+  socialPlatform: string | null;
+  monthsActive: number;
+  message: string | null;
+}
+
+const SOCIAL_ICONS: Record<string, typeof Instagram> = {
+  instagram: Instagram,
+  linkedin: Linkedin,
+  github: Github,
+  twitter: Twitter,
+  website: ExternalLink,
+};
+
+export default function PatronCard({ patron }: { patron: Patron }) {
+  const badgeColors = patron.badgeLevel ? BADGE_COLORS[patron.badgeLevel] : null;
+  const SocialIcon = patron.socialPlatform ? SOCIAL_ICONS[patron.socialPlatform] : null;
+  const initials = patron.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+
+  return (
+    <div
+      style={{
+        background: "linear-gradient(135deg, #FFFBEB, #FEF3C7)",
+        border: "2px solid #F59E0B",
+        borderRadius: 14,
+        padding: "20px 24px",
+        marginBottom: 16,
+      }}
+    >
+      <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 12 }}>
+        🌟 ALL-INDIA PATRON
+      </div>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            background: badgeColors?.bg ?? "#FEF3C7",
+            color: badgeColors?.text ?? "#92400E",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 18,
+            fontWeight: 800,
+            flexShrink: 0,
+            border: `3px solid ${badgeColors?.border ?? "#F59E0B"}`,
+          }}
+        >
+          {initials}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A" }}>
+              {patron.name}
+            </span>
+            {SocialIcon && patron.socialLink && (
+              <a href={patron.socialLink} target="_blank" rel="noopener noreferrer" style={{ color: "#92400E", lineHeight: 0 }}>
+                <SocialIcon size={16} />
+              </a>
+            )}
+          </div>
+          <div style={{ fontSize: 12, color: "#92400E", marginTop: 2, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <span>All-India Patron · {patron.monthsActive} months</span>
+            {patron.badgeLevel && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  padding: "2px 7px",
+                  borderRadius: 5,
+                  background: badgeColors?.bg,
+                  color: badgeColors?.text,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {patron.badgeLevel}
+              </span>
+            )}
+          </div>
+          {patron.message && (
+            <div style={{ fontSize: 14, color: "#4B4B4B", marginTop: 8, fontStyle: "italic", lineHeight: 1.6 }}>
+              &ldquo;{patron.message}&rdquo;
+            </div>
+          )}
+        </div>
+      </div>
+      <div style={{ fontSize: 11, color: "#B45309", marginTop: 10 }}>
+        This patron supports ALL 780+ districts across India. Their contribution keeps every district dashboard running.
+      </div>
+    </div>
+  );
+}

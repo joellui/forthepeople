@@ -59,6 +59,7 @@ export const SIDEBAR_MODULES: SidebarModule[] = [
   { slug: "responsibility",   label: "My Responsibility",   emoji: "🌱", icon: Flame,            description: "What YOU can do to improve your district", group: "info" },
   { slug: "news",             label: "News & Updates",      emoji: "📰", icon: Newspaper,        description: "Local news aggregated from RSS", group: "info" },
   { slug: "data-sources",     label: "Data Sources",        emoji: "🔗", icon: Database,         description: "All official sources + scraping status", group: "info" },
+  { slug: "contributors",     label: "Contributors",        emoji: "🤝", icon: Heart,            description: "People who support this district's data", group: "info" },
 ];
 
 // The 5 modules shown in mobile bottom nav

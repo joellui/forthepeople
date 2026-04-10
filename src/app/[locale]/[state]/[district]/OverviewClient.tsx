@@ -24,6 +24,7 @@ import { StatCard, SectionLabel, CardGrid, LoadingShell, LiveBadge, SeverityBadg
 import EmptyState from "@/components/district/EmptyState";
 import AIInsightCard from "@/components/common/AIInsightCard";
 import { DistrictHealthScoreCard } from "@/components/district/DistrictHealthScoreCard";
+import DistrictSponsorBanner from "@/components/common/DistrictSponsorBanner";
 
 interface Props {
   locale: string;
@@ -220,9 +221,32 @@ export default function OverviewClient({ locale, stateSlug, districtSlug, stateN
             </div>
           )}
         </div>
+
+        {/* Sponsor CTA */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 16, flexWrap: "wrap" }}>
+          <Link
+            href={`/${locale}/support?tier=district&state=${stateSlug}&district=${districtSlug}`}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 5,
+              padding: "8px 20px", background: "linear-gradient(135deg, #EC4899, #F43F5E)", color: "#fff",
+              border: "none", borderRadius: 20,
+              fontSize: 13, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap",
+              boxShadow: "0 2px 8px rgba(244, 63, 94, 0.2)",
+            }}
+          >
+            ❤️ Sponsor {districtData.name} — ₹2,000/mo →
+          </Link>
+          <Link href={`/${locale}/support?tier=state&state=${stateSlug}`} style={{ fontSize: 12, color: "#6B6B6B", textDecoration: "none" }}>
+            or: Sponsor all of {stateName} →
+          </Link>
+          <Link href={`/${locale}/support?tier=patron`} style={{ fontSize: 12, color: "#6B6B6B", textDecoration: "none" }}>
+            or: Sponsor all of India →
+          </Link>
+        </div>
       </div>
 
       <div style={{ padding: "20px 24px 24px" }}>
+        <DistrictSponsorBanner district={districtSlug} state={stateSlug} locale={locale} />
         <AIInsightCard module="overview" district={districtSlug} />
         <DistrictHealthScoreCard districtSlug={districtSlug} />
 

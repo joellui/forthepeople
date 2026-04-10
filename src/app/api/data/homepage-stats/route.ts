@@ -13,7 +13,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { cacheGet, cacheSet } from "@/lib/cache";
 
-const CACHE_KEY = "ftp:homepage-stats:v1";
+const CACHE_KEY = "ftp:homepage-stats:v2";
 
 export async function GET() {
   const cached = await cacheGet<object>(CACHE_KEY);

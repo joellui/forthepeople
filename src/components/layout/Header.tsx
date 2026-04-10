@@ -9,7 +9,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { Search, Globe, ChevronDown, Menu, Lock, Users, Github } from "lucide-react";
+import { Search, Globe, ChevronDown, Menu, Lock, Users, Github, Heart } from "lucide-react";
 import { INDIA_STATES, getState, getDistrict, PILOT_STATE, PILOT_DISTRICT } from "@/lib/constants/districts";
 import MobileSidebar from "./MobileSidebar";
 
@@ -396,6 +396,32 @@ export default function Header({ locale }: HeaderProps) {
           <Github size={16} />
         </a>
 
+        {/* Support — heart CTA */}
+        <Link
+          href={`/${locale}/support`}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            padding: "6px 12px",
+            background: "#FFF1F2",
+            color: "#E11D48",
+            border: "1px solid #FECDD3",
+            borderRadius: 20,
+            fontSize: 12,
+            fontWeight: 700,
+            textDecoration: "none",
+            whiteSpace: "nowrap",
+            letterSpacing: "0.01em",
+            transition: "background 150ms",
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "#FFE4E6"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "#FFF1F2"; }}
+        >
+          <Heart size={14} fill="#E11D48" />
+          <span className="hidden sm:inline">Support</span>
+        </Link>
+
         {/* Vote on Features — eye-catching CTA */}
         <Link
           href="/en/features"
@@ -583,7 +609,7 @@ function StateDropdown({ locale, currentState }: {
                 <button
                   key={s.slug}
                   onClick={() => {
-                    if (s.active) { router.push(`/${locale}/${s.slug}`); setOpen(false); }
+                    router.push(`/${locale}/${s.slug}`); setOpen(false);
                   }}
                   style={{
                     display: "flex",
@@ -594,7 +620,7 @@ function StateDropdown({ locale, currentState }: {
                     minHeight: 44,
                     border: "none",
                     background: s.slug === currentState?.slug ? "#EFF6FF" : "none",
-                    cursor: s.active ? "pointer" : "default",
+                    cursor: "pointer",
                     textAlign: "left",
                     fontSize: 13,
                     color: s.active ? "#1A1A1A" : "#9B9B9B",
@@ -695,7 +721,7 @@ function DistrictDropdown({ locale, state, currentDistrict }: {
                 <button
                   key={d.slug}
                   onClick={() => {
-                    if (d.active) { router.push(`/${locale}/${state.slug}/${d.slug}`); setOpen(false); }
+                    router.push(`/${locale}/${state.slug}/${d.slug}`); setOpen(false);
                   }}
                   style={{
                     display: "flex",
@@ -706,7 +732,7 @@ function DistrictDropdown({ locale, state, currentDistrict }: {
                     minHeight: 44,
                     border: "none",
                     background: d.slug === currentDistrict?.slug ? "#EFF6FF" : "none",
-                    cursor: d.active ? "pointer" : "default",
+                    cursor: "pointer",
                     textAlign: "left",
                     fontSize: 13,
                     color: d.active ? "#1A1A1A" : "#9B9B9B",

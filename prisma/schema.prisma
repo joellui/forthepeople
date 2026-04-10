@@ -23,6 +23,7 @@ model State {
   capital     String?
   districts   District[]
   governmentExams GovernmentExam[]
+  supporters  Supporter[]
 }
 
 model District {
@@ -90,6 +91,7 @@ model District {
   newsActionQueue     NewsActionQueue[]
   governmentExams     GovernmentExam[]
   departmentStaffing  DepartmentStaffing[]
+  supporters          Supporter[]
 
   @@unique([stateId, slug])
 }
@@ -1161,16 +1163,36 @@ model Supporter {
   name         String
   email        String?
   phone        String?
-  amount       Float                             // ₹ amount
+  amount       Float                             // ₹ amount (rupees, not paise)
   currency     String    @default("INR")
-  tier         String    @default("one-time")    // "one-time", "monthly", "district-sponsor", "state-champion"
+  tier         String    @default("custom")      // "chai" | "monthly" | "district" | "state" | "patron" | "custom"
   paymentId    String?   @unique                 // Razorpay payment_id
   orderId      String?                           // Razorpay order_id
+  razorpaySubscriptionId String?                 // Razorpay subscription_id (recurring)
   method       String?                           // "upi", "card", "netbanking", "wallet"
   status       String    @default("success")     // "success", "failed", "pending", "refunded"
   message      String?
-  district     String?
-  isRecurring  Boolean   @default(false)
+  district     String?                           // Legacy plain-text district name
+
+  // Subscription fields
+  isRecurring         Boolean   @default(false)
+  subscriptionStatus  String?                    // "active" | "paused" | "cancelled" | "expired"
+  activatedAt         DateTime?                  // When subscription started
+  expiresAt           DateTime?                  // When current period ends
+
+  // Sponsorship FK relations
+  districtId   String?
+  sponsoredDistrict District? @relation(fields: [districtId], references: [id])
+  stateId      String?
+  sponsoredState    State?    @relation(fields: [stateId], references: [id])
+
+  // Social & display
+  socialLink      String?                        // One URL
+  socialPlatform  String?                        // "instagram" | "linkedin" | "github" | "twitter" | "website"
+  badgeType       String?                        // "supporter" | "champion" | "state" | "patron"
+  badgeLevel      String?                        // "bronze" | "silver" | "gold" | "platinum"
+
+  isPublic     Boolean   @default(true)
   receiptSent  Boolean   @default(false)
   razorpayData Json?
   createdAt    DateTime  @default(now())
@@ -1178,6 +1200,11 @@ model Supporter {
 
   @@index([status, createdAt])
   @@index([email])
+  @@index([tier])
+  @@index([districtId])
+  @@index([stateId])
+  @@index([subscriptionStatus])
+  @@index([isRecurring, subscriptionStatus])
 }
 
 

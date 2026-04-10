@@ -34,7 +34,7 @@ const SIDEBAR_CATEGORIES = [
   },
   {
     label: "COMMUNITY",
-    slugs: ["transport", "jjm", "housing", "power", "schools"],
+    slugs: ["transport", "jjm", "housing", "power", "schools", "contributors"],
   },
   {
     label: "TRANSPARENCY",

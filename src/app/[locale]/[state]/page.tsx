@@ -38,6 +38,15 @@ export default async function StatePage({
 
   return (
     <main style={{ background: "#FAFAF8", minHeight: "calc(100vh - 56px - 36px)" }}>
+      <style>{`
+        @media (min-width: 768px) {
+          .state-grid-with-map { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 767px) {
+          .state-grid-with-map { grid-template-columns: 1fr !important; }
+          .state-grid-with-map > div:first-child { max-height: 280px !important; }
+        }
+      `}</style>
       {/* State header */}
       <div
         style={{
@@ -65,57 +74,63 @@ export default async function StatePage({
           {!stateData.active && (
             <div
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                marginTop: 10,
-                padding: "4px 10px",
-                background: "#FFF8E1",
-                border: "1px solid #FFE082",
-                borderRadius: 20,
-                fontSize: 12,
-                color: "#6B5800",
+                marginTop: 12,
+                padding: "12px 16px",
+                background: "#EFF6FF",
+                border: "1px solid #BFDBFE",
+                borderRadius: 10,
+                fontSize: 13,
+                color: "#1E40AF",
+                lineHeight: 1.6,
               }}
             >
-              <Lock size={11} />
-              Coming Soon
+              🔓 This state is coming soon to ForThePeople.in. District data is being prepared. You can{" "}
+              <Link href={`/${locale}/support`} style={{ color: "#2563EB", fontWeight: 600 }}>
+                sponsor a district
+              </Link>{" "}
+              to help us launch faster.
             </div>
           )}
         </div>
       </div>
 
-      {/* Karnataka interactive district map */}
-      {stateData.slug === "karnataka" && (
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "20px 24px 0" }}>
-          <StateMapSection
-            locale={locale}
-            activeDistrictSlugs={stateData.districts.filter((d) => d.active).map((d) => d.slug)}
-          />
-        </div>
-      )}
-
-      {/* District grid */}
+      {/* Map + District grid */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px" }}>
-        <h2
-          style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: "#9B9B9B",
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-            marginBottom: 16,
-          }}
-        >
-          Districts
-        </h2>
-
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-            gap: 10,
-          }}
+          style={{ display: "grid", gap: 24 }}
+          className="state-grid-with-map"
         >
+          {/* State district map */}
+          <div style={{ maxHeight: 400, overflow: "hidden" }}>
+            <StateMapSection
+              locale={locale}
+              stateSlug={stateSlug}
+              activeDistrictSlugs={stateData.districts.filter((d) => d.active).map((d) => d.slug)}
+            />
+          </div>
+
+          {/* District grid */}
+          <div>
+            <h2
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: "#9B9B9B",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                marginBottom: 16,
+              }}
+            >
+              Districts ({stateData.districts.length})
+            </h2>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                gap: 10,
+              }}
+            >
           {stateData.districts.map((d) => (
             d.active ? (
               <Link
@@ -146,8 +161,9 @@ export default async function StatePage({
                 <ArrowRight size={14} />
               </Link>
             ) : (
-              <div
+              <Link
                 key={d.slug}
+                href={`/${locale}/${stateSlug}/${d.slug}`}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -158,6 +174,7 @@ export default async function StatePage({
                   borderRadius: 10,
                   color: "#9B9B9B",
                   fontSize: 14,
+                  textDecoration: "none",
                 }}
               >
                 <div>
@@ -169,9 +186,11 @@ export default async function StatePage({
                   )}
                 </div>
                 <Lock size={13} />
-              </div>
+              </Link>
             )
           ))}
+          </div>
+        </div>
         </div>
       </div>
     </main>

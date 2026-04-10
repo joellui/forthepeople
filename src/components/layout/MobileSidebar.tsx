@@ -223,7 +223,7 @@ export default function MobileSidebar({
               gap: 10,
               padding: "11px 16px",
               textDecoration: "none",
-              color: "#2563EB",
+              color: "#E11D48",
               fontSize: 14,
               fontWeight: 500,
               minHeight: 44,
@@ -231,6 +231,26 @@ export default function MobileSidebar({
           >
             <span style={{ fontSize: 16, lineHeight: 1 }}>❤️</span>
             <span>Support This Project</span>
+          </Link>
+
+          {/* Vote on Features */}
+          <Link
+            href="/en/features"
+            onClick={onClose}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "11px 16px",
+              textDecoration: "none",
+              color: "#7C3AED",
+              fontSize: 14,
+              fontWeight: 500,
+              minHeight: 44,
+            }}
+          >
+            <span style={{ fontSize: 16, lineHeight: 1 }}>🗳️</span>
+            <span>Vote on Features</span>
           </Link>
         </div>
       </div>

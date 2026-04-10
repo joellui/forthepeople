@@ -5,13 +5,15 @@
  */
 
 // ═══════════════════════════════════════════════════════════
-// ForThePeople.in — District Overview Dashboard (Section 5)
+// ForThePeople.in — District Overview Dashboard
+// Shows full dashboard for active districts, preview for locked
 // ═══════════════════════════════════════════════════════════
 export const revalidate = 300; // ISR: revalidate every 5 minutes
 
 import { notFound } from "next/navigation";
 import { getDistrict, getState } from "@/lib/constants/districts";
 import OverviewClient from "./OverviewClient";
+import LockedDistrictPreview from "@/components/district/LockedDistrictPreview";
 
 export default async function DistrictPage({
   params,
@@ -24,6 +26,26 @@ export default async function DistrictPage({
   const districtData = getDistrict(stateSlug, districtSlug);
   if (!districtData || !stateData) notFound();
 
+  // Locked district → show preview page
+  if (!districtData.active) {
+    return (
+      <LockedDistrictPreview
+        locale={locale}
+        stateSlug={stateSlug}
+        districtSlug={districtSlug}
+        stateName={stateData.name}
+        districtName={districtData.name}
+        districtNameLocal={districtData.nameLocal}
+        tagline={districtData.tagline}
+        population={districtData.population}
+        area={districtData.area}
+        talukCount={districtData.talukCount ?? districtData.taluks.length}
+        literacy={districtData.literacy}
+      />
+    );
+  }
+
+  // Active district → full dashboard
   return (
     <OverviewClient
       locale={locale}

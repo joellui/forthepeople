@@ -21,11 +21,13 @@ export default function KarnatakaMap({ locale, activeDistricts }: KarnatakaMapPr
   const [tooltip, setTooltip] = useState<{ name: string; active: boolean; x: number; y: number } | null>(null);
 
   return (
-    <div style={{ position: "relative", width: "100%", minHeight: 360 }}>
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ center: [76.5, 15.3], scale: 3200 }}
-        style={{ width: "100%", height: "100%" }}
+        width={500}
+        height={450}
+        style={{ width: "100%", height: "auto", maxHeight: "100%", display: "block" }}
       >
         <Geographies geography="/geo/karnataka-districts.json">
           {({ geographies }: { geographies: Array<{ rsmKey: string; properties: Record<string, string | boolean> }> }) =>
