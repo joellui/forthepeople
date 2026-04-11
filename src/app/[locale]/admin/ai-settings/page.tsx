@@ -262,14 +262,56 @@ export default function AISettingsPage() {
           🤖 AI Provider Settings
         </h1>
         <div style={{ fontSize: 13, color: "#6B6B6B", marginTop: 4 }}>
-          Choose your AI source. All intelligence features switch instantly. Gemini for speed, Claude for depth.
+          OpenRouter is the primary AI gateway. All calls route through it with tiered model selection.
         </div>
       </div>
 
-      {/* ─── 3-Provider Cards ─── */}
+      {/* ─── OpenRouter Active Card ─── */}
+      <div style={{ ...cardBase, borderLeft: "4px solid #16A34A", marginBottom: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span style={{ fontSize: 20 }}>🌐</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A" }}>OpenRouter</span>
+              <span style={{ fontSize: 10, fontWeight: 700, background: "#16A34A", color: "#fff", padding: "2px 8px", borderRadius: 10 }}>ACTIVE</span>
+            </div>
+            <div style={{ fontSize: 12, color: "#6B6B6B" }}>Unified API gateway — 300+ models via single endpoint</div>
+          </div>
+        </div>
+
+        <div style={{ fontSize: 13, fontWeight: 600, color: "#1A1A1A", marginBottom: 8 }}>Model Routing</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 12 }}>
+          {[
+            { purpose: "Classification / Summaries", model: "google/gemini-2.5-flash:free", cost: "Free" },
+            { purpose: "District Insights / Fact-check", model: "anthropic/claude-sonnet-4", cost: "~$3/M tokens" },
+            { purpose: "Document Analysis", model: "google/gemini-2.5-pro", cost: "~$1.25/M tokens" },
+          ].map((r) => (
+            <div key={r.purpose} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 10px", background: "#FAFAF8", borderRadius: 6, fontSize: 12 }}>
+              <span style={{ color: "#6B6B6B" }}>{r.purpose}</span>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <span style={{ fontFamily: "var(--font-mono)", color: "#1A1A1A", fontWeight: 500, fontSize: 11 }}>{r.model}</span>
+                <span style={{ fontSize: 10, color: "#16A34A", fontWeight: 600 }}>{r.cost}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", gap: 12, fontSize: 12, color: "#6B6B6B" }}>
+          <span>Total calls: <strong style={{ fontFamily: "monospace", color: "#1A1A1A" }}>{(s.totalGeminiCalls + s.totalAnthropicCalls).toLocaleString("en-IN")}</strong></span>
+        </div>
+
+        {s.lastError && (
+          <div style={{ marginTop: 10, padding: "8px 12px", background: "#FFF1F2", border: "1px solid #FECDD3", borderRadius: 8, fontSize: 11, color: "#DC2626" }}>
+            Last error: {s.lastError}
+            {s.lastErrorAt && ` (${new Date(s.lastErrorAt).toLocaleString("en-IN")})`}
+          </div>
+        )}
+      </div>
+
+      {/* ─── Legacy Provider Cards (fallback configuration) ─── */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A", marginBottom: 14 }}>
-          AI Source — select one
+          Legacy Providers (fallback keys)
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
           {PROVIDERS.map((p) => {
