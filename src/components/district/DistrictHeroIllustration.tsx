@@ -314,6 +314,7 @@ export default function DistrictHeroIllustration({
         borderBottom: "1px solid #E8E8E4",
         minHeight: 220,
       }}
+      className="hero-illustration"
     >
       {/* SVG background — right-aligned */}
       <div
@@ -368,7 +369,7 @@ export default function DistrictHeroIllustration({
         {badges && badges.length > 0 && <DistrictBadges badges={badges} districtSlug={districtSlug} />}
 
         {/* Stats strip */}
-        <div style={{ display: "flex", gap: 20, marginTop: 16, flexWrap: "wrap" }}>
+        <div className="stats-strip" style={{ display: "flex", gap: 20, marginTop: 16, flexWrap: "wrap" }}>
           {stats.population && (
             <div>
               <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "var(--font-mono)", letterSpacing: "-0.4px", color: "#1A1A1A" }}>

@@ -72,7 +72,7 @@ function CropsPageInner({ params }: { params: Promise<{ locale: string; state: s
         <>
           {/* Kg / Quintal toggle */}
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
-            <div style={{ display: "inline-flex", background: "#F5F5F0", borderRadius: 100, padding: 3, gap: 2 }}>
+            <div className="crop-toggle" style={{ display: "inline-flex", background: "#F5F5F0", borderRadius: 100, padding: 3, gap: 2 }}>
               {(["kg", "quintal"] as const).map((u) => (
                 <button key={u} onClick={() => setUnit(u)} style={{
                   padding: "6px 14px", borderRadius: 100, fontSize: 13, fontWeight: 500,

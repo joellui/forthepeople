@@ -283,7 +283,7 @@ export function DataTable({
     );
   }
   return (
-    <div
+    <div className="data-table-scroll"
       style={{
         background: "#FFFFFF",
         border: "1px solid #E8E8E4",

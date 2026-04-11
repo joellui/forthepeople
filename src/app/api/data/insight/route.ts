@@ -72,6 +72,7 @@ export async function GET(req: NextRequest) {
       aiProvider: row.aiProvider,
       aiModel: row.aiModel,
       generatedAt: row.generatedAt.toISOString(),
+      expiresAt: row.expiresAt?.toISOString() ?? null,
       fromCache: false,
     };
 

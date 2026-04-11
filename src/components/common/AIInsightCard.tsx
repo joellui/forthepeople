@@ -7,7 +7,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getInsightFrequencyLabel } from "@/lib/constants/state-config";
 
 type Severity = "good" | "watch" | "alert" | "critical";
 
@@ -16,9 +15,42 @@ interface ModuleInsight {
   severity: Severity;
   recommendation: string;
   generatedAt: string;
+  expiresAt?: string | null;
   fromCache?: boolean;
   aiProvider?: string;
   aiModel?: string;
+}
+
+function formatInsightTiming(generatedAt: string, expiresAt?: string | null) {
+  const now = Date.now();
+  const generated = new Date(generatedAt).getTime();
+  const minutesAgo = Math.floor((now - generated) / 60000);
+  const hoursAgo = Math.floor(minutesAgo / 60);
+
+  let lastUpdated: string;
+  if (minutesAgo < 5) lastUpdated = "just now";
+  else if (minutesAgo < 60) lastUpdated = `${minutesAgo}m ago`;
+  else if (hoursAgo < 24) lastUpdated = `${hoursAgo}h ago`;
+  else if (hoursAgo < 48) lastUpdated = "yesterday";
+  else lastUpdated = `${Math.floor(hoursAgo / 24)} days ago`;
+
+  let nextRefresh: string;
+  if (expiresAt) {
+    const msUntil = new Date(expiresAt).getTime() - now;
+    if (msUntil <= 0) {
+      nextRefresh = "Refreshing soon";
+    } else {
+      const hUntil = Math.floor(msUntil / 3600000);
+      const mUntil = Math.floor((msUntil % 3600000) / 60000);
+      if (hUntil < 1) nextRefresh = `Next refresh in ${mUntil}m`;
+      else if (hUntil < 24) nextRefresh = `Next refresh in ${hUntil}h`;
+      else nextRefresh = `Next refresh in ${Math.floor(hUntil / 24)}d`;
+    }
+  } else {
+    nextRefresh = "Updated periodically";
+  }
+
+  return { lastUpdated, nextRefresh };
 }
 
 interface AIInsightCardProps {
@@ -85,10 +117,7 @@ export default function AIInsightCard({ module, district }: AIInsightCardProps) 
   if (!insight) return null;
 
   const cfg = SEVERITY_CONFIG[insight.severity] ?? SEVERITY_CONFIG.watch;
-  const age = insight.generatedAt
-    // eslint-disable-next-line react-hooks/purity
-    ? Math.round((Date.now() - new Date(insight.generatedAt).getTime()) / 60000)
-    : null;
+  const timing = insight.generatedAt ? formatInsightTiming(insight.generatedAt, insight.expiresAt) : null;
 
   return (
     <div
@@ -141,9 +170,9 @@ export default function AIInsightCard({ module, district }: AIInsightCardProps) 
             >
               {cfg.label}
             </span>
-            {age !== null && (
+            {timing && (
               <span style={{ fontSize: 10, color: "#9B9B9B", marginLeft: "auto" }}>
-                {age === 0 ? "just now" : age < 60 ? `${age}m ago` : `${Math.round(age / 60)}h ago`}
+                {timing.lastUpdated}
               </span>
             )}
           </div>
@@ -198,8 +227,7 @@ export default function AIInsightCard({ module, district }: AIInsightCardProps) 
           {insight.aiModel ? ` (${insight.aiModel})` : ""} · ForThePeople.in
         </span>
         <span style={{ fontSize: 10, color: "#9B9B9B" }}>
-          🕐 {age !== null ? (age === 0 ? "Analysis from just now" : age < 60 ? `Analysis from ${age}m ago` : `Analysis from ${Math.round(age / 60)}h ago`) : ""}
-          {" · "}{getInsightFrequencyLabel(module)}
+          🕐 {timing ? `Analysis from ${timing.lastUpdated} · ${timing.nextRefresh}` : ""}
         </span>
       </div>
     </div>

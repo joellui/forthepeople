@@ -735,3 +735,7 @@ scripts/cleanup-test-contributors.ts   — Removes [TEST] records before deploy
 27. **Sponsor UI** — Uses subtle warm styling (#f5f0eb background) in a separated bar below the hero. NOT hot pink/red gradient. Keep consistent with the site's warm aesthetic.
 
 28. **UP uses "Tehsil"** — `state-config.ts` has `uttar-pradesh` entry with `subDistrictUnit: "Tehsil"`. Never hardcode Taluk/Mandal/Tehsil in UI — always use `getStateConfig(stateSlug).subDistrictUnit`.
+
+29. **Mobile-first responsive** — All new components must work at 375px. Use base styles for mobile, `md:` prefix for desktop. Min tap target 44px. Tables must use `data-table-scroll` class for horizontal scroll. Stats use `stats-strip` class for 2x2 mobile layout.
+
+30. **AI insight timing** — Never hardcode "Updated every X hours". `AIInsightCard` uses `formatInsightTiming()` which shows human-readable "X days ago" + "Next refresh in Xh" from `generatedAt`/`expiresAt` fields. The insight API returns both fields.

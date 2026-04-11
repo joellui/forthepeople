@@ -1584,6 +1584,17 @@ Lucknow (#10) Full Data Seeding  COMPLETE (2026-04-11)
     - DistrictBadges.tsx: Lucknow badge avoidance (no pink/purple)
     - health/page.tsx: Added Ayushman Bharat UP to state health schemes
     - seed-subdistrict-populations.ts: Added Lucknow 4 tehsils
+  Mobile Optimization + AI Insight Timing (2026-04-11):
+    - globals.css: mobile breakpoint (max-width:767px) with responsive rules
+    - Hero illustration: min-height reduced on mobile
+    - Stats strip: 2x2 on mobile (no border-left separators)
+    - Sponsor bar: column layout on mobile
+    - DataTable: horizontal scroll wrapper on mobile
+    - Crop toggle: min tap target 36px
+    - AI insight: human-readable timing ("13 days ago" not "313h ago")
+    - AI insight: shows "Next refresh in Xh" from expiresAt field
+    - Removed hardcoded "Updated every 2 hours" — uses dynamic timing
+
   Cross-District Fixes (2026-04-11):
     - Budget consistency: overview filters to latest FY only (matches finance page)
     - Schemes: Apply Online button green (#0f6e56), grey fallback for missing URLs

@@ -181,7 +181,7 @@ export default function OverviewClient({ locale, stateSlug, districtSlug, stateN
       />
 
       {/* ── Sponsor CTA (plain subtle bar below hero) ─── */}
-      <div style={{
+      <div className="sponsor-bar" style={{
         display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
         padding: "10px 28px",
         borderBottom: "1px solid #E8E8E4",

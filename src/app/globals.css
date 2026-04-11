@@ -199,3 +199,26 @@ body {
   color: #6B5800;
   text-align: center;
 }
+
+/* ── Mobile responsive (375px+) ─────────────────── */
+@media (max-width: 767px) {
+  /* Hero illustration: reduce height */
+  .hero-illustration { min-height: 180px !important; }
+
+  /* Stats row: 2x2 grid */
+  .stats-strip { gap: 12px !important; }
+  .stats-strip > div { padding-left: 0 !important; border-left: none !important; }
+
+  /* Sponsor bar: column layout */
+  .sponsor-bar { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; padding: 10px 16px !important; }
+
+  /* Data tables: horizontal scroll */
+  .data-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .data-table-scroll table { min-width: 500px; }
+
+  /* Module page padding */
+  .module-page { padding: 16px !important; }
+
+  /* Crop toggle: min tap target */
+  .crop-toggle button { min-height: 36px; min-width: 36px; }
+}
