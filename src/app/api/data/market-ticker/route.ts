@@ -109,7 +109,7 @@ async function fetchIBJAPrices(): Promise<{
     if (!res.ok) return { gold: null, silver: null };
     const html = await res.text();
 
-    // Look for hidden fields or specific patterns
+    // IBJA hidden fields contain JSON with purity999 (24K gold per 10g) and silver per kg
     const goldRateMatch = html.match(/HdnGold[^"]*"[^"]*value="([^"]*)"/i);
     const silverRateMatch = html.match(/HdnSilver[^"]*"[^"]*value="([^"]*)"/i);
 
@@ -118,48 +118,47 @@ async function fetchIBJAPrices(): Promise<{
     let silverPrice: number | null = null;
     let silverPrevPrice: number | null = null;
 
-    // Try hidden fields first (most reliable) — contains comma-separated historical daily prices
+    // Parse JSON format: {"labels":[...], "purity999":[128596, 132710, ...]}
     if (goldRateMatch) {
-      const vals = goldRateMatch[1].split(",").map((v: string) => parseFloat(v.trim())).filter((v: number) => !isNaN(v) && v > 50000);
-      if (vals.length >= 2) {
-        goldPrice = vals[vals.length - 1];
-        goldPrevPrice = vals[vals.length - 2];
-      } else if (vals.length === 1) {
-        goldPrice = vals[0];
-      }
-    }
-    if (silverRateMatch) {
-      const vals = silverRateMatch[1].split(",").map((v: string) => parseFloat(v.trim())).filter((v: number) => !isNaN(v) && v > 50000);
-      if (vals.length >= 2) {
-        silverPrice = vals[vals.length - 1];
-        silverPrevPrice = vals[vals.length - 2];
-      } else if (vals.length === 1) {
-        silverPrice = vals[0];
-      }
-    }
-
-    // Fallback: parse from visible text — look for 6-digit numbers near "999" and "Gold"/"Silver"
-    if (!goldPrice) {
-      const allGoldPrices = html.match(/(?:Gold|999)[^<]{0,200}?([\d,]{6,8})/gi);
-      if (allGoldPrices) {
-        for (const m of allGoldPrices) {
-          const numMatch = m.match(/([\d,]{6,8})/);
-          if (numMatch) {
-            const val = parseFloat(numMatch[1].replace(/,/g, ""));
-            if (val > 50000 && val < 500000) { goldPrice = val; break; }
-          }
+      try {
+        const decoded = goldRateMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+        const data = JSON.parse(decoded);
+        const vals: number[] = data.purity999 ?? data.purity995 ?? [];
+        if (vals.length >= 2) {
+          goldPrice = vals[vals.length - 1];
+          goldPrevPrice = vals[vals.length - 2];
+        } else if (vals.length === 1) {
+          goldPrice = vals[0];
+        }
+      } catch {
+        // Fallback: try comma-separated format
+        const vals = goldRateMatch[1].split(",").map((v: string) => parseFloat(v.trim())).filter((v: number) => !isNaN(v) && v > 50000);
+        if (vals.length >= 2) {
+          goldPrice = vals[vals.length - 1];
+          goldPrevPrice = vals[vals.length - 2];
+        } else if (vals.length === 1) {
+          goldPrice = vals[0];
         }
       }
     }
-    if (!silverPrice) {
-      const allSilverPrices = html.match(/Silver[^<]{0,300}?([\d,]{6,8})/gi);
-      if (allSilverPrices) {
-        for (const m of allSilverPrices) {
-          const numMatch = m.match(/([\d,]{6,8})/);
-          if (numMatch) {
-            const val = parseFloat(numMatch[1].replace(/,/g, ""));
-            if (val > 50000 && val < 500000) { silverPrice = val; break; }
-          }
+    if (silverRateMatch) {
+      try {
+        const decoded = silverRateMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+        const data = JSON.parse(decoded);
+        const vals: number[] = data.purity999 ?? [];
+        if (vals.length >= 2) {
+          silverPrice = vals[vals.length - 1];
+          silverPrevPrice = vals[vals.length - 2];
+        } else if (vals.length === 1) {
+          silverPrice = vals[0];
+        }
+      } catch {
+        const vals = silverRateMatch[1].split(",").map((v: string) => parseFloat(v.trim())).filter((v: number) => !isNaN(v) && v > 50000);
+        if (vals.length >= 2) {
+          silverPrice = vals[vals.length - 1];
+          silverPrevPrice = vals[vals.length - 2];
+        } else if (vals.length === 1) {
+          silverPrice = vals[0];
         }
       }
     }
@@ -179,15 +178,16 @@ async function fetchIBJAPrices(): Promise<{
 }
 
 // Fallback static data (last known realistic values — used when all sources fail)
+// Fallback: last known values (April 2026) — used when all live sources fail
 const FALLBACK: TickerItem[] = [
-  { symbol: "GOLD", label: "Gold (24K)", value: "₹14,779", change: "–", changePct: 0, direction: "flat", unit: "/g" },
-  { symbol: "SILVER", label: "Silver", value: "₹239.93", change: "–", changePct: 0, direction: "flat", unit: "/g" },
+  { symbol: "GOLD", label: "Gold (24K)", value: "₹15,033", change: "–", changePct: 0, direction: "flat", unit: "/g" },
+  { symbol: "SILVER", label: "Silver", value: "₹260", change: "–", changePct: 0, direction: "flat", unit: "/g" },
   { symbol: "PETROL", label: "Petrol", value: "₹104.61", change: "–", changePct: 0, direction: "flat", unit: "/L" },
   { symbol: "DIESEL", label: "Diesel", value: "₹92.27", change: "–", changePct: 0, direction: "flat", unit: "/L" },
-  { symbol: "USD_INR", label: "USD/INR", value: "₹84.52", change: "+0.08", changePct: 0.09, direction: "up", unit: "" },
+  { symbol: "USD_INR", label: "USD/INR", value: "₹85.50", change: "–", changePct: 0, direction: "flat", unit: "" },
   { symbol: "SENSEX", label: "Sensex", value: "74,248", change: "+312", changePct: 0.42, direction: "up", unit: "" },
   { symbol: "NIFTY50", label: "Nifty 50", value: "22,519", change: "+87", changePct: 0.39, direction: "up", unit: "" },
-  { symbol: "CRUDE", label: "Crude", value: "$78.40", change: "-0.90", changePct: -1.14, direction: "down", unit: "/bbl" },
+  { symbol: "CRUDE", label: "Crude", value: "$62.50", change: "-0.90", changePct: -1.14, direction: "down", unit: "/bbl" },
 ];
 
 function fmt(n: number, decimals = 0): string {
