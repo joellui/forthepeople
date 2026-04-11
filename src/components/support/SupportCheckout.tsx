@@ -12,7 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { Instagram, Linkedin, Github, Twitter, ExternalLink } from "lucide-react";
 import { INDIA_STATES } from "@/lib/constants/districts";
 import { detectAndCleanSocialLink } from "@/lib/social-detect";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, QueryClient } from "@tanstack/react-query";
 
 declare global {
   interface Window {
@@ -59,7 +59,9 @@ interface Props {
 }
 
 export default function SupportCheckout({ tier }: Props) {
-  const queryClient = useQueryClient();
+  // Safe — support page at /support is outside QueryClientProvider
+  let queryClient: QueryClient | null = null;
+  try { queryClient = useQueryClient(); } catch { /* no provider */ }
   const containerRef = useRef<HTMLDivElement>(null);
   const [amount, setAmount] = useState(tier.defaultAmount);
   const [amountStr, setAmountStr] = useState(String(tier.defaultAmount));
@@ -215,9 +217,9 @@ export default function SupportCheckout({ tier }: Props) {
               setPaidAmount(amount);
               setStep("success");
               // Instantly invalidate all contributor queries so walls refresh
-              queryClient.invalidateQueries({ queryKey: ["district-sponsors"] });
-              queryClient.invalidateQueries({ queryKey: ["contributors"] });
-              queryClient.invalidateQueries({ queryKey: ["homepage-preview"] });
+              queryClient?.invalidateQueries({ queryKey: ["district-sponsors"] });
+              queryClient?.invalidateQueries({ queryKey: ["contributors"] });
+              queryClient?.invalidateQueries({ queryKey: ["homepage-preview"] });
             } else {
               setStep("error");
             }
@@ -278,9 +280,9 @@ export default function SupportCheckout({ tier }: Props) {
               setPaidAmount(amount);
               setStep("success");
               // Instantly invalidate all contributor queries so walls refresh
-              queryClient.invalidateQueries({ queryKey: ["district-sponsors"] });
-              queryClient.invalidateQueries({ queryKey: ["contributors"] });
-              queryClient.invalidateQueries({ queryKey: ["homepage-preview"] });
+              queryClient?.invalidateQueries({ queryKey: ["district-sponsors"] });
+              queryClient?.invalidateQueries({ queryKey: ["contributors"] });
+              queryClient?.invalidateQueries({ queryKey: ["homepage-preview"] });
             } else {
               setStep("error");
             }
