@@ -143,7 +143,10 @@ function SchoolsPageInner({ params }: { params: Promise<{ locale: string; state:
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#9B9B9B", marginBottom: 3 }}>
                         <span>Student:Teacher ratio</span><span>{ratio.toFixed(0)}:1</span>
                       </div>
-                      <ProgressBar pct={Math.min(100, (ratio / 40) * 100)} />
+                      <ProgressBar
+                        pct={Math.min(100, (ratio / 40) * 100)}
+                        color={ratio <= 20 ? "#16A34A" : ratio <= 30 ? "#D97706" : ratio <= 40 ? "#EA580C" : "#DC2626"}
+                      />
                     </div>
                   )}
                   {latestResult && (

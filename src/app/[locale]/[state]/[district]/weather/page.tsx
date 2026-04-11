@@ -16,6 +16,7 @@ import { getModuleSources } from "@/lib/constants/state-config";
 import ShareButtons from "@/components/common/ShareButtons";
 import ModuleErrorBoundary from "@/components/common/ModuleErrorBoundary";
 import { downloadCSV, todayISO } from "@/lib/csv";
+import NoDataCard from "@/components/common/NoDataCard";
 
 function WeatherPageInner({ params }: { params: Promise<{ locale: string; state: string; district: string }> }) {
   const { locale, state, district } = use(params);
@@ -66,6 +67,7 @@ function WeatherPageInner({ params }: { params: Promise<{ locale: string; state:
 
       {/* Current Weather */}
       {wLoading && <LoadingShell rows={3} />}
+      {!wLoading && !latest && <NoDataCard module="weather" district={district} state={state} />}
       {!wLoading && latest && (
         <div style={{ marginBottom: 24 }}>
           <SectionLabel action={<LiveBadge />}>Current Conditions</SectionLabel>

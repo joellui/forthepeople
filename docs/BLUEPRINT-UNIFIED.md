@@ -1429,6 +1429,17 @@ Post-launch: District Health Score  COMPLETE
   - Pre-computed weekly, stored in DistrictHealthScore
   - Shown on homepage district cards + district overview
 
+Bug Fixes from User Feedback        COMPLETE (2026-04-12)
+  - Schools: student:teacher ratio color INVERTED (green=good, red=bad)
+  - Population: grid minmax reduced 150→130px for mobile
+  - Overview: responsive grid uses min(240px, 100%) to prevent overflow
+  - Water & Dams: tooltips on Level, Inflow, Outflow, Storage with info icons
+  - Weather: NoDataCard added when no readings available
+  - Crops: NoDataCard for empty crop data (metro districts like Chennai)
+  - Market Ticker: USD/INR now uses Yahoo Finance (USDINR=X) as primary source
+  - Market Ticker: "Last updated" timestamp shown on desktop
+  - Data fix script: scripts/fix-data-april-2026.ts (TN Governor + Bengaluru elections)
+
 Error Monitoring + Alerts           COMPLETE (2026-04-11)
   - @sentry/nextjs for automatic error catching in production
   - AdminAlert model for storing alerts in DB

@@ -45,7 +45,7 @@ export default function PopulationPage({ params }: { params: Promise<{ locale: s
 
       {!isLoading && latest && (
         <>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10, marginBottom: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 10, marginBottom: 24 }}>
             <StatCard label="Population (2021)" value={latest.population?.toLocaleString("en-IN") ?? "—"} icon={BarChart3} />
             <StatCard label="Sex Ratio" value={latest.sexRatio ? `${latest.sexRatio}/1k` : "—"} />
             <StatCard label="Literacy" value={latest.literacy ? `${latest.literacy}%` : "—"} accent="#16A34A" />

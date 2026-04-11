@@ -68,6 +68,10 @@ function CropsPageInner({ params }: { params: Promise<{ locale: string; state: s
       {isLoading && <LoadingShell rows={5} />}
       {error && <ErrorBlock />}
 
+      {!isLoading && !error && latestByCrop.length === 0 && (
+        <NoDataCard module="crops" district={district} state={state} />
+      )}
+
       {!isLoading && latestByCrop.length > 0 && (
         <>
           {/* Kg / Quintal toggle */}

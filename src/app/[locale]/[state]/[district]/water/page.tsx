@@ -71,27 +71,27 @@ function WaterPageInner({ params }: { params: Promise<{ locale: string; state: s
                   <div style={{
                     fontSize: 28, fontWeight: 700, fontFamily: "var(--font-mono)", letterSpacing: "-1px",
                     color: dam.storagePct > 75 ? "#16A34A" : dam.storagePct > 30 ? "#D97706" : "#DC2626",
-                  }}>
+                  }} title="Current water stored as a percentage of total reservoir capacity">
                     {dam.storagePct.toFixed(1)}%
                   </div>
                 </div>
                 <ProgressBar value={dam.storagePct} color={dam.storagePct > 75 ? "#2563EB" : dam.storagePct > 30 ? "#D97706" : "#DC2626"} />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 14 }}>
                   <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 11, color: "#9B9B9B" }}>Level (ft)</div>
+                    <div style={{ fontSize: 11, color: "#9B9B9B" }} title="Current water level in the reservoir measured in feet">Level (ft) <span style={{ cursor: "help" }}>ℹ️</span></div>
                     <div style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-mono)" }}>{dam.waterLevel.toFixed(1)}</div>
                   </div>
                   <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 11, color: "#9B9B9B" }}>Inflow</div>
+                    <div style={{ fontSize: 11, color: "#9B9B9B" }} title="Volume of water flowing INTO the reservoir (cusecs)">Inflow <span style={{ cursor: "help" }}>ℹ️</span></div>
                     <div style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-mono)", color: "#16A34A" }}>{dam.inflow.toFixed(0)}</div>
                   </div>
                   <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 11, color: "#9B9B9B" }}>Outflow</div>
+                    <div style={{ fontSize: 11, color: "#9B9B9B" }} title="Volume of water released FROM the reservoir for irrigation, drinking water, or flood management (cusecs)">Outflow <span style={{ cursor: "help" }}>ℹ️</span></div>
                     <div style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-mono)", color: "#DC2626" }}>{dam.outflow.toFixed(0)}</div>
                   </div>
                 </div>
-                <div style={{ fontSize: 11, color: "#9B9B9B", marginTop: 10, textAlign: "right" }}>
-                  Storage: {dam.storage.toFixed(0)} / {dam.maxStorage.toFixed(0)} MCM
+                <div style={{ fontSize: 11, color: "#9B9B9B", marginTop: 10, textAlign: "right" }} title="Usable water stored vs total capacity in Million Cubic Metres">
+                  Live Storage: {dam.storage.toFixed(0)} / {dam.maxStorage.toFixed(0)} MCM <span style={{ cursor: "help" }}>ℹ️</span>
                   · {new Date(dam.recordedAt).toLocaleDateString("en-IN")}
                 </div>
               </div>

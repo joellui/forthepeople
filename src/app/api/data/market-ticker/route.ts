@@ -234,19 +234,35 @@ export async function GET() {
     });
   }
 
-  // USD/INR
-  const usd = await fetchUSDINR();
-  if (usd) {
+  // USD/INR — try Yahoo Finance first (real-time), fall back to open.er-api
+  const usdYahoo = await fetchYahooQuote("USDINR=X");
+  if (usdYahoo) {
     fetchedAny = true;
     items.push({
       symbol: "USD_INR",
       label: "USD/INR",
-      value: `₹${fmt(usd.rate, 2)}`,
-      change: "–",
-      changePct: 0,
-      direction: "flat",
+      value: `₹${fmt(usdYahoo.price, 2)}`,
+      change: usdYahoo.change !== 0
+        ? `${usdYahoo.change >= 0 ? "+" : ""}${fmt(usdYahoo.change, 2)}`
+        : "–",
+      changePct: usdYahoo.changePct,
+      direction: usdYahoo.change > 0 ? "up" : usdYahoo.change < 0 ? "down" : "flat",
       unit: "",
     });
+  } else {
+    const usd = await fetchUSDINR();
+    if (usd) {
+      fetchedAny = true;
+      items.push({
+        symbol: "USD_INR",
+        label: "USD/INR",
+        value: `₹${fmt(usd.rate, 2)}`,
+        change: "–",
+        changePct: 0,
+        direction: "flat",
+        unit: "",
+      });
+    }
   }
 
   // Crude oil

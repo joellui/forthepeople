@@ -248,7 +248,7 @@ export default function OverviewClient({ locale, stateSlug, districtSlug, stateN
         )}
 
         {/* ── Live Data Row ─────────────────────────────── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12, marginBottom: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(240px, 100%), 1fr))", gap: 12, marginBottom: 24 }}>
 
           {/* Weather Widget */}
           <Link href={`${base}/weather`} style={{ textDecoration: "none" }}

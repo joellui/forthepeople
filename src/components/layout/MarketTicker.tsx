@@ -169,6 +169,11 @@ export default function MarketTicker() {
               {(data?.items ?? []).map((item, i) => (
                 <TickerItemView key={`a-${item.symbol}-${i}`} item={item} />
               ))}
+              {updatedMin !== null && (
+                <div className="hidden md:flex" style={{ padding: "0 12px", fontSize: 10, color: "#9B9B9B", whiteSpace: "nowrap", flexShrink: 0 }}>
+                  {updatedMin === 0 ? "Just now" : `${updatedMin}m ago`}
+                </div>
+              )}
               {/* Duplicate set for infinite scroll — hidden on desktop */}
               <div className="md:hidden" style={{ display: "flex", alignItems: "center" }}>
                 {(data?.items ?? []).map((item, i) => (
