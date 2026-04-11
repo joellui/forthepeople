@@ -44,8 +44,8 @@ export default function DistrictSponsorBanner({ district, state, locale = "en" }
     queryKey: ["district-sponsors", district, state],
     queryFn: () =>
       fetch(`/api/data/contributors?district=${district}&state=${state}`).then((r) => r.json()),
-    staleTime: 120_000,
-    refetchInterval: 300_000,
+    staleTime: 30_000,       // 30s — so invalidation triggers refetch quickly
+    refetchInterval: 120_000, // 2min auto-refresh
   });
 
   const allSponsors = data?.contributors ?? [];

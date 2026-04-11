@@ -11,7 +11,13 @@ import { cacheSet } from "@/lib/cache";
 import { TIER_CONFIG } from "@/lib/constants/razorpay-plans";
 import { detectSocialPlatform } from "@/lib/social-detect";
 
-const CONTRIBUTORS_CACHE_KEY = "ftp:contributors:v1";
+// All cache keys used by /api/data/contributors — must invalidate ALL on payment
+const CONTRIBUTOR_CACHE_KEYS = [
+  "ftp:contributors:v1",
+  "ftp:contributors:all",
+  "ftp:contributors:leaderboard",
+  "ftp:contributors:district-rankings",
+];
 
 export async function POST(req: NextRequest) {
   try {
@@ -120,8 +126,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Invalidate contributors cache
-    await cacheSet(CONTRIBUTORS_CACHE_KEY, null, 1);
+    // Invalidate ALL contributor caches so walls refresh immediately
+    await Promise.all(CONTRIBUTOR_CACHE_KEYS.map((k) => cacheSet(k, null, 1)));
 
     return NextResponse.json({ success: true, message: "Subscription verified" });
   } catch (err) {
