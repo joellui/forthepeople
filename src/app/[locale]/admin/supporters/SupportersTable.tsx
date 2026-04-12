@@ -8,7 +8,7 @@
 
 import { useState, useMemo } from "react";
 
-interface SupporterRow {
+export interface SupporterRow {
   id: string;
   name: string;
   email: string | null;
@@ -23,13 +23,16 @@ interface SupporterRow {
   expiresAt: string | null;
   districtName: string | null;
   districtSlug: string | null;
+  districtId: string | null;
   stateName: string | null;
   stateSlug: string | null;
+  stateId: string | null;
   socialLink: string | null;
   badgeLevel: string | null;
   badgeType: string | null;
   message: string | null;
   isPublic: boolean;
+  source: string;
   createdAt: string;
 }
 
@@ -69,7 +72,13 @@ function exportCSV(supporters: SupporterRow[]) {
   URL.revokeObjectURL(url);
 }
 
-export default function SupportersTable({ supporters }: { supporters: SupporterRow[] }) {
+export default function SupportersTable({
+  supporters,
+  onEdit,
+}: {
+  supporters: SupporterRow[];
+  onEdit?: (s: SupporterRow) => void;
+}) {
   const [tierFilter, setTierFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
@@ -261,10 +270,33 @@ export default function SupportersTable({ supporters }: { supporters: SupporterR
                 {filtered.map((s, i) => {
                   const displayStatus = s.isRecurring ? (s.subscriptionStatus ?? s.status) : s.status;
                   return (
-                    <tr key={s.id} style={{ borderBottom: i < filtered.length - 1 ? "1px solid #F5F5F0" : "none" }}>
+                    <tr
+                      key={s.id}
+                      onClick={onEdit ? () => onEdit(s) : undefined}
+                      style={{
+                        borderBottom: i < filtered.length - 1 ? "1px solid #F5F5F0" : "none",
+                        cursor: onEdit ? "pointer" : "default",
+                      }}
+                    >
                       <td style={{ padding: "8px 10px", fontWeight: 500 }}>
                         {s.name}
                         {!s.isPublic && <span style={{ fontSize: 10, color: "#D97706", marginLeft: 4 }}>(hidden)</span>}
+                        {s.source === "manual" && (
+                          <span
+                            style={{
+                              fontSize: 9,
+                              fontWeight: 700,
+                              padding: "1px 5px",
+                              borderRadius: 3,
+                              background: "#F3F4F6",
+                              color: "#6B6B6B",
+                              marginLeft: 6,
+                            }}
+                            title="Added manually via admin panel"
+                          >
+                            MANUAL
+                          </span>
+                        )}
                       </td>
                       <td style={{ padding: "8px 10px", color: "#6B6B6B" }}>{s.email ?? "—"}</td>
                       <td style={{ padding: "8px 10px", color: "#6B6B6B" }}>

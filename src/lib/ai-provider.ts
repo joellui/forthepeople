@@ -32,7 +32,7 @@ function getModelForPurpose(purpose: string): string {
     case "classify":
     case "summarize":
     case "format":
-      return "google/gemma-4-26b-a4b-it:free";
+      return "openai/gpt-oss-20b:free";
 
     // TIER 2 — Affordable at scale — user-facing content
     case "insight":
@@ -46,9 +46,17 @@ function getModelForPurpose(purpose: string): string {
       return "anthropic/claude-sonnet-4";
 
     default:
-      return "google/gemma-4-26b-a4b-it:free";
+      return "openai/gpt-oss-20b:free";
   }
 }
+
+// Fallback chain: if primary model fails (rate limit, unavailable), try these in order
+const FREE_FALLBACK_MODELS = [
+  "openai/gpt-oss-20b:free",
+  "openai/gpt-oss-120b:free",
+  "z-ai/glm-4.5-air:free",
+  "google/gemma-4-26b-a4b-it:free",
+];
 
 // ── OpenRouter call ─────────────────────────────────────────
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
@@ -231,9 +239,9 @@ export async function callAI(request: AIRequest): Promise<AIResponse> {
       })
       .catch(() => {});
 
-    // Fallback: try the free model if the primary model failed
-    if (model !== "google/gemma-4-26b-a4b-it:free") {
-      const fbModel = "google/gemma-4-26b-a4b-it:free";
+    // Fallback: try each free model in sequence until one works
+    const tryFallbacks = FREE_FALLBACK_MODELS.filter((m) => m !== model);
+    for (const fbModel of tryFallbacks) {
       console.log(`[AI] Falling back to ${fbModel}`);
       const fbStart = Date.now();
       try {
@@ -243,10 +251,10 @@ export async function callAI(request: AIRequest): Promise<AIResponse> {
       } catch (fbError) {
         logUsage(fbModel, purpose, request.district, undefined, Date.now() - fbStart, false,
           fbError instanceof Error ? fbError.message : String(fbError));
-        throw new Error(`OpenRouter failed: ${errMsg}. Fallback also failed: ${fbError}`);
+        // continue to next fallback
       }
     }
-    throw primaryError;
+    throw new Error(`All OpenRouter models failed. Primary (${model}): ${errMsg}`);
   }
 }
 

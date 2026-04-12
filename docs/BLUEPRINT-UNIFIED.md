@@ -842,18 +842,65 @@ POST /api/cron/generate-insights   — Cron: pre-compute AI insights (every 2h)
 
 URL: `forthepeople.in/en/admin`
 
-### 9 Tabs
+### Navigation (April 2026 overhaul)
+Unified left sidebar (`src/components/admin/AdminSidebar.tsx`) replaces the old
+two-layer nav (top bar + sub-tab row). All admin routes share the sidebar via
+`admin/layout.tsx`. Active item is derived from `pathname + ?tab=` query param.
+Mobile (<1024px): hamburger button → slide-in overlay. Unread badges fetched
+from `/api/admin/nav-counts` (alerts, review queue, feedback).
+
+### 10 Tabs (grouped)
 ```
-1. Dashboard      — Overview stats, sync tools, FactChecker, DataVerifier, StaleDataManager
-2. System Health  — DB/Redis status, data freshness table, scraper logs, pending items, revenue
-3. Alerts & Logs  — AdminAlert feed with level filters, mark-as-read, email status indicator
-4. AI Settings    — 3-provider cards (OpusCode.pro, Official Anthropic, Gemini), model select,
-                    fallback toggle, advanced (maxTokens, temperature), test connection
-5. Security       — 2FA setup/status, backup codes count, recovery email/phone, last login
-6. Review         — AI Insight review queue (approve/reject generated insights)
-7. Feedback       — All user feedback submissions with status management
-8. Supporters     — Contributions table with Razorpay sync button + router.refresh() after sync
-9. Analytics      — District requests, feature votes, feedback/revenue trends, totals
+OVERVIEW
+ 1. Dashboard         — Action Required banner, Platform Health (DB/Redis/Scrapers),
+                        Revenue summary, AI Provider (OpenRouter live spend),
+                        Recent Activity feed with filters
+OPERATIONS
+ 2. System Health     — DB/Redis/Server status, Data Freshness per district with
+                        per-cell popover (last run, last error, Run Now button),
+                        Scraper success % + filterable log table with expandable errors
+ 3. Alerts & Logs     — AdminAlert feed, severity colours, source badges (scraper /
+                        feedback / payment / system), email status per alert,
+                        filters (level / source / date / district / unread), CSV export
+AI & DATA
+ 4. AI Settings       — 3-provider cards (OpusCode.pro, Official Anthropic, Gemini),
+                        model select, fallback toggle, test connection
+ 5. Review Queue      — AI Insight approve/reject (AIModuleInsight / ReviewQueue)
+FINANCE
+ 6. Revenue & Supporters — Contributions from Razorpay, manual sync, total/weekly totals
+ 7. Costs & Billing   — OpenRouter live credits (usage / limit / remaining / projected),
+                        per-model estimated cost breakdown (free tier reported $0),
+                        subscription table with editable renewal dates + countdown
+ANALYTICS
+ 8. Analytics         — District requests, feature votes, feedback/revenue trends
+SECURITY
+ 9. Access & 2FA      — 2FA setup, backup codes, recovery email, last login
+COMMUNITY
+10. Feedback          — User feedback feed, AI classification, inline reply
+```
+
+### URL / routing
+```
+/en/admin                     — default tab (dashboard)
+/en/admin?tab=system-health   — in-page switch (SystemHealth, AlertsAndLogs,
+/en/admin?tab=alerts            AnalyticsDashboard, CostsTab render under AdminClient)
+/en/admin?tab=analytics
+/en/admin?tab=costs
+/en/admin/ai-settings         — full-route pages (separate Next.js routes)
+/en/admin/review
+/en/admin/supporters          — Revenue & Supporters
+/en/admin/feedback
+/en/admin/security            — Access & 2FA
+```
+
+### New API Routes (April 2026)
+```
+GET  /api/admin/nav-counts        — Unread badge counts for sidebar
+GET  /api/admin/dashboard-summary — Roll-up powering the Dashboard (30s Redis cache)
+GET  /api/admin/openrouter-usage  — Real credit spend from OpenRouter /auth/key (5min cache)
+POST /api/admin/run-scraper       — Manual scraper trigger per district + job
+                                    ({ district: slug, job: "weather"|"news"|"crops"|"insights" })
+DELETE /api/admin/scraper-logs    — Purge ScraperLog entries older than N days
 ```
 
 ### AI Settings Page (`/admin/ai-settings`)
@@ -1101,6 +1148,82 @@ Admin Sync:
 
 Contributor Wall: shown on /support + compact version on homepage
 ```
+
+---
+
+## 19B. FINANCE SYSTEM (April 2026)
+
+Three admin tabs under 💰 FINANCE, all backed by database queries — zero hardcoded values:
+
+**Revenue & Supporters** (`/admin/supporters` — full route)
+- Summary cards: total revenue, this month/week, supporter count, weekly trend %
+- Monthly breakdown chart (last 12 months, revenue only)
+- "Add Manual Supporter" modal: name, email, amount, tier, payment method, reference, date,
+  sponsored district/state, social link, message, public toggle.
+- Click any supporter row → inline edit modal (tier, district, state, message, public)
+- Source badge: `MANUAL` pill on manually-added supporters vs Razorpay webhook rows
+- Razorpay sync + CSV export (preserved from earlier iteration)
+- Cache invalidation: `ftp:contributors:v1|all|leaderboard|district-rankings` are set to null with
+  1s TTL on every manual add / edit so the public Wall refreshes immediately.
+
+**Expenditure** (`/admin?tab=expenditure` — in-page tab)
+- Summary cards: total expense, this month, net P&L (month), recurring monthly total
+- Add/edit/delete expenses (modal): date, category, description, INR + USD amount with
+  exchange rate snapshot, payment method, reference, invoice link, recurring interval, notes
+- List view with category + recurring filter + search
+- **P&L view** — monthly table comparing revenue vs expenses for last 12 months with Profit/Loss status
+- CSV export of filtered rows
+- **Invoice attachment: link-only for now.** `Expense.invoiceBlobUrl` reserved for future
+  Vercel Blob upload — not wired (would need `@vercel/blob` + `BLOB_READ_WRITE_TOKEN`).
+
+**Costs & Billing** (`/admin?tab=costs` — in-page tab)
+- Top summary: Monthly Cost (INR + USD), Yearly Cost, Expiring Soon count
+- OpenRouter live credit spend card (from Prompt 1)
+- AI usage + per-model estimated cost
+- Subscription table with: displayName, plan, account email, INR+USD cost, purchase date,
+  expiry countdown (red <7d, yellow ≤30d, red if past due), inline renewal date edit
+
+### Models (prisma/schema.prisma)
+
+**Subscription** (extended from Prompt 1; `ServiceSubscription` merged in):
+  id, name, displayName, serviceName @unique, provider, category, plan,
+  costINR, costUSD, currency, costOriginal, exchangeRate,
+  billingCycle, purchaseDate, expiryDate, renewalDate (legacy), status,
+  autoRenew, accountEmail, apiKeyEnvVar, dashboardUrl, notes
+
+**Expense** (new):
+  id, date, category, description, amountINR, amountUSD, exchangeRate,
+  paymentMethod, referenceNumber, invoiceUrl, invoiceBlobUrl,
+  isRecurring, recurringInterval, notes, createdBy
+
+**Supporter** (extended): + `source "razorpay"|"manual"`, `referenceNumber`
+
+### API Routes
+
+```
+GET    /api/admin/expenses?category=&from=&to=&recurring=  — list
+POST   /api/admin/expenses                                   — create
+PATCH  /api/admin/expenses/[id]                              — update
+DELETE /api/admin/expenses/[id]                              — delete
+
+GET    /api/admin/subscriptions                              — list (existing)
+POST   /api/admin/subscriptions                              — create (existing)
+PATCH  /api/admin/subscriptions/[id]                         — update (new, REST-style)
+DELETE /api/admin/subscriptions/[id]                         — hard delete (new)
+
+POST   /api/admin/manual-supporter                           — create offline supporter +
+                                                               invalidate contributor caches
+PATCH  /api/admin/supporters/[id]                            — edit (tier/district/msg/public)
+
+GET    /api/admin/finance-summary                            — combined revenue + expenses +
+                                                               subscriptions (5min Redis cache)
+```
+
+### Seed
+
+`prisma/seed-subscriptions.ts` — upserts 9 default services (OpenRouter, Upstash, Neon,
+Domain, Resend, Vercel Pro, Plausible, Sentry, Razorpay) idempotently keyed on `serviceName`.
+Run with: `npx tsx prisma/seed-subscriptions.ts`
 
 ---
 
@@ -1851,4 +1974,68 @@ prisma/seed-hierarchy.ts                        — State→District→Taluk hie
 prisma/seed-features.ts                         — 23 feature requests seed
 prisma.config.ts                                — Prisma 7 config (DATABASE_URL from env)
 Dockerfile.scraper                              — Railway scraper container
+```
+
+---
+
+## 29. EXTERNAL INTEGRATIONS (April 2026)
+
+### Sentry Error API
+Reads unresolved issues and surfaces them inside Alerts & Logs tab + Dashboard banner.
+- `src/lib/sentry-api.ts` — REST client (sentry.io/api/0)
+- `src/app/api/admin/sentry-errors/route.ts` — cookie-auth endpoint, 5min Redis cache
+- `src/components/admin/SentryErrorsSection.tsx` — rendered at top of Alerts & Logs
+- Env: `SENTRY_API_TOKEN` (not SENTRY_AUTH_TOKEN — that's build-time), `SENTRY_ORG`,
+  `SENTRY_PROJECT`. Token requires `event:read` + `project:read` scopes.
+- Graceful: shows setup instructions when unconfigured.
+
+### Plausible Stats API
+Powers the Traffic tab with real-time visitors, top pages, referrers, devices, countries.
+- `src/lib/plausible-api.ts` — `fetchAllPlausibleData(period)` returns all blocks in one go
+- `src/app/api/admin/traffic/route.ts` — cookie-auth, 3min cache, supports 7d/30d/90d/month/year
+- `src/app/[locale]/admin/TrafficTab.tsx` — in-page tab (`?tab=traffic`)
+- Env: `PLAUSIBLE_API_KEY`, `PLAUSIBLE_SITE_ID` (default: forthepeople.in)
+- Graceful: setup instructions when unconfigured.
+- "View Full Analytics" button links to plausible.io dashboard.
+
+### API Key Vault (April 2026)
+- Models: `AdminAPIKey` (extended: envVarName, maskedKey, notes, lastAccessedAt, lastAccessedBy, addedBy)
+- Gate: separate TOTP verification (`ftp_vault_session` cookie, 10-min Redis TTL, bound to admin
+  cookie hash so the session can't be replayed from another browser)
+- Reveal: POST `/api/admin/vault/[id]/reveal` — decrypts via `src/lib/encryption.ts`, rate limited
+  to 5 reveals per session, auto-hidden after 30s client-side
+- `/api/admin/vault` GET (list masked + env reference), POST (add/upsert)
+- `/api/admin/vault/[id]` GET, PATCH, DELETE
+- `/api/admin/vault/unlock` POST, `/api/admin/vault/session` GET/DELETE
+- Seed: `scripts/seed-vault-keys.ts` — reads known env vars + stores encrypted. Idempotent.
+- Every vault action writes an AdminAuditLog entry.
+
+### Multi-user Admin (Foundation — future work)
+- Models: `AdminUser` (username, passwordHash [bcryptjs], role, permissions, totpSecret),
+  `AdminAuditLog` (actorLabel, action, resource, resourceId, details, ipAddress, userAgent)
+- Roles: `owner` (full access), `admin` (no vault/users), `viewer` (Dashboard/Health/Analytics/Traffic)
+- `/api/admin/users` GET/POST, `/api/admin/users/[id]` PATCH/DELETE (soft delete → isActive=false)
+- Scaffolding only: ADMIN_PASSWORD cookie still gates all admin routes. Per-user login remains
+  a future task — the table is populated so role-based UI filtering can be wired later.
+
+### Audit Logging
+- `src/lib/audit-log.ts`: `logAudit()` + `logAuditAuto()` (auto-extracts IP + UA from headers).
+- Never throws — audit write failures are logged to stderr but don't break the main operation.
+- Viewer: `/api/admin/audit-log` with filters (action, adminUserId, resource, date range),
+  rendered as paginated table on Security page with CSV export.
+- Instrumented: vault ops, manual-supporter, supporter edit, expense add/edit/delete,
+  platform-report manual generation, user create/update/deactivate.
+
+### AI Platform Analysis
+Weekly AI-generated platform health report with action items + cost tips.
+- Model: `PlatformReport` (type, summary, actionItems, metrics, costTips, growthNotes,
+  aiModel, aiProvider, aiCostUSD, generatedAt)
+- `src/lib/platform-analysis.ts` — gathers 7-day snapshot + calls Gemini 2.5 Pro via callAIJSON
+- `src/app/api/admin/platform-report/route.ts` — GET latest + estimate, POST with
+  `?confirm=true` to generate
+- `src/app/api/cron/platform-report/route.ts` — Sundays 00:00 UTC via vercel.json
+- `src/components/admin/PlatformReportCard.tsx` — Dashboard card with two-step generate flow
+- Approx cost: $0.002 (~₹0.20) per report. Cheaper than the prompt's ~$0.01 estimate because
+  the actual prompt fits in ~1.7K tokens.
+- Weekly cron needs `CRON_SECRET` set; manual trigger from Dashboard works independently.
 ```

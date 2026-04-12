@@ -20,7 +20,8 @@ ALL STATES:       36 states/UTs browsable (locked ones show preview + sponsor CT
 ALL DISTRICTS:    152 districts in DB (locked ones show LockedDistrictPreview)
 STATE MAPS:       33 GeoJSON maps from DataMeet Census 2011 + Karnataka hand-tuned
 PROJECT ID:       FTP-JMB-2026-IN (watermark ID)
-LAST UPDATED:     April 11, 2026
+LAST UPDATED:     April 13, 2026 (security: API Key Vault with separate 2FA gate, multi-user
+                  admin foundation, audit logging across admin ops)
 ```
 
 ---
@@ -295,6 +296,59 @@ src/app/api/cron/news-intelligence/route.ts     — Every-4h news classify + exe
 src/app/api/admin/cleanup-news/route.ts         — Cleanup stale/dup articles + bad alerts
 src/app/api/data/freshness/route.ts             — Traffic-light freshness monitor per module
 src/app/api/payment/verify/route.ts             — Razorpay HMAC sig verification
+src/app/api/admin/nav-counts/route.ts           — Sidebar unread badge counts (alerts/reviews/feedback)
+src/app/api/admin/dashboard-summary/route.ts    — Dashboard roll-up (30s Redis cache)
+src/app/api/admin/openrouter-usage/route.ts     — OpenRouter live credit tracking (5min cache)
+src/app/api/admin/run-scraper/route.ts          — Manual per-district scraper trigger
+src/app/api/admin/scraper-logs/route.ts         — GET last 50 logs + DELETE old (cookie-auth)
+src/app/api/admin/finance-summary/route.ts      — Combined revenue + expenses + subs (5min cache)
+src/app/api/admin/expenses/route.ts             — Expense GET/POST
+src/app/api/admin/expenses/[id]/route.ts        — Expense PATCH/DELETE
+src/app/api/admin/subscriptions/[id]/route.ts   — Subscription PATCH/DELETE (REST-style)
+src/app/api/admin/manual-supporter/route.ts     — Add offline supporter + bust contributor cache
+src/app/api/admin/supporters/[id]/route.ts      — Edit supporter (tier/district/msg/public)
+prisma/seed-subscriptions.ts                    — Idempotent seed of 9 default services
+```
+
+### Admin components (April 2026)
+```
+src/components/admin/AdminSidebar.tsx            — Unified sidebar, 10 tabs grouped
+src/components/admin/ModuleHelp.tsx              — ⓘ popover tooltip used across tabs
+src/app/[locale]/admin/layout.tsx                — Auth gate + sidebar wrapper
+src/app/[locale]/admin/actions.ts                — Extracted server actions (login/totp/logout)
+src/app/[locale]/admin/AdminClient.tsx           — ?tab= routing for in-page sub-tabs
+src/app/[locale]/admin/DashboardView.tsx         — Action Required, Health, Revenue, Activity feed
+src/app/[locale]/admin/SystemHealth.tsx          — Run Now buttons + expandable error details
+src/app/[locale]/admin/AlertsAndLogs.tsx         — Filters (level/source/date/district), CSV export
+src/app/[locale]/admin/CostsTab.tsx              — OpenRouter real spend, per-model est. cost,
+                                                   monthly/yearly totals, service renewal countdowns
+src/app/[locale]/admin/ExpenditureTab.tsx        — Expense tracking, P&L view, CSV export (in-page tab)
+src/app/[locale]/admin/TrafficTab.tsx            — Plausible traffic (in-page tab)
+src/app/[locale]/admin/supporters/SupportersSection.tsx — Revenue+supporters client wrapper
+src/app/[locale]/admin/supporters/RevenueSummary.tsx    — Revenue cards + monthly chart
+src/app/[locale]/admin/supporters/ManualSupporterForm.tsx — Offline supporter modal
+src/components/admin/SentryErrorsSection.tsx     — Unresolved Sentry issues (rendered in Alerts tab)
+src/components/admin/PlatformReportCard.tsx     — AI weekly analysis card (rendered in Dashboard)
+src/lib/sentry-api.ts                            — Sentry REST client (unresolved issues)
+src/lib/plausible-api.ts                         — Plausible Stats API client
+src/lib/platform-analysis.ts                     — AI weekly report generator
+src/app/api/admin/sentry-errors/route.ts         — Sentry unresolved (5min Redis cache)
+src/app/api/admin/traffic/route.ts               — Plausible traffic (3min Redis cache)
+src/app/api/admin/platform-report/route.ts       — AI report GET + POST?confirm=true
+src/app/api/cron/platform-report/route.ts        — Weekly cron (Sun 00:00 UTC)
+src/lib/vault-session.ts                          — Vault session (Redis, 10-min TTL, cookie-bound)
+src/lib/audit-log.ts                              — Audit logger (logAudit / logAuditAuto)
+src/app/api/admin/vault/unlock/route.ts           — POST: TOTP → mint vault session cookie
+src/app/api/admin/vault/session/route.ts          — GET/DELETE vault session status
+src/app/api/admin/vault/route.ts                  — GET masked list + env reference / POST upsert
+src/app/api/admin/vault/[id]/route.ts             — GET/PATCH/DELETE single key
+src/app/api/admin/vault/[id]/reveal/route.ts      — POST reveal (rate-limited, audit-logged)
+src/app/api/admin/users/route.ts                  — GET/POST admin users
+src/app/api/admin/users/[id]/route.ts             — PATCH/DELETE admin user
+src/app/api/admin/audit-log/route.ts              — GET paginated audit entries
+src/app/[locale]/admin/VaultTab.tsx               — Vault tab (gate + key list + add form)
+src/app/[locale]/admin/security/SessionInfoCard.tsx — Session info + team members + audit log
+scripts/seed-vault-keys.ts                        — Seed existing env-var keys into the vault
 ```
 
 ### Scraper
