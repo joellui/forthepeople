@@ -48,9 +48,18 @@ docs/GEO-AUDIT-REPORT.md           ← SEO/GEO audit results
 - AI calls: always use callAI()/callAIJSON() from src/lib/ai-provider.ts
 - Admin auth: cookie ftp_admin_v1, ADMIN_PASSWORD with timingSafeEqual
 
-## Current State (April 11, 2026)
+## Current State (April 12, 2026)
 - 10 live districts, 7 states
-- 9 admin tabs (Dashboard, System Health, Alerts, AI, Security, Review, Feedback, Supporters, Analytics)
+- Admin: unified left sidebar (10 tabs grouped: Overview, Operations, AI & Data, Finance,
+  Analytics, Security, Community). URL `?tab=` routing for in-page sub-tabs.
+- Admin dashboard: Action Required banner, Platform Health cards, Revenue + OpenRouter
+  live credit tracking, filterable Recent Activity feed.
+- System Health: per-district "Run Now" scraper trigger, expandable error details,
+  filterable scraper log table.
+- Alerts: severity colours, source badges (scraper/feedback/payment/system), email
+  status, CSV export, email-config warning banner when RESEND_API_KEY/ADMIN_EMAIL missing.
+- Costs: real OpenRouter credit spend, per-model estimated cost, subscription
+  renewal dates (editable) with countdown badges.
 - Sentry error monitoring active
 - Email alerts via Resend
 - Plausible analytics (conditional on env var)

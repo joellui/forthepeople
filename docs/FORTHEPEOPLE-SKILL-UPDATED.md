@@ -20,7 +20,8 @@ ALL STATES:       36 states/UTs browsable (locked ones show preview + sponsor CT
 ALL DISTRICTS:    152 districts in DB (locked ones show LockedDistrictPreview)
 STATE MAPS:       33 GeoJSON maps from DataMeet Census 2011 + Karnataka hand-tuned
 PROJECT ID:       FTP-JMB-2026-IN (watermark ID)
-LAST UPDATED:     April 11, 2026
+LAST UPDATED:     April 12, 2026 (admin overhaul: unified sidebar, OpenRouter live spend,
+                  manual scraper triggers, dashboard roll-up endpoint)
 ```
 
 ---
@@ -295,6 +296,24 @@ src/app/api/cron/news-intelligence/route.ts     — Every-4h news classify + exe
 src/app/api/admin/cleanup-news/route.ts         — Cleanup stale/dup articles + bad alerts
 src/app/api/data/freshness/route.ts             — Traffic-light freshness monitor per module
 src/app/api/payment/verify/route.ts             — Razorpay HMAC sig verification
+src/app/api/admin/nav-counts/route.ts           — Sidebar unread badge counts (alerts/reviews/feedback)
+src/app/api/admin/dashboard-summary/route.ts    — Dashboard roll-up (30s Redis cache)
+src/app/api/admin/openrouter-usage/route.ts     — OpenRouter live credit tracking (5min cache)
+src/app/api/admin/run-scraper/route.ts          — Manual per-district scraper trigger
+src/app/api/admin/scraper-logs/route.ts         — GET last 50 logs + DELETE old (cookie-auth)
+```
+
+### Admin components (April 2026)
+```
+src/components/admin/AdminSidebar.tsx            — Unified sidebar, 10 tabs grouped
+src/components/admin/ModuleHelp.tsx              — ⓘ popover tooltip used across tabs
+src/app/[locale]/admin/layout.tsx                — Auth gate + sidebar wrapper
+src/app/[locale]/admin/actions.ts                — Extracted server actions (login/totp/logout)
+src/app/[locale]/admin/AdminClient.tsx           — ?tab= routing for in-page sub-tabs
+src/app/[locale]/admin/DashboardView.tsx         — Action Required, Health, Revenue, Activity feed
+src/app/[locale]/admin/SystemHealth.tsx          — Run Now buttons + expandable error details
+src/app/[locale]/admin/AlertsAndLogs.tsx         — Filters (level/source/date/district), CSV export
+src/app/[locale]/admin/CostsTab.tsx              — OpenRouter real spend, per-model est. cost
 ```
 
 ### Scraper

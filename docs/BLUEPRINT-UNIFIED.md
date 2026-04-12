@@ -842,18 +842,65 @@ POST /api/cron/generate-insights   — Cron: pre-compute AI insights (every 2h)
 
 URL: `forthepeople.in/en/admin`
 
-### 9 Tabs
+### Navigation (April 2026 overhaul)
+Unified left sidebar (`src/components/admin/AdminSidebar.tsx`) replaces the old
+two-layer nav (top bar + sub-tab row). All admin routes share the sidebar via
+`admin/layout.tsx`. Active item is derived from `pathname + ?tab=` query param.
+Mobile (<1024px): hamburger button → slide-in overlay. Unread badges fetched
+from `/api/admin/nav-counts` (alerts, review queue, feedback).
+
+### 10 Tabs (grouped)
 ```
-1. Dashboard      — Overview stats, sync tools, FactChecker, DataVerifier, StaleDataManager
-2. System Health  — DB/Redis status, data freshness table, scraper logs, pending items, revenue
-3. Alerts & Logs  — AdminAlert feed with level filters, mark-as-read, email status indicator
-4. AI Settings    — 3-provider cards (OpusCode.pro, Official Anthropic, Gemini), model select,
-                    fallback toggle, advanced (maxTokens, temperature), test connection
-5. Security       — 2FA setup/status, backup codes count, recovery email/phone, last login
-6. Review         — AI Insight review queue (approve/reject generated insights)
-7. Feedback       — All user feedback submissions with status management
-8. Supporters     — Contributions table with Razorpay sync button + router.refresh() after sync
-9. Analytics      — District requests, feature votes, feedback/revenue trends, totals
+OVERVIEW
+ 1. Dashboard         — Action Required banner, Platform Health (DB/Redis/Scrapers),
+                        Revenue summary, AI Provider (OpenRouter live spend),
+                        Recent Activity feed with filters
+OPERATIONS
+ 2. System Health     — DB/Redis/Server status, Data Freshness per district with
+                        per-cell popover (last run, last error, Run Now button),
+                        Scraper success % + filterable log table with expandable errors
+ 3. Alerts & Logs     — AdminAlert feed, severity colours, source badges (scraper /
+                        feedback / payment / system), email status per alert,
+                        filters (level / source / date / district / unread), CSV export
+AI & DATA
+ 4. AI Settings       — 3-provider cards (OpusCode.pro, Official Anthropic, Gemini),
+                        model select, fallback toggle, test connection
+ 5. Review Queue      — AI Insight approve/reject (AIModuleInsight / ReviewQueue)
+FINANCE
+ 6. Revenue & Supporters — Contributions from Razorpay, manual sync, total/weekly totals
+ 7. Costs & Billing   — OpenRouter live credits (usage / limit / remaining / projected),
+                        per-model estimated cost breakdown (free tier reported $0),
+                        subscription table with editable renewal dates + countdown
+ANALYTICS
+ 8. Analytics         — District requests, feature votes, feedback/revenue trends
+SECURITY
+ 9. Access & 2FA      — 2FA setup, backup codes, recovery email, last login
+COMMUNITY
+10. Feedback          — User feedback feed, AI classification, inline reply
+```
+
+### URL / routing
+```
+/en/admin                     — default tab (dashboard)
+/en/admin?tab=system-health   — in-page switch (SystemHealth, AlertsAndLogs,
+/en/admin?tab=alerts            AnalyticsDashboard, CostsTab render under AdminClient)
+/en/admin?tab=analytics
+/en/admin?tab=costs
+/en/admin/ai-settings         — full-route pages (separate Next.js routes)
+/en/admin/review
+/en/admin/supporters          — Revenue & Supporters
+/en/admin/feedback
+/en/admin/security            — Access & 2FA
+```
+
+### New API Routes (April 2026)
+```
+GET  /api/admin/nav-counts        — Unread badge counts for sidebar
+GET  /api/admin/dashboard-summary — Roll-up powering the Dashboard (30s Redis cache)
+GET  /api/admin/openrouter-usage  — Real credit spend from OpenRouter /auth/key (5min cache)
+POST /api/admin/run-scraper       — Manual scraper trigger per district + job
+                                    ({ district: slug, job: "weather"|"news"|"crops"|"insights" })
+DELETE /api/admin/scraper-logs    — Purge ScraperLog entries older than N days
 ```
 
 ### AI Settings Page (`/admin/ai-settings`)
